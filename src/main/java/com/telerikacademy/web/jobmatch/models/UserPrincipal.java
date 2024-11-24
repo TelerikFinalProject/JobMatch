@@ -28,4 +28,7 @@ public class UserPrincipal {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private Role role;
+
+    @Column(name = "email")
+    private String email;
 }
