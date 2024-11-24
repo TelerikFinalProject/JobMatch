@@ -12,7 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Professional extends UserPrincipal{
+public class Professional extends UserPrincipal {
     @Column(name = "first_name")
     private String firstName;
 
