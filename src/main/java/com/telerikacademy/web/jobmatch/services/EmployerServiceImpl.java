@@ -9,6 +9,7 @@ import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
 import com.telerikacademy.web.jobmatch.repositories.contracts.EmployerRepository;
 import com.telerikacademy.web.jobmatch.services.contracts.EmployersService;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
+import com.telerikacademy.web.jobmatch.services.contracts.RoleService;
 import com.telerikacademy.web.jobmatch.services.contracts.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,14 +22,17 @@ public class EmployerServiceImpl implements EmployersService {
     private final EmployerRepository employerRepository;
     private final LocationService locationService;
     private final UserService userService;
+    private final RoleService roleService;
 
     @Autowired
     public EmployerServiceImpl(EmployerRepository employerRepository,
                                LocationService locationService,
-                               UserService userService) {
+                               UserService userService,
+                               RoleService roleService) {
         this.employerRepository = employerRepository;
         this.locationService = locationService;
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     @Override
@@ -50,7 +54,7 @@ public class EmployerServiceImpl implements EmployersService {
 
     @Override
     public void createEmployer(EmployerDtoIn employerDtoIn) {
-        Employer employerToCreate = EmployerMappers.INSTANCE.fromDtoIn(employerDtoIn, locationService);
+        Employer employerToCreate = EmployerMappers.INSTANCE.fromDtoIn(employerDtoIn, locationService, roleService);
         checkForDuplicateEmail(employerToCreate);
         checkForDuplicateUsername(employerToCreate);
         checkForDuplicateCompanyName(employerToCreate);

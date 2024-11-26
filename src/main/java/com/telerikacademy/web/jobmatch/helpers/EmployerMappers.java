@@ -2,10 +2,12 @@ package com.telerikacademy.web.jobmatch.helpers;
 
 import com.telerikacademy.web.jobmatch.models.Employer;
 import com.telerikacademy.web.jobmatch.models.Location;
+import com.telerikacademy.web.jobmatch.models.Role;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerOutDto;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerUpdateDto;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
+import com.telerikacademy.web.jobmatch.services.contracts.RoleService;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -21,8 +23,11 @@ public interface EmployerMappers {
     @Mapping(source = "email", target = "email")
     @Mapping(source = "companyName", target = "companyName")
     @Mapping(target = "location", source = "employerDtoIn", qualifiedByName = "mapLocation")
+    @Mapping(target = "role", expression = "java(returnInitialRole(roleService))")
     @Mapping(source = "description", target = "description")
-    Employer fromDtoIn(EmployerDtoIn employerDtoIn, @Context LocationService locationService);
+    Employer fromDtoIn(EmployerDtoIn employerDtoIn,
+                       @Context LocationService locationService,
+                       @Context RoleService roleService);
 
     @Mapping(target = "id", source = "employer.id") // Keep the `id` from the existing Employer
     @Mapping(target = "role", source = "employer.role") // Keep the `role` from the existing Employer
@@ -48,5 +53,9 @@ public interface EmployerMappers {
     default Location mapLocation(EmployerDtoIn employerDtoIn, @Context LocationService locationService) {
         return locationService.returnIfExistOrCreate(employerDtoIn.getLocCountryIsoCode(),
                 employerDtoIn.getLocCityId());
+    }
+
+    default Role returnInitialRole(@Context RoleService roleService){
+        return roleService.getRole("ROLE_PROFESSIONAL");
     }
 }
