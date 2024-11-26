@@ -17,7 +17,6 @@ import lombok.Setter;
 public class Location {
     @Id
     @EqualsAndHashCode.Include
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(name = "city_name")

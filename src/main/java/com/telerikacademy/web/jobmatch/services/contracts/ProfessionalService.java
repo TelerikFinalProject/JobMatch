@@ -2,19 +2,22 @@ package com.telerikacademy.web.jobmatch.services.contracts;
 
 import com.telerikacademy.web.jobmatch.models.Professional;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
+import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalDtoIn;
 
 import java.util.List;
 
 public interface ProfessionalService {
-    List<Professional> getProfessionals(UserPrincipal user);
+    List<Professional> getProfessionals();
 
-    Professional getProfessional(UserPrincipal user, int id);
+    Professional getProfessional(int id);
 
-    Professional getProfessional(UserPrincipal user, String username);
+    Professional getProfessionalByUsername(String username);
 
-    void registerProfessional(Professional professional);
+    Professional getProfessionalByEmail(String email);
 
-    void updateProfessional(UserPrincipal user, Professional professional);
+    void registerProfessional(ProfessionalDtoIn professionalDtoIn);
 
-    void deleteProfessional(UserPrincipal user, int id);
+    void updateProfessional(Professional professional);
+
+    void deleteProfessional(int id);
 }

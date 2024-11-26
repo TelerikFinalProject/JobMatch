@@ -1,10 +1,16 @@
 package com.telerikacademy.web.jobmatch.services;
 
-import com.telerikacademy.web.jobmatch.exceptions.AuthorizationException;
+import com.telerikacademy.web.jobmatch.exceptions.EntityDuplicateException;
+import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
+import com.telerikacademy.web.jobmatch.helpers.ProfessionalMappers;
 import com.telerikacademy.web.jobmatch.models.Professional;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
+import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalDtoIn;
 import com.telerikacademy.web.jobmatch.repositories.contracts.ProfessionalRepository;
+import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import com.telerikacademy.web.jobmatch.services.contracts.ProfessionalService;
+import com.telerikacademy.web.jobmatch.services.contracts.RoleService;
+import com.telerikacademy.web.jobmatch.services.contracts.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,63 +20,88 @@ import java.util.List;
 public class ProfessionalServiceImpl implements ProfessionalService {
 
     private final ProfessionalRepository professionalRepository;
+    private final UserService userService;
+    private final RoleService roleService;
+    private final LocationService locationService;
 
     @Autowired
-    public ProfessionalServiceImpl(ProfessionalRepository professionalRepository) {
+    public ProfessionalServiceImpl(ProfessionalRepository professionalRepository,
+                                   UserService userService,
+                                   RoleService roleService,
+                                   LocationService locationService) {
         this.professionalRepository = professionalRepository;
+        this.userService = userService;
+        this.roleService = roleService;
+        this.locationService = locationService;
     }
 
     @Override
-    public List<Professional> getProfessionals(UserPrincipal user) {
-        authorizationCheck(user,"access");
-
+    public List<Professional> getProfessionals() {
         return professionalRepository.getProfessionals();
     }
 
     @Override
-    public Professional getProfessional(UserPrincipal user, int id) {
-        authorizationCheck(user, id, "access");
-
+    public Professional getProfessional(int id) {
         return professionalRepository.getProfessional(id);
     }
 
     @Override
-    public Professional getProfessional(UserPrincipal user, String username) {
-        if (!user.getRole().getRole().equals("ROLE_ADMIN") || user.getUsername().equals(username)) {
-            throw new AuthorizationException("access", "recourse");
-        }
-
-        return professionalRepository.getProfessional(username);
+    public Professional getProfessionalByUsername(String username) {
+        UserPrincipal userFound = userService.findByUsername(username);
+        return professionalRepository.getProfessional(userFound.getId());
     }
 
     @Override
-    public void registerProfessional(Professional professional) {
-        professionalRepository.registerProfessional(professional);
+    public Professional getProfessionalByEmail(String email) {
+        UserPrincipal userFound = userService.findByEmail(email);
+        return professionalRepository.getProfessional(userFound.getId());
     }
 
     @Override
-    public void updateProfessional(UserPrincipal user, Professional professional) {
-        authorizationCheck(user, professional.getId(), "update");
-        
+    public void registerProfessional(ProfessionalDtoIn professionalDtoIn) {
+        Professional professionalToCreate = ProfessionalMappers.INSTANCE.fromDtoIn(professionalDtoIn);
+        checkForDuplicateEmail(professionalToCreate);
+        checkForDuplicateUsername(professionalToCreate);
+        professionalToCreate.setRole(roleService.getRole("ROLE_PROFESSIONAL"));
+
+        professionalToCreate.setLocation(locationService.returnIfExistOrCreate(professionalDtoIn.getLocCountryIsoCode(),
+                professionalDtoIn.getLocCityId()));
+
+        professionalRepository.registerProfessional(professionalToCreate);
+    }
+
+    @Override
+    public void updateProfessional(Professional professional) {
         professionalRepository.updateProfessional(professional);
     }
 
     @Override
-    public void deleteProfessional(UserPrincipal user, int id) {
-        authorizationCheck(user, id, "delete");
-
+    public void deleteProfessional(int id) {
         professionalRepository.deleteProfessional(id);
     }
 
-    private static void authorizationCheck(UserPrincipal user, int id, String action) {
-        if (!user.getRole().getRole().equals("ROLE_ADMIN") || user.getId() != id) {
-            throw new AuthorizationException(action, "recourse");
+    private void checkForDuplicateEmail(Professional professional) {
+        boolean duplicateExists = true;
+        try {
+            getProfessionalByEmail(professional.getEmail());
+
+        } catch (EntityNotFoundException e) {
+            duplicateExists = false;
+        }
+        if (duplicateExists) {
+            throw new EntityDuplicateException("Employer", "email", professional.getEmail());
         }
     }
 
-    private static void authorizationCheck(UserPrincipal user, String action) {
-        if (!user.getRole().getRole().equals("ROLE_ADMIN")) {
-            throw new AuthorizationException(action, "recourse");
+    private void checkForDuplicateUsername(Professional professional) {
+        boolean duplicateExists = true;
+        try {
+            getProfessionalByUsername(professional.getUsername());
+        } catch (EntityNotFoundException e) {
+            duplicateExists = false;
+        }
+        if (duplicateExists) {
+            throw new EntityDuplicateException("Employer", "username", professional.getUsername());
         }
     }
 }

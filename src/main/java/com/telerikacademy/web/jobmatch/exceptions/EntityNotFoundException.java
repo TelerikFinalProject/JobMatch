@@ -1,4 +1,4 @@
-package com.telerikacademy.web.jobmatch.Exceptions;
+package com.telerikacademy.web.jobmatch.exceptions;
 
 public class EntityNotFoundException extends RuntimeException {
     public EntityNotFoundException(String message) { super(message); }

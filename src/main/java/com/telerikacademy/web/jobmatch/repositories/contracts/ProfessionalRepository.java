@@ -9,8 +9,6 @@ public interface ProfessionalRepository {
 
     Professional getProfessional(int id);
 
-    Professional getProfessional(String username);
-
     void registerProfessional(Professional professional);
 
     void updateProfessional(Professional professional);

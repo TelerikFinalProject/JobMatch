@@ -1,8 +1,8 @@
-package com.telerikacademy.web.jobmatch.repositories.contracts;
+package com.telerikacademy.web.jobmatch.services.contracts;
 
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
 
-public interface UserRepository {
+public interface UserService {
     UserPrincipal findByUsername(String username);
 
     UserPrincipal findByEmail(String email);

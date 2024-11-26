@@ -1,4 +1,4 @@
-package com.telerikacademy.web.jobmatch.repositories;
+package com.telerikacademy.web.jobmatch.repositories.contracts;
 
 import com.telerikacademy.web.jobmatch.models.JobAd;
 

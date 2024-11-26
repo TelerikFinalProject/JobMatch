@@ -1,4 +1,4 @@
-package com.telerikacademy.web.jobmatch.services;
+package com.telerikacademy.web.jobmatch.services.contracts;
 
 import com.telerikacademy.web.jobmatch.models.JobApplication;
 

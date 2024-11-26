@@ -30,13 +30,27 @@ public class EmployerRepositoryImpl implements EmployerRepository {
     }
 
     @Override
-    public Employer getEmployerById(int id) {
+    public Employer getEmployer(int id) {
         try (Session session = sessionFactory.openSession()) {
             Employer employer = session.get(Employer.class, id);
             if (employer == null) {
                 throw new EntityNotFoundException("Employer", id);
             }
             return employer;
+        }
+    }
+
+    @Override
+    public Employer getEmployerByCompanyName(String companyName) {
+        try (Session session = sessionFactory.openSession()) {
+            Query<Employer> employerQuery = session.createQuery("from Employer where companyName = :companyName", Employer.class);
+            employerQuery.setParameter("companyName", companyName);
+            List<Employer> employer = employerQuery.list();
+
+            if (employer.isEmpty()) {
+                throw new EntityNotFoundException("Employer", "company name", companyName);
+            }
+            return employer.get(0);
         }
     }
 
@@ -61,7 +75,7 @@ public class EmployerRepositoryImpl implements EmployerRepository {
     @Override
     public void deleteUser(int id) {
         try (Session session = sessionFactory.openSession()) {
-            Employer employer = getEmployerById(id);
+            Employer employer = getEmployer(id);
             session.beginTransaction();
             session.remove(employer);
             session.getTransaction().commit();

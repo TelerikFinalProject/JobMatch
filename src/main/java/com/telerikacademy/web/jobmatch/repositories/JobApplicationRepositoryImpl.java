@@ -1,6 +1,7 @@
 package com.telerikacademy.web.jobmatch.repositories;
 
 import com.telerikacademy.web.jobmatch.models.JobApplication;
+import com.telerikacademy.web.jobmatch.repositories.contracts.JobApplicationRepository;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;

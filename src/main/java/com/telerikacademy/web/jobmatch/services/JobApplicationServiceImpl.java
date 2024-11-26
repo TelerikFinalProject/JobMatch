@@ -1,8 +1,9 @@
 package com.telerikacademy.web.jobmatch.services;
 
-import com.telerikacademy.web.jobmatch.Exceptions.EntityNotFoundException;
+import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
 import com.telerikacademy.web.jobmatch.models.JobApplication;
-import com.telerikacademy.web.jobmatch.repositories.JobApplicationRepository;
+import com.telerikacademy.web.jobmatch.repositories.contracts.JobApplicationRepository;
+import com.telerikacademy.web.jobmatch.services.contracts.JobApplicationService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

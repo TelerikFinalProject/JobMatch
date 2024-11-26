@@ -2,8 +2,10 @@ package com.telerikacademy.web.jobmatch.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.telerikacademy.web.jobmatch.exceptions.AuthorizationException;
 import com.telerikacademy.web.jobmatch.exceptions.EntityDuplicateException;
 import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
+import com.telerikacademy.web.jobmatch.exceptions.ExternalResourceException;
 import com.telerikacademy.web.jobmatch.models.Country;
 import com.telerikacademy.web.jobmatch.models.Location;
 import com.telerikacademy.web.jobmatch.repositories.contracts.LocationRepository;
@@ -17,13 +19,15 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class LocationServiceImpl implements LocationService {
 
     public static final String EXTERNAL_API_KEY_VALUE = "SVVPWG5udjJUbktPZ1lOUExFeHJoZDlpUzJ6dHM0ZE9HZmo3Mk44Sw==";
     public static final String EXTERNAL_API_KEY_NAME = "X-CSCAPI-KEY";
-    public static final String EXTERNAL_API_URL = "https://api.countrystatecity.in/v1/countries";
+    public static final String EXTERNAL_API_URL = "https://api.countrystatecity.in/v1/countries/";
 
     private final LocationRepository locationRepository;
 
@@ -33,53 +37,90 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public List<Country> getAllCountries() throws IOException, InterruptedException {
+    public List<Country> getAllCountries() {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(EXTERNAL_API_URL))
                 .header(EXTERNAL_API_KEY_NAME, EXTERNAL_API_KEY_VALUE)
                 .build();
 
-        HttpResponse<String> response = client.send(request,
-                HttpResponse.BodyHandlers.ofString());
+        try {
+            HttpResponse<String> response = client.send(request,
+                    HttpResponse.BodyHandlers.ofString());
 
-        String responseBody = response.body();
+            checkAccessToExternalApi(response);
+            checkIfResourceExistsOnExternalApi(response);
 
-        ObjectMapper objectMapper = new ObjectMapper();
+            String responseBody = response.body();
 
-        return objectMapper.readValue(responseBody, new TypeReference<>() {});
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            return objectMapper.readValue(responseBody, new TypeReference<>() {
+            });
+        } catch (IOException | InterruptedException e) {
+            throw new ExternalResourceException(e.getMessage());
+        }
     }
 
     @Override
-    public List<Location> getLocationsByCountry(String isoCode) throws IOException, InterruptedException {
+    public Map<Integer, Location> getLocationsByCountry(String isoCode) {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(EXTERNAL_API_URL + isoCode +"/cities"))
+                .uri(URI.create(EXTERNAL_API_URL + isoCode + "/cities"))
                 .header(EXTERNAL_API_KEY_NAME, EXTERNAL_API_KEY_VALUE)
                 .build();
 
-        HttpResponse<String> response = client.send(request,
-                HttpResponse.BodyHandlers.ofString());
+        try {
+            HttpResponse<String> response = client.send(request,
+                    HttpResponse.BodyHandlers.ofString());
 
-        ObjectMapper objectMapper = new ObjectMapper();
+            checkAccessToExternalApi(response);
+            checkIfResourceExistsOnExternalApi(response);
 
-        return objectMapper.readValue(response.body(), new TypeReference<>() {});
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            List<Location> cities = objectMapper.readValue(response.body(), new TypeReference<>() {
+            });
+
+            return cities.stream().collect(Collectors.toMap(Location::getId, city -> city));
+        } catch (IOException | InterruptedException e) {
+            throw new ExternalResourceException(e.getMessage());
+        }
     }
 
     @Override
-    public Country getCountryByIsoCode(String isoCode) throws IOException, InterruptedException {
+    public Country getCountryByIsoCode(String isoCode) {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(EXTERNAL_API_URL + isoCode))
                 .header(EXTERNAL_API_KEY_NAME, EXTERNAL_API_KEY_VALUE)
                 .build();
 
-        HttpResponse<String> response = client.send(request,
-                HttpResponse.BodyHandlers.ofString());
+        try {
+            HttpResponse<String> response = client.send(request,
+                    HttpResponse.BodyHandlers.ofString());
 
-        ObjectMapper objectMapper = new ObjectMapper();
+            checkAccessToExternalApi(response);
+            checkIfResourceExistsOnExternalApi(response);
 
-        return objectMapper.readValue(response.body(), Country.class);
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            return objectMapper.readValue(response.body(), Country.class);
+        } catch (IOException | InterruptedException e) {
+            throw new ExternalResourceException(e.getMessage());
+        }
+    }
+
+    @Override
+    public Location returnIfExistOrCreate(String isoCode, int cityId) {
+        Location location;
+        try {
+            location = getLocationById(cityId);
+        } catch (EntityNotFoundException e) {
+            location = getLocationsByCountry(isoCode.toUpperCase()).get(cityId);
+            addLocation(location, isoCode);
+        }
+        return location;
     }
 
     @Override
@@ -88,7 +129,7 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public void addLocation(Location location, Country country) {
+    public void addLocation(Location location, String countryIsoCode) {
         boolean exist = true;
 
         try {
@@ -101,7 +142,19 @@ public class LocationServiceImpl implements LocationService {
             throw new EntityDuplicateException("Location", "id", String.valueOf(location.getId()));
         }
 
-        location.setIsoCode(location.getIsoCode());
+        location.setIsoCode(countryIsoCode);
         locationRepository.addLocation(location);
+    }
+
+    private void checkAccessToExternalApi(HttpResponse<String> response){
+        if (response.statusCode() == 401){
+            throw new AuthorizationException("access", "resource");
+        }
+    }
+
+    private void checkIfResourceExistsOnExternalApi(HttpResponse<String> response){
+        if (response.statusCode() == 404){
+            throw new EntityNotFoundException("Resource cannot be found on external API");
+        }
     }
 }

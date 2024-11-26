@@ -1,19 +1,20 @@
 package com.telerikacademy.web.jobmatch.services.contracts;
 
 import com.telerikacademy.web.jobmatch.models.Employer;
+import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
 
 import java.util.List;
 
 public interface EmployersService {
     List<Employer> getEmployers();
 
-    Employer getEmployerById(int id);
+    Employer getEmployer(int id);
 
-    void createEmployer(Employer user);
+    Employer getEmployer(String username);
 
-    void updateEmployer(Employer updatedUser, Employer user);
+    void createEmployer(EmployerDtoIn employerDtoIn);
+
+    void updateEmployer(Employer updatedUser);
 
     void deleteEmployer(int id);
-
-    Employer getUserByUsername(String username);
 }

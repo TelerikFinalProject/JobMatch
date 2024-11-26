@@ -7,7 +7,9 @@ import java.util.List;
 public interface EmployerRepository {
     List<Employer> getEmployers();
 
-    Employer getEmployerById(int id);
+    Employer getEmployer(int id);
+
+    Employer getEmployerByCompanyName(String companyName);
 
     void createEmployer(Employer user);
 

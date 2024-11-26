@@ -1,8 +1,8 @@
 package com.telerikacademy.web.jobmatch.controllers.rest;
 
-import com.telerikacademy.web.jobmatch.Exceptions.EntityNotFoundException;
+import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
 import com.telerikacademy.web.jobmatch.models.JobAd;
-import com.telerikacademy.web.jobmatch.services.JobAdService;
+import com.telerikacademy.web.jobmatch.services.contracts.JobAdService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
