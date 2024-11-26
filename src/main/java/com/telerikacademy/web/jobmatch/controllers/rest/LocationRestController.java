@@ -1,5 +1,6 @@
 package com.telerikacademy.web.jobmatch.controllers.rest;
 
+import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
 import com.telerikacademy.web.jobmatch.exceptions.ExternalResourceException;
 import com.telerikacademy.web.jobmatch.models.Country;
 import com.telerikacademy.web.jobmatch.models.Location;
@@ -43,6 +44,8 @@ public class LocationRestController {
             return ResponseEntity.ok(cities);
         } catch (ExternalResourceException e) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, e.getMessage());
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
 
@@ -53,6 +56,8 @@ public class LocationRestController {
             return ResponseEntity.ok(country);
         } catch (ExternalResourceException e) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, e.getMessage());
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
 }

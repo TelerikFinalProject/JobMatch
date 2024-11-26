@@ -56,6 +56,6 @@ public interface EmployerMappers {
     }
 
     default Role returnInitialRole(@Context RoleService roleService){
-        return roleService.getRole("ROLE_PROFESSIONAL");
+        return roleService.getRole("ROLE_EMPLOYER");
     }
 }

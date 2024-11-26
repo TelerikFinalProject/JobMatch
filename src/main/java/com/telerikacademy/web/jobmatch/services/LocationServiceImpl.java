@@ -82,6 +82,10 @@ public class LocationServiceImpl implements LocationService {
             List<Location> cities = objectMapper.readValue(response.body(), new TypeReference<>() {
             });
 
+            if (cities.isEmpty()){
+                throw new EntityNotFoundException("Country", "Iso", isoCode);
+            }
+
             return cities.stream()
                     .peek(city -> city.setIsoCode(isoCode))
                     .collect(Collectors.toMap(Location::getId, city -> city));
@@ -122,6 +126,7 @@ public class LocationServiceImpl implements LocationService {
             if (!location.getIsoCode().equals(isoCode)) {
                 validLocation = false;
             }
+            return location;
         } catch (EntityNotFoundException e) {
             location = getLocationsByCountry(isoCode.toUpperCase()).get(cityId);
             if (location == null){
