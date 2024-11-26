@@ -15,4 +15,5 @@ public class ProfessionalOutDto {
     private String summary;
     private String role;
     private String location;
+    private String status;
 }

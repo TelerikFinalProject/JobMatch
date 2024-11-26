@@ -82,7 +82,9 @@ public class LocationServiceImpl implements LocationService {
             List<Location> cities = objectMapper.readValue(response.body(), new TypeReference<>() {
             });
 
-            return cities.stream().collect(Collectors.toMap(Location::getId, city -> city));
+            return cities.stream()
+                    .peek(city -> city.setIsoCode(isoCode))
+                    .collect(Collectors.toMap(Location::getId, city -> city));
         } catch (IOException | InterruptedException e) {
             throw new ExternalResourceException(e.getMessage());
         }
@@ -114,12 +116,23 @@ public class LocationServiceImpl implements LocationService {
     @Override
     public Location returnIfExistOrCreate(String isoCode, int cityId) {
         Location location;
+        boolean validLocation = true;
         try {
             location = getLocationById(cityId);
+            if (!location.getIsoCode().equals(isoCode)) {
+                validLocation = false;
+            }
         } catch (EntityNotFoundException e) {
             location = getLocationsByCountry(isoCode.toUpperCase()).get(cityId);
-            addLocation(location, isoCode);
+            if (location == null){
+                validLocation = false;
+            }
         }
+        if (!validLocation) {
+            Country country = getCountryByIsoCode(isoCode.toUpperCase());
+            throw new EntityNotFoundException(String.format("City with ID:%d is not a city in %s.", cityId, country.getName()));
+        }
+        addLocation(location, isoCode);
         return location;
     }
 

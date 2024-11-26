@@ -9,6 +9,7 @@ import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerOutDto;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerUpdateDto;
 import com.telerikacademy.web.jobmatch.services.contracts.EmployersService;
+import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +23,12 @@ import java.util.List;
 public class EmployerRestController {
 
     private final EmployersService employersService;
+    private final LocationService locationService;
 
     @Autowired
-    public EmployerRestController(EmployersService employersService) {
+    public EmployerRestController(EmployersService employersService, LocationService locationService) {
         this.employersService = employersService;
+        this.locationService = locationService;
     }
 
     @GetMapping
@@ -80,11 +83,13 @@ public class EmployerRestController {
         }
 
         try {
-            Employer updatedEmployer = EmployerMappers.INSTANCE.fromDtoIn(employerToUpdate, employerDto);
+            Employer updatedEmployer = EmployerMappers.INSTANCE.fromDtoIn(employerToUpdate, employerDto, locationService);
             employersService.updateEmployer(updatedEmployer);
             return ResponseEntity.ok(EmployerMappers.INSTANCE.toDtoOut(updatedEmployer));
         } catch (EntityDuplicateException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
 

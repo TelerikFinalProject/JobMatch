@@ -7,10 +7,7 @@ import com.telerikacademy.web.jobmatch.models.Professional;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
 import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalDtoIn;
 import com.telerikacademy.web.jobmatch.repositories.contracts.ProfessionalRepository;
-import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
-import com.telerikacademy.web.jobmatch.services.contracts.ProfessionalService;
-import com.telerikacademy.web.jobmatch.services.contracts.RoleService;
-import com.telerikacademy.web.jobmatch.services.contracts.UserService;
+import com.telerikacademy.web.jobmatch.services.contracts.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,16 +20,19 @@ public class ProfessionalServiceImpl implements ProfessionalService {
     private final UserService userService;
     private final RoleService roleService;
     private final LocationService locationService;
+    private final StatusService statusService;
 
     @Autowired
     public ProfessionalServiceImpl(ProfessionalRepository professionalRepository,
                                    UserService userService,
                                    RoleService roleService,
-                                   LocationService locationService) {
+                                   LocationService locationService,
+                                   StatusService statusService) {
         this.professionalRepository = professionalRepository;
         this.userService = userService;
         this.roleService = roleService;
         this.locationService = locationService;
+        this.statusService = statusService;
     }
 
     @Override
@@ -59,19 +59,19 @@ public class ProfessionalServiceImpl implements ProfessionalService {
 
     @Override
     public void registerProfessional(ProfessionalDtoIn professionalDtoIn) {
-        Professional professionalToCreate = ProfessionalMappers.INSTANCE.fromDtoIn(professionalDtoIn);
+        Professional professionalToCreate = ProfessionalMappers.INSTANCE
+                .fromDtoIn(professionalDtoIn, locationService, roleService, statusService);
         checkForDuplicateEmail(professionalToCreate);
         checkForDuplicateUsername(professionalToCreate);
-        professionalToCreate.setRole(roleService.getRole("ROLE_PROFESSIONAL"));
-
-        professionalToCreate.setLocation(locationService.returnIfExistOrCreate(professionalDtoIn.getLocCountryIsoCode(),
-                professionalDtoIn.getLocCityId()));
 
         professionalRepository.registerProfessional(professionalToCreate);
     }
 
     @Override
     public void updateProfessional(Professional professional) {
+        checkForDuplicateEmail(professional.getId(), professional);
+        checkForDuplicateUsername(professional.getId(), professional);
+
         professionalRepository.updateProfessional(professional);
     }
 
@@ -102,6 +102,26 @@ public class ProfessionalServiceImpl implements ProfessionalService {
         }
         if (duplicateExists) {
             throw new EntityDuplicateException("Employer", "username", professional.getUsername());
+        }
+    }
+
+    private void checkForDuplicateEmail(int id, Professional professional) {
+        try {
+            checkForDuplicateEmail(professional);
+        } catch (EntityDuplicateException e) {
+            if (professional.getId() != id) {
+                throw new EntityDuplicateException(e.getMessage());
+            }
+        }
+    }
+
+    private void checkForDuplicateUsername(int id, Professional professional) {
+        try {
+            checkForDuplicateUsername(professional);
+        } catch (EntityDuplicateException e) {
+            if (professional.getId() != id) {
+                throw new EntityDuplicateException(e.getMessage());
+            }
         }
     }
 }

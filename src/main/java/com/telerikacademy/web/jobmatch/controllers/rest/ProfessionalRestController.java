@@ -8,6 +8,7 @@ import com.telerikacademy.web.jobmatch.models.Professional;
 import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalOutDto;
 import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalUpdateDto;
+import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import com.telerikacademy.web.jobmatch.services.contracts.ProfessionalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,10 +22,13 @@ import java.util.List;
 @RequestMapping("/api/professionals")
 public class ProfessionalRestController {
     private final ProfessionalService professionalService;
+    private final LocationService locationService;
 
     @Autowired
-    public ProfessionalRestController(ProfessionalService professionalService) {
+    public ProfessionalRestController(ProfessionalService professionalService,
+                                      LocationService locationService) {
         this.professionalService = professionalService;
+        this.locationService = locationService;
     }
 
     @GetMapping
@@ -53,7 +57,7 @@ public class ProfessionalRestController {
 
         try {
             professionalService.registerProfessional(professionalDtoIn);
-            return ResponseEntity.ok("Employer created");
+            return ResponseEntity.ok("Employee created");
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (EntityDuplicateException e) {
@@ -82,11 +86,13 @@ public class ProfessionalRestController {
 
         try {
             Professional updatedProfessional = ProfessionalMappers.INSTANCE
-                    .fromDtoIn(professionalToUpdate, professionalDto);
+                    .fromDtoIn(professionalToUpdate, professionalDto, locationService);
             professionalService.updateProfessional(updatedProfessional);
             return ResponseEntity.ok(ProfessionalMappers.INSTANCE.toDtoOut(updatedProfessional));
         } catch (EntityDuplicateException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        } catch (EntityNotFoundException e){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
 

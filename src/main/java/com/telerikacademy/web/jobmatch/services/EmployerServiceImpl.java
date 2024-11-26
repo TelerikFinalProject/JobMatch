@@ -9,7 +9,6 @@ import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
 import com.telerikacademy.web.jobmatch.repositories.contracts.EmployerRepository;
 import com.telerikacademy.web.jobmatch.services.contracts.EmployersService;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
-import com.telerikacademy.web.jobmatch.services.contracts.RoleService;
 import com.telerikacademy.web.jobmatch.services.contracts.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,17 +19,14 @@ import java.util.List;
 public class EmployerServiceImpl implements EmployersService {
 
     private final EmployerRepository employerRepository;
-    private final RoleService roleService;
     private final LocationService locationService;
     private final UserService userService;
 
     @Autowired
     public EmployerServiceImpl(EmployerRepository employerRepository,
-                               RoleService roleService,
                                LocationService locationService,
                                UserService userService) {
         this.employerRepository = employerRepository;
-        this.roleService = roleService;
         this.locationService = locationService;
         this.userService = userService;
     }
@@ -54,14 +50,10 @@ public class EmployerServiceImpl implements EmployersService {
 
     @Override
     public void createEmployer(EmployerDtoIn employerDtoIn) {
-        Employer employerToCreate = EmployerMappers.INSTANCE.fromDtoIn(employerDtoIn);
+        Employer employerToCreate = EmployerMappers.INSTANCE.fromDtoIn(employerDtoIn, locationService);
         checkForDuplicateEmail(employerToCreate);
         checkForDuplicateUsername(employerToCreate);
         checkForDuplicateCompanyName(employerToCreate);
-        employerToCreate.setRole(roleService.getRole("ROLE_EMPLOYER"));
-
-        employerToCreate.setLocation(locationService.returnIfExistOrCreate(employerDtoIn.getLocCountryIsoCode(),
-                employerDtoIn.getLocCityId()));
 
         employerRepository.createEmployer(employerToCreate);
     }
@@ -71,6 +63,7 @@ public class EmployerServiceImpl implements EmployersService {
         checkForDuplicateUsername(updatedUser.getId(), updatedUser);
         checkForDuplicateCompanyName(updatedUser.getId(), updatedUser);
         checkForDuplicateEmail(updatedUser.getId(), updatedUser);
+
 
         employerRepository.updateEmployer(updatedUser);
     }
@@ -118,9 +111,9 @@ public class EmployerServiceImpl implements EmployersService {
     }
 
     private void checkForDuplicateEmail(int id, Employer employer) {
-        try{
+        try {
             checkForDuplicateEmail(employer);
-        } catch (EntityDuplicateException e){
+        } catch (EntityDuplicateException e) {
             if (employer.getId() != id) {
                 throw new EntityDuplicateException(e.getMessage());
             }
@@ -130,7 +123,7 @@ public class EmployerServiceImpl implements EmployersService {
     private void checkForDuplicateUsername(int id, Employer employer) {
         try {
             checkForDuplicateUsername(employer);
-        } catch (EntityDuplicateException e){
+        } catch (EntityDuplicateException e) {
             if (employer.getId() != id) {
                 throw new EntityDuplicateException(e.getMessage());
             }
@@ -140,7 +133,7 @@ public class EmployerServiceImpl implements EmployersService {
     private void checkForDuplicateCompanyName(int id, Employer employer) {
         try {
             checkForDuplicateCompanyName(employer);
-        } catch (EntityDuplicateException e){
+        } catch (EntityDuplicateException e) {
             if (employer.getId() != id) {
                 throw new EntityDuplicateException(e.getMessage());
             }

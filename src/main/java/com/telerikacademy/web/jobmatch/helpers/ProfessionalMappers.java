@@ -1,11 +1,16 @@
 package com.telerikacademy.web.jobmatch.helpers;
 
+import com.telerikacademy.web.jobmatch.models.Location;
 import com.telerikacademy.web.jobmatch.models.Professional;
+import com.telerikacademy.web.jobmatch.models.Role;
+import com.telerikacademy.web.jobmatch.models.Status;
 import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalOutDto;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
+import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalUpdateDto;
+import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
+import com.telerikacademy.web.jobmatch.services.contracts.RoleService;
+import com.telerikacademy.web.jobmatch.services.contracts.StatusService;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -20,11 +25,17 @@ public interface ProfessionalMappers {
     @Mapping(source = "firstName", target = "firstName")
     @Mapping(source = "lastName", target = "lastName")
     @Mapping(source = "summary", target = "summary")
-    Professional fromDtoIn(ProfessionalDtoIn professionalDtoIn);
+    @Mapping(target = "location", source = "professionalDtoIn", qualifiedByName = "mapLocation")
+    @Mapping(target = "role", expression = "java(returnInitialRole(roleService))")
+    @Mapping(target = "status", expression = "java(returnInitialStatus(statusService))")
+    Professional fromDtoIn(ProfessionalDtoIn professionalDtoIn,
+                           @Context LocationService locationService,
+                           @Context RoleService roleService,
+                           @Context StatusService statusService);
 
 
     @Mapping(target = "id", source = "professional.id")
-    @Mapping(target = "location", source = "professional.location")
+    @Mapping(target = "location", source = "professionalDtoIn", qualifiedByName = "mapLocation")
     @Mapping(target = "role", source = "professional.role")
     @Mapping(target = "username", source = "professionalDtoIn.username")
     @Mapping(target = "password", source = "professionalDtoIn.password")
@@ -32,7 +43,10 @@ public interface ProfessionalMappers {
     @Mapping(target = "firstName", source = "professionalDtoIn.firstName")
     @Mapping(target = "lastName", source = "professionalDtoIn.lastName")
     @Mapping(target = "summary", source = "professionalDtoIn.summary")
-    Professional fromDtoIn(Professional professional, ProfessionalDtoIn professionalDtoIn);
+    @Mapping(target = "status", source = "professional.status")
+    Professional fromDtoIn(Professional professional,
+                           ProfessionalUpdateDto professionalDtoIn,
+                           @Context LocationService locationService);
 
     @Mapping(source = "username", target = "username")
     @Mapping(source = "email", target = "email")
@@ -40,8 +54,23 @@ public interface ProfessionalMappers {
     @Mapping(source = "lastName", target = "lastName")
     @Mapping(source = "summary", target = "summary")
     @Mapping(source = "role.role", target = "role") // Nested mapping for role
-    @Mapping(source = "location.name", target = "location") // Nested mapping for location
+    @Mapping(source = "location.name", target = "location")// Nested mapping for location
+    @Mapping(source = "status.status", target = "status")
     ProfessionalOutDto toDtoOut(Professional professional);
 
     List<ProfessionalOutDto> toDtoOutList(List<Professional> professionals);
+
+    @Named("mapLocation")
+    default Location mapLocation(ProfessionalDtoIn professionalDtoIn, @Context LocationService locationService) {
+        return locationService.returnIfExistOrCreate(professionalDtoIn.getLocCountryIsoCode(),
+                professionalDtoIn.getLocCityId());
+    }
+
+    default Role returnInitialRole(@Context RoleService roleService){
+        return roleService.getRole("ROLE_PROFESSIONAL");
+    }
+
+    default Status returnInitialStatus(@Context StatusService statusService){
+        return statusService.getStatus("Active");
+    }
 }
