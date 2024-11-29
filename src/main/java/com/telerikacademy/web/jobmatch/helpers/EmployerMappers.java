@@ -8,7 +8,6 @@ import com.telerikacademy.web.jobmatch.models.dtos.EmployerUpdateDto;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
