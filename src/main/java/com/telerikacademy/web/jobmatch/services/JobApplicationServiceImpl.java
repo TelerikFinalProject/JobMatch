@@ -4,18 +4,16 @@ import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
 import com.telerikacademy.web.jobmatch.models.JobApplication;
 import com.telerikacademy.web.jobmatch.repositories.contracts.JobApplicationRepository;
 import com.telerikacademy.web.jobmatch.services.contracts.JobApplicationService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class JobApplicationServiceImpl implements JobApplicationService {
 
     private final JobApplicationRepository jobApplicationRepository;
-
-    public JobApplicationServiceImpl(JobApplicationRepository jobApplicationRepository) {
-        this.jobApplicationRepository = jobApplicationRepository;
-    }
 
     @Override
     public List<JobApplication> getJobApplications() {
@@ -24,25 +22,22 @@ public class JobApplicationServiceImpl implements JobApplicationService {
 
     @Override
     public JobApplication getJobApplication(int id) {
-        JobApplication jobApplication = jobApplicationRepository.findById(id);
 
-        if (jobApplication == null) {
-            throw new EntityNotFoundException("Job application", id);
-        }
-
-        return jobApplication;
+        return jobApplicationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Job application", id));
     }
 
     @Override
-    public void addJobApplication(JobApplication jobAd) {
-        jobApplicationRepository.save(jobAd);
+    public void addJobApplication(JobApplication jobApplication) {
+        jobApplicationRepository.save(jobApplication);
     }
 
     @Override
-    public void updateJobApplication(JobApplication jobAd) {
-        jobApplicationRepository.findById(jobAd.getId());
+    public void updateJobApplication(JobApplication jobApplication) {
+        JobApplication existingJobApplication = jobApplicationRepository.findById(jobApplication.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Job application", jobApplication.getId()));
 
-        jobApplicationRepository.update(jobAd);
+        jobApplicationRepository.save(jobApplication);
     }
 
     @Override
