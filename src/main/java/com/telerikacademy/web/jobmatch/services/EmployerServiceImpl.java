@@ -9,9 +9,9 @@ import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
 import com.telerikacademy.web.jobmatch.repositories.contracts.EmployerRepository;
 import com.telerikacademy.web.jobmatch.services.contracts.EmployersService;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
-import com.telerikacademy.web.jobmatch.services.contracts.RoleService;
 import com.telerikacademy.web.jobmatch.services.contracts.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,17 +22,17 @@ public class EmployerServiceImpl implements EmployersService {
     private final EmployerRepository employerRepository;
     private final LocationService locationService;
     private final UserService userService;
-    private final RoleService roleService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public EmployerServiceImpl(EmployerRepository employerRepository,
                                LocationService locationService,
                                UserService userService,
-                               RoleService roleService) {
+                               PasswordEncoder passwordEncoder) {
         this.employerRepository = employerRepository;
         this.locationService = locationService;
         this.userService = userService;
-        this.roleService = roleService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -54,7 +54,9 @@ public class EmployerServiceImpl implements EmployersService {
 
     @Override
     public void createEmployer(EmployerDtoIn employerDtoIn) {
-        Employer employerToCreate = EmployerMappers.INSTANCE.fromDtoIn(employerDtoIn, locationService, roleService);
+        Employer employerToCreate = EmployerMappers.INSTANCE.fromDtoIn(employerDtoIn, locationService);
+        employerToCreate.setPassword(passwordEncoder.encode(employerToCreate.getPassword()));
+
         checkForDuplicateEmail(employerToCreate);
         checkForDuplicateUsername(employerToCreate);
         checkForDuplicateCompanyName(employerToCreate);

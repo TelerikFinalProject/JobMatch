@@ -18,19 +18,16 @@ public class ProfessionalServiceImpl implements ProfessionalService {
 
     private final ProfessionalRepository professionalRepository;
     private final UserService userService;
-    private final RoleService roleService;
     private final LocationService locationService;
     private final StatusService statusService;
 
     @Autowired
     public ProfessionalServiceImpl(ProfessionalRepository professionalRepository,
                                    UserService userService,
-                                   RoleService roleService,
                                    LocationService locationService,
                                    StatusService statusService) {
         this.professionalRepository = professionalRepository;
         this.userService = userService;
-        this.roleService = roleService;
         this.locationService = locationService;
         this.statusService = statusService;
     }
@@ -60,7 +57,7 @@ public class ProfessionalServiceImpl implements ProfessionalService {
     @Override
     public void registerProfessional(ProfessionalDtoIn professionalDtoIn) {
         Professional professionalToCreate = ProfessionalMappers.INSTANCE
-                .fromDtoIn(professionalDtoIn, locationService, roleService, statusService);
+                .fromDtoIn(professionalDtoIn, locationService, statusService);
         checkForDuplicateEmail(professionalToCreate);
         checkForDuplicateUsername(professionalToCreate);
 

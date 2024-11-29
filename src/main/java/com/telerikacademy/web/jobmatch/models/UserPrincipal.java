@@ -32,9 +32,8 @@ public class UserPrincipal {
     @Column(name = "password")
     private String password;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id")
-    private Role role;
+    @Column(name = "roles")
+    private String roles;
 
     @Column(name = "email")
     private String email;
@@ -43,13 +42,6 @@ public class UserPrincipal {
     @JoinColumn(name = "location_id")
     private Location location;
 
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        return Collections.singletonList(new SimpleGrantedAuthority(role.getRole()));
-//    }
-//
-//    @Override
-//    public boolean isEnabled() {
-//        return true;
-//    }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<RefreshTokenEntity> refreshTokens;
 }
