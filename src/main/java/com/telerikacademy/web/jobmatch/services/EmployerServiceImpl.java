@@ -7,6 +7,7 @@ import com.telerikacademy.web.jobmatch.models.Employer;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
 import com.telerikacademy.web.jobmatch.repositories.contracts.EmployerRepository;
+import com.telerikacademy.web.jobmatch.repositories.contracts.EmployerRepositoryTest;
 import com.telerikacademy.web.jobmatch.services.contracts.EmployersService;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import com.telerikacademy.web.jobmatch.services.contracts.UserService;
@@ -19,13 +20,13 @@ import java.util.List;
 @Service
 public class EmployerServiceImpl implements EmployersService {
 
-    private final EmployerRepository employerRepository;
+    private final EmployerRepositoryTest employerRepository;
     private final LocationService locationService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public EmployerServiceImpl(EmployerRepository employerRepository,
+    public EmployerServiceImpl(EmployerRepositoryTest employerRepository,
                                LocationService locationService,
                                UserService userService,
                                PasswordEncoder passwordEncoder) {
@@ -37,18 +38,18 @@ public class EmployerServiceImpl implements EmployersService {
 
     @Override
     public List<Employer> getEmployers() {
-        return employerRepository.getEmployers();
+        return employerRepository.findAll();
     }
 
     @Override
     public Employer getEmployer(int id) {
-        return employerRepository.getEmployer(id);
+        return employerRepository.findById(id).orElseThrow(() -> EntityNotFoundException);
     }
 
     @Override
     public Employer getEmployer(String username) {
         UserPrincipal user = userService.findByUsername(username);
-        return employerRepository.getEmployer(user.getId());
+        return employerRepository.getReferenceById(user.getId());
     }
 
 
@@ -61,7 +62,7 @@ public class EmployerServiceImpl implements EmployersService {
         checkForDuplicateUsername(employerToCreate);
         checkForDuplicateCompanyName(employerToCreate);
 
-        employerRepository.createEmployer(employerToCreate);
+        employerRepository.save(employerToCreate);
     }
 
     @Override
@@ -71,12 +72,13 @@ public class EmployerServiceImpl implements EmployersService {
         checkForDuplicateEmail(updatedUser.getId(), updatedUser);
 
 
-        employerRepository.updateEmployer(updatedUser);
+        employerRepository.save(updatedUser);
     }
 
     @Override
     public void deleteEmployer(int id) {
-        employerRepository.deleteUser(id);
+        Employer employer = getEmployer(id);
+        employerRepository.delete(employer);
     }
 
     private void checkForDuplicateEmail(Employer employer) {
@@ -107,7 +109,7 @@ public class EmployerServiceImpl implements EmployersService {
     private void checkForDuplicateCompanyName(Employer employer) {
         boolean duplicateExists = true;
         try {
-            employerRepository.getEmployerByCompanyName(employer.getCompanyName());
+            employerRepository.findByCompanyName(employer.getCompanyName()).orElseThrow(() -> EntityNotFoundException);
         } catch (EntityNotFoundException e) {
             duplicateExists = false;
         }
