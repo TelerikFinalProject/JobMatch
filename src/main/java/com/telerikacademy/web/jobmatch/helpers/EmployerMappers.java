@@ -10,6 +10,7 @@ import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import com.telerikacademy.web.jobmatch.services.contracts.RoleService;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
