@@ -4,18 +4,16 @@ import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
 import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.repositories.contracts.JobAdRepository;
 import com.telerikacademy.web.jobmatch.services.contracts.JobAdService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class JobAdServiceImpl implements JobAdService {
 
     private final JobAdRepository jobAdRepository;
-
-    public JobAdServiceImpl(JobAdRepository jobAdRepository) {
-        this.jobAdRepository = jobAdRepository;
-    }
 
     @Override
     public List<JobAd> getJobAds() {
@@ -24,13 +22,9 @@ public class JobAdServiceImpl implements JobAdService {
 
     @Override
     public JobAd getJobAd(int id) {
-        JobAd jobAd =  jobAdRepository.findById(id);
 
-        if (jobAd == null) {
-            throw new EntityNotFoundException("Job ad", id);
-        }
-
-        return jobAd;
+        return jobAdRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Job ad", id));
     }
 
     @Override
@@ -40,12 +34,13 @@ public class JobAdServiceImpl implements JobAdService {
 
     @Override
     public void updateJobAd(JobAd jobAd) {
-        jobAdRepository.update(jobAd);
+        JobAd existingAd = getJobAd(jobAd.getId());
+
+        jobAdRepository.save(jobAd);
     }
 
     @Override
     public void removeJobAd(int id) {
-        JobAd jobAd = jobAdRepository.findById(id);
-        jobAdRepository.delete(jobAd);
+        jobAdRepository.deleteById(id);
     }
 }
