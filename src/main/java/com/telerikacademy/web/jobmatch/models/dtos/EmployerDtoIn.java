@@ -17,11 +17,4 @@ public class EmployerDtoIn extends UserDtoIn{
     @NotNull(message = "Description" + NULL_FIELD_ERROR)
     @Size(min = 10, max = 200)
     private String description;
-
-    @NotNull(message = "Country Iso code" + NULL_FIELD_ERROR)
-    @Size(min = 2, max = 3)
-    private String locCountryIsoCode;
-
-    @NotNull(message = "City ID" + NULL_FIELD_ERROR)
-    private int locCityId;
 }

@@ -8,10 +8,6 @@ import java.util.List;
 public interface AdminService {
     List<UserPrincipal> getAdmins();
 
-    UserPrincipal getAdmin(int id);
-
-    UserPrincipal getAdmin(String username);
-
     void createAdmin(UserDtoIn userDtoIn);
 
     void updateAdmin(UserPrincipal updatedUser);

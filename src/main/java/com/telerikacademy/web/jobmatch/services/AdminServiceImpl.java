@@ -32,19 +32,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<UserPrincipal> getAdmins() {
         //TODO only admins can access this resource
-        return userRepository.findAll();
-    }
-
-    @Override
-    public UserPrincipal getAdmin(int id) {
-        //TODO only admins can access this resource
-        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Admin", id));
-    }
-
-    @Override
-    public UserPrincipal getAdmin(String username) {
-        //TODO only admins can access this resource
-        return userRepository.getAdmin(username);
+        return userRepository.findAllByRole("ROLE_ADMIN");
     }
 
     @Override
@@ -56,12 +44,15 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void updateAdmin(UserPrincipal updatedUser) {
-        userRepository.updateAdmin(updatedUser);
+        userRepository.save(updatedUser);
     }
 
     @Override
     public void deleteAdmin(int id) {
-        UserPrincipal user = userRepository.getAdmin(id);
+        UserPrincipal user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Admin", id));
+        if (!user.getRole().getRole().equals("ROLE_ADMIN")) {
+            throw new EntityNotFoundException("Admin", id);
+        }
         userRepository.delete(user);
     }
 }

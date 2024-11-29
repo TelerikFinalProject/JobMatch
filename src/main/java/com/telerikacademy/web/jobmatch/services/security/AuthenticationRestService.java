@@ -11,10 +11,8 @@ import com.telerikacademy.web.jobmatch.models.dtos.AuthResponseDto;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalDtoIn;
 import com.telerikacademy.web.jobmatch.models.enums.TokenType;
-import com.telerikacademy.web.jobmatch.repositories.contracts.ProfessionalRepository;
 import com.telerikacademy.web.jobmatch.repositories.contracts.RefreshTokenRepository;
-import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
-import com.telerikacademy.web.jobmatch.services.contracts.StatusService;
+import com.telerikacademy.web.jobmatch.services.contracts.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -37,18 +35,19 @@ import java.util.List;
 public class AuthenticationRestService {
 
     public static final String USER_WITH_THE_SAME_USERNAME_ALREADY_EXISTS = "User with the same username already exists";
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final JwtTokenGenerator jwtTokenGenerator;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final EmployerRepository employerRepository;
-    private final ProfessionalRepository professionalRepository;
+    private final EmployersService employersService;
+    private final ProfessionalService professionalService;
     private final LocationService locationService;
     private final UserInfoMapper userInfoMapper;
     private final StatusService statusService;
+    private final RoleService roleService;
 
     public AuthResponseDto getJwtTokensAfterAuthentication(Authentication authentication, HttpServletResponse response) {
         try {
-            UserPrincipal userPrinciple = userRepository.findByUsername(authentication.getName());
+            UserPrincipal userPrinciple = userService.findByUsername(authentication.getName());
 
             String accessToken = jwtTokenGenerator.generateAccessToken(authentication);
             String refreshToken = jwtTokenGenerator.generateRefreshToken(authentication);
@@ -127,7 +126,7 @@ public class AuthenticationRestService {
         // Extract user details from UserDetailsEntity
         String username = userInfoEntity.getUsername();
         String password = userInfoEntity.getPassword();
-        String roles = userInfoEntity.getRoles();
+        String roles = userInfoEntity.getRole().getRole();
 
         // Extract authorities from roles (comma-separated)
         String[] roleArray = roles.split(",");
@@ -142,13 +141,13 @@ public class AuthenticationRestService {
         boolean isUsernameExist = true;
         boolean isEmailExist = true;
         try {
-            UserPrincipal user = userRepository.findByUsername(employerDtoIn.getUsername());
+            UserPrincipal user = userService.findByUsername(employerDtoIn.getUsername());
         } catch (EntityNotFoundException e) {
             isUsernameExist = false;
         }
 
         try {
-            UserPrincipal user = userRepository.findByEmail(employerDtoIn.getEmail());
+            UserPrincipal user = userService.findByEmail(employerDtoIn.getEmail());
         } catch (EntityNotFoundException e) {
             isEmailExist = false;
         }
@@ -167,8 +166,8 @@ public class AuthenticationRestService {
         String refreshToken = jwtTokenGenerator.generateRefreshToken(authentication);
 
 
-        employerRepository.createEmployer(EmployerMappers.INSTANCE.fromDtoIn(employerDtoIn, locationService));
-        int employerId = userRepository.findByUsername(employerDtoIn.getUsername()).getId();
+        employersService.createEmployer(employerDtoIn);
+        int employerId = userService.findByUsername(employerDtoIn.getUsername()).getId();
         userDetailsEntity.setId(employerId);
         saveUserRefreshToken(userDetailsEntity,refreshToken);
 
@@ -187,13 +186,13 @@ public class AuthenticationRestService {
         boolean isUsernameExist = true;
         boolean isEmailExist = true;
         try {
-            UserPrincipal user = userRepository.findByUsername(professionalDtoIn.getUsername());
+            UserPrincipal user = userService.findByUsername(professionalDtoIn.getUsername());
         } catch (EntityNotFoundException e) {
             isUsernameExist = false;
         }
 
         try {
-            UserPrincipal user = userRepository.findByEmail(professionalDtoIn.getEmail());
+            UserPrincipal user = userService.findByEmail(professionalDtoIn.getEmail());
         } catch (EntityNotFoundException e) {
             isEmailExist = false;
         }
@@ -212,8 +211,8 @@ public class AuthenticationRestService {
         String refreshToken = jwtTokenGenerator.generateRefreshToken(authentication);
 
 
-        professionalRepository.registerProfessional(ProfessionalMappers.INSTANCE.fromDtoIn(professionalDtoIn, locationService, statusService));
-        int id = userRepository.findByUsername(professionalDtoIn.getUsername()).getId();
+        professionalService.registerProfessional(professionalDtoIn);
+        int id = userService.findByUsername(professionalDtoIn.getUsername()).getId();
         userDetailsEntity.setId(id);
         saveUserRefreshToken(userDetailsEntity,refreshToken);
 

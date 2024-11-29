@@ -9,6 +9,7 @@ import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalDtoIn;
 import com.telerikacademy.web.jobmatch.repositories.contracts.ProfessionalRepository;
 import com.telerikacademy.web.jobmatch.services.contracts.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,16 +21,22 @@ public class ProfessionalServiceImpl implements ProfessionalService {
     private final UserService userService;
     private final LocationService locationService;
     private final StatusService statusService;
+    private final RoleService roleService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public ProfessionalServiceImpl(ProfessionalRepository professionalRepository,
                                    UserService userService,
                                    LocationService locationService,
-                                   StatusService statusService) {
+                                   StatusService statusService,
+                                   RoleService roleService,
+                                   PasswordEncoder passwordEncoder) {
         this.professionalRepository = professionalRepository;
         this.userService = userService;
         this.locationService = locationService;
         this.statusService = statusService;
+        this.roleService = roleService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -58,10 +65,11 @@ public class ProfessionalServiceImpl implements ProfessionalService {
     @Override
     public void registerProfessional(ProfessionalDtoIn professionalDtoIn) {
         Professional professionalToCreate = ProfessionalMappers.INSTANCE
-                .fromDtoIn(professionalDtoIn, locationService, statusService);
+                .fromDtoIn(professionalDtoIn, locationService, roleService,statusService);
         checkForDuplicateEmail(professionalToCreate);
         checkForDuplicateUsername(professionalToCreate);
 
+        professionalToCreate.setPassword(passwordEncoder.encode(professionalToCreate.getPassword()));
         professionalRepository.save(professionalToCreate);
     }
 

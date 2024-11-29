@@ -9,6 +9,7 @@ import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
 import com.telerikacademy.web.jobmatch.repositories.contracts.EmployerRepository;
 import com.telerikacademy.web.jobmatch.services.contracts.EmployersService;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
+import com.telerikacademy.web.jobmatch.services.contracts.RoleService;
 import com.telerikacademy.web.jobmatch.services.contracts.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,16 +24,19 @@ public class EmployerServiceImpl implements EmployersService {
     private final LocationService locationService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
 
     @Autowired
     public EmployerServiceImpl(EmployerRepository employerRepository,
                                LocationService locationService,
                                UserService userService,
-                               PasswordEncoder passwordEncoder) {
+                               PasswordEncoder passwordEncoder,
+                               RoleService roleService) {
         this.employerRepository = employerRepository;
         this.locationService = locationService;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.roleService = roleService;
     }
 
     @Override
@@ -55,7 +59,7 @@ public class EmployerServiceImpl implements EmployersService {
 
     @Override
     public void createEmployer(EmployerDtoIn employerDtoIn) {
-        Employer employerToCreate = EmployerMappers.INSTANCE.fromDtoIn(employerDtoIn, locationService);
+        Employer employerToCreate = EmployerMappers.INSTANCE.fromDtoIn(employerDtoIn, locationService, roleService);
         employerToCreate.setPassword(passwordEncoder.encode(employerToCreate.getPassword()));
 
         checkForDuplicateEmail(employerToCreate);

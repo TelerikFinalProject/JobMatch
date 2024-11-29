@@ -6,8 +6,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 @RequiredArgsConstructor
 public class UserInfoConfig implements UserDetails {
@@ -18,12 +18,7 @@ public class UserInfoConfig implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Converts string of roles (coma separated) into a collection of SimpleGrantedAuthority objects
         // Represents the authorities granted to the user by spring security
-        return Arrays
-                .stream(userPrincipal
-                        .getRoles()
-                        .split(","))
-                .map(SimpleGrantedAuthority::new)
-                .toList();
+        return Collections.singletonList(new SimpleGrantedAuthority(userPrincipal.getRole().getRole()));
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.telerikacademy.web.jobmatch.helpers;
 import com.telerikacademy.web.jobmatch.models.Employer;
 import com.telerikacademy.web.jobmatch.models.Location;
 import com.telerikacademy.web.jobmatch.models.Role;
+import com.telerikacademy.web.jobmatch.models.UserPrincipal;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerOutDto;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerUpdateDto;
@@ -49,6 +50,16 @@ public interface EmployerMappers {
     @Mapping(target = "successfulMatches", expression =
             "java(employer.getSuccessfulProfessionalsMatched() != null ? employer.getSuccessfulProfessionalsMatched().size() : 0)")
     EmployerOutDto toDtoOut(Employer employer);
+
+
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "email", target = "email")
+    @Mapping(target = "role", expression = "java(returnInitialRole(roleService))")
+    @Mapping(target = "location", source = "employerDtoIn", qualifiedByName = "mapLocation")
+    //@Mapping(source = "password", target = "password")
+    UserPrincipal toUserPrinciple(EmployerDtoIn employerDtoIn,
+                                  @Context RoleService roleService,
+                                  @Context LocationService locationService);
 
     List<EmployerOutDto> toDtoOutList(List<Employer> employers);
 

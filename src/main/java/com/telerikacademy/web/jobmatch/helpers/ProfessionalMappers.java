@@ -9,6 +9,8 @@ import com.telerikacademy.web.jobmatch.services.contracts.RoleService;
 import com.telerikacademy.web.jobmatch.services.contracts.StatusService;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +61,14 @@ public interface ProfessionalMappers {
     @Mapping(target = "successfulMatches", source = "professional.successfulMatches", qualifiedByName = "returnSuccessfulMatches")
     ProfessionalOutDto toDtoOut(Professional professional);
 
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "email", target = "email")
+    @Mapping(target = "role", expression = "java(returnInitialRole(roleService))")
+    @Mapping(target = "location", source = "professionalDtoIn", qualifiedByName = "mapLocation")
+    UserPrincipal toUserPrinciple(ProfessionalDtoIn professionalDtoIn,
+                                  @Context RoleService roleService,
+                                  @Context LocationService locationService);
+
     List<ProfessionalOutDto> toDtoOutList(List<Professional> professionals);
 
     @Named("mapLocation")
@@ -66,6 +76,7 @@ public interface ProfessionalMappers {
         return locationService.returnIfExistOrCreate(professionalDtoIn.getLocCountryIsoCode(),
                 professionalDtoIn.getLocCityId());
     }
+
 
     default Role returnInitialRole(@Context RoleService roleService){
         return roleService.getRole("ROLE_PROFESSIONAL");
