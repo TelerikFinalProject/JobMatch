@@ -1,17 +1,11 @@
 package com.telerikacademy.web.jobmatch.repositories.contracts;
 
 import com.telerikacademy.web.jobmatch.models.Professional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface ProfessionalRepository {
-    List<Professional> getProfessionals();
-
-    Professional getProfessional(int id);
-
-    void registerProfessional(Professional professional);
-
-    void updateProfessional(Professional professional);
-
-    void deleteProfessional(int id);
+@Repository
+public interface ProfessionalRepository extends JpaRepository<Professional, Integer> {
 }

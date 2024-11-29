@@ -1,5 +1,6 @@
 package com.telerikacademy.web.jobmatch.services;
 
+import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
 import com.telerikacademy.web.jobmatch.models.Status;
 import com.telerikacademy.web.jobmatch.repositories.contracts.StatusRepository;
 import com.telerikacademy.web.jobmatch.services.contracts.StatusService;
@@ -17,11 +18,12 @@ public class StatusServiceImpl implements StatusService {
 
     @Override
     public Status getStatus(int id) {
-        return statusRepository.getStatus(id);
+        return statusRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Status", id));
     }
 
     @Override
     public Status getStatus(String status) {
-        return statusRepository.getStatus(status);
+        return statusRepository.findByStatus(status)
+                .orElseThrow(() -> new EntityNotFoundException("Status", "name", status));
     }
 }

@@ -2,10 +2,8 @@ package com.telerikacademy.web.jobmatch.utils;
 
 import com.telerikacademy.web.jobmatch.config.UserInfoConfig;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
-import com.telerikacademy.web.jobmatch.repositories.contracts.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 

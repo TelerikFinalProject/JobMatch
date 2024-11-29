@@ -1,21 +1,12 @@
 package com.telerikacademy.web.jobmatch.repositories.contracts;
 
 import com.telerikacademy.web.jobmatch.models.Employer;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
 
-public interface EmployerRepository {
-    List<Employer> getEmployers();
-
-    Employer getEmployer(int id);
-
-    Employer getEmployerByCompanyName(String companyName);
-
-    void createEmployer(Employer user);
-
-    void updateEmployer(Employer updatedUser);
-
-    void deleteUser(int id);
-
-    Employer getUserByUsername(String username);
+@Repository
+public interface EmployerRepository extends JpaRepository<Employer, Integer> {
+    Optional<Employer> findByCompanyName(String companyName);
 }

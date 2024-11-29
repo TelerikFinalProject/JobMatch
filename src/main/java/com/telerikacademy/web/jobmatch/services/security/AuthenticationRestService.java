@@ -5,21 +5,17 @@ import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
 import com.telerikacademy.web.jobmatch.helpers.EmployerMappers;
 import com.telerikacademy.web.jobmatch.helpers.ProfessionalMappers;
 import com.telerikacademy.web.jobmatch.helpers.UserInfoMapper;
-import com.telerikacademy.web.jobmatch.models.Employer;
 import com.telerikacademy.web.jobmatch.models.RefreshTokenEntity;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
 import com.telerikacademy.web.jobmatch.models.dtos.AuthResponseDto;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalDtoIn;
 import com.telerikacademy.web.jobmatch.models.enums.TokenType;
-import com.telerikacademy.web.jobmatch.repositories.contracts.EmployerRepository;
 import com.telerikacademy.web.jobmatch.repositories.contracts.ProfessionalRepository;
 import com.telerikacademy.web.jobmatch.repositories.contracts.RefreshTokenRepository;
-import com.telerikacademy.web.jobmatch.repositories.contracts.UserRepository;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import com.telerikacademy.web.jobmatch.services.contracts.StatusService;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +30,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

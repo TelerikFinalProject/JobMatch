@@ -144,7 +144,8 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public Location getLocationById(int id) {
-        return locationRepository.getLocation(id);
+        return locationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Location", id));
     }
 
     @Override
@@ -152,7 +153,7 @@ public class LocationServiceImpl implements LocationService {
         boolean exist = true;
 
         try {
-            locationRepository.getLocation(location.getId());
+            getLocationById(location.getId());
         } catch (EntityNotFoundException e) {
             exist = false;
         }
@@ -162,7 +163,7 @@ public class LocationServiceImpl implements LocationService {
         }
 
         location.setIsoCode(countryIsoCode);
-        locationRepository.addLocation(location);
+        locationRepository.save(location);
     }
 
     private void checkAccessToExternalApi(HttpResponse<String> response){

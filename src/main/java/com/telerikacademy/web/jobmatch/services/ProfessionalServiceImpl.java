@@ -34,24 +34,25 @@ public class ProfessionalServiceImpl implements ProfessionalService {
 
     @Override
     public List<Professional> getProfessionals() {
-        return professionalRepository.getProfessionals();
+        return professionalRepository.findAll();
     }
 
     @Override
     public Professional getProfessional(int id) {
-        return professionalRepository.getProfessional(id);
+        return professionalRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Professional", id));
     }
 
     @Override
     public Professional getProfessionalByUsername(String username) {
         UserPrincipal userFound = userService.findByUsername(username);
-        return professionalRepository.getProfessional(userFound.getId());
+        return getProfessional(userFound.getId());
     }
 
     @Override
     public Professional getProfessionalByEmail(String email) {
         UserPrincipal userFound = userService.findByEmail(email);
-        return professionalRepository.getProfessional(userFound.getId());
+        return getProfessional(userFound.getId());
     }
 
     @Override
@@ -61,7 +62,7 @@ public class ProfessionalServiceImpl implements ProfessionalService {
         checkForDuplicateEmail(professionalToCreate);
         checkForDuplicateUsername(professionalToCreate);
 
-        professionalRepository.registerProfessional(professionalToCreate);
+        professionalRepository.save(professionalToCreate);
     }
 
     @Override
@@ -69,12 +70,13 @@ public class ProfessionalServiceImpl implements ProfessionalService {
         checkForDuplicateEmail(professional.getId(), professional);
         checkForDuplicateUsername(professional.getId(), professional);
 
-        professionalRepository.updateProfessional(professional);
+        professionalRepository.save(professional);
     }
 
     @Override
     public void deleteProfessional(int id) {
-        professionalRepository.deleteProfessional(id);
+        Professional professional = getProfessional(id);
+        professionalRepository.delete(professional);
     }
 
     private void checkForDuplicateEmail(Professional professional) {

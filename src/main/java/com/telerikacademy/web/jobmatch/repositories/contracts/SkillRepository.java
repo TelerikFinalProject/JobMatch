@@ -1,17 +1,9 @@
 package com.telerikacademy.web.jobmatch.repositories.contracts;
 
 import com.telerikacademy.web.jobmatch.models.Skill;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-public interface SkillRepository {
-    List<Skill> getAllSkills();
-
-    Skill getSkillById(int id);
-
-    Skill getSkillByName(String name);
-
-    void saveSkill(Skill skill);
-
-    void deleteSkill(Skill skill);
+@Repository
+public interface SkillRepository extends JpaRepository<Skill, Integer> {
 }

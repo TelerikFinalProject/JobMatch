@@ -1,13 +1,17 @@
 package com.telerikacademy.web.jobmatch.repositories.contracts;
 
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
-public interface UserRepository {
-    UserPrincipal findByUsername(String username);
+@Repository
+public interface UserRepository extends JpaRepository<UserPrincipal, Integer> {
+    Optional<UserPrincipal> findByUsername(String username);
 
-    UserPrincipal findByEmail(String email);
+    Optional<UserPrincipal> findByEmail(String email);
 
-    UserPrincipal findById(int id);
+    List<UserRepository> findAllByRole(Role role);
 }

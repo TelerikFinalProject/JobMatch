@@ -1,7 +1,6 @@
 package com.telerikacademy.web.jobmatch.config;
 
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
-import com.telerikacademy.web.jobmatch.repositories.contracts.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

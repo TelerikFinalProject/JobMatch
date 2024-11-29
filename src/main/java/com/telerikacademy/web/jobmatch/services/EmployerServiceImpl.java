@@ -7,7 +7,6 @@ import com.telerikacademy.web.jobmatch.models.Employer;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
 import com.telerikacademy.web.jobmatch.repositories.contracts.EmployerRepository;
-import com.telerikacademy.web.jobmatch.repositories.contracts.EmployerRepositoryTest;
 import com.telerikacademy.web.jobmatch.services.contracts.EmployersService;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import com.telerikacademy.web.jobmatch.services.contracts.UserService;
@@ -20,13 +19,13 @@ import java.util.List;
 @Service
 public class EmployerServiceImpl implements EmployersService {
 
-    private final EmployerRepositoryTest employerRepository;
+    private final EmployerRepository employerRepository;
     private final LocationService locationService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public EmployerServiceImpl(EmployerRepositoryTest employerRepository,
+    public EmployerServiceImpl(EmployerRepository employerRepository,
                                LocationService locationService,
                                UserService userService,
                                PasswordEncoder passwordEncoder) {
@@ -43,7 +42,8 @@ public class EmployerServiceImpl implements EmployersService {
 
     @Override
     public Employer getEmployer(int id) {
-        return employerRepository.findById(id).orElseThrow(() -> EntityNotFoundException);
+        return employerRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Employer", id));
     }
 
     @Override
@@ -109,7 +109,8 @@ public class EmployerServiceImpl implements EmployersService {
     private void checkForDuplicateCompanyName(Employer employer) {
         boolean duplicateExists = true;
         try {
-            employerRepository.findByCompanyName(employer.getCompanyName()).orElseThrow(() -> EntityNotFoundException);
+            employerRepository.findByCompanyName(employer.getCompanyName())
+                    .orElseThrow(() -> new EntityNotFoundException("Employer", "company name", employer.getCompanyName()));
         } catch (EntityNotFoundException e) {
             duplicateExists = false;
         }
