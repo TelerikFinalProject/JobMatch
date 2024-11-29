@@ -1,5 +1,7 @@
 package com.telerikacademy.web.jobmatch.models.dtos;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,13 +9,19 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class EmployerDtoIn {
-    private String username;
-    private String email;
-    private String password;
-    private String confirmPassword;
+public class EmployerDtoIn extends UserDtoIn{
+    @NotNull(message = "Company name" + NULL_FIELD_ERROR)
+    @Size(min = 3, max = 32)
     private String companyName;
+
+    @NotNull(message = "Description" + NULL_FIELD_ERROR)
+    @Size(min = 10, max = 200)
     private String description;
+
+    @NotNull(message = "Country Iso code" + NULL_FIELD_ERROR)
+    @Size(min = 2, max = 3)
     private String locCountryIsoCode;
+
+    @NotNull(message = "City ID" + NULL_FIELD_ERROR)
     private int locCityId;
 }

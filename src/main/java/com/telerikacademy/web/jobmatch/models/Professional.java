@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "professionals")
 @Getter
@@ -23,4 +25,12 @@ public class Professional extends UserPrincipal {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "status_id")
     private Status status;
+
+    @ManyToMany
+    @JoinTable(
+            name = "successful_matches",
+            joinColumns = @JoinColumn(name = "professional_id"),
+            inverseJoinColumns = @JoinColumn(name = "employer_id")
+    )
+    private Set<Employer> successfulMatches;
 }

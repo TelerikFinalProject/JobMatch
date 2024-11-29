@@ -1,9 +1,6 @@
 package com.telerikacademy.web.jobmatch.helpers;
 
-import com.telerikacademy.web.jobmatch.models.Location;
-import com.telerikacademy.web.jobmatch.models.Professional;
-import com.telerikacademy.web.jobmatch.models.Role;
-import com.telerikacademy.web.jobmatch.models.Status;
+import com.telerikacademy.web.jobmatch.models.*;
 import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalOutDto;
 import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalUpdateDto;
@@ -13,7 +10,9 @@ import com.telerikacademy.web.jobmatch.services.contracts.StatusService;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ProfessionalMappers {
@@ -44,6 +43,7 @@ public interface ProfessionalMappers {
     @Mapping(target = "lastName", source = "professionalDtoIn.lastName")
     @Mapping(target = "summary", source = "professionalDtoIn.summary")
     @Mapping(target = "status", source = "professional.status")
+    @Mapping(target = "successfulMatches", source = "professional.successfulMatches")
     Professional fromDtoIn(Professional professional,
                            ProfessionalUpdateDto professionalDtoIn,
                            @Context LocationService locationService);
@@ -56,6 +56,7 @@ public interface ProfessionalMappers {
     @Mapping(source = "role.role", target = "role") // Nested mapping for role
     @Mapping(source = "location.name", target = "location")// Nested mapping for location
     @Mapping(source = "status.status", target = "status")
+    @Mapping(target = "successfulMatches", source = "professional.successfulMatches", qualifiedByName = "returnSuccessfulMatches")
     ProfessionalOutDto toDtoOut(Professional professional);
 
     List<ProfessionalOutDto> toDtoOutList(List<Professional> professionals);
@@ -72,5 +73,19 @@ public interface ProfessionalMappers {
 
     default Status returnInitialStatus(@Context StatusService statusService){
         return statusService.getStatus("Active");
+    }
+
+    @Named("returnSuccessfulMatches")
+    default String returnSuccessfulMatches(Set<Employer> successfulMatches){
+        if (successfulMatches != null){
+            List<String> companyNames = new ArrayList<>();
+
+            for (Employer employer : successfulMatches) {
+                companyNames.add(employer.getCompanyName());
+            }
+
+            return String.join(", ", companyNames);
+        }
+        return "No successful matches.";
     }
 }

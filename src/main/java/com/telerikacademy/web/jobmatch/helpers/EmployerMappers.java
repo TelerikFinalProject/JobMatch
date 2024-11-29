@@ -37,6 +37,7 @@ public interface EmployerMappers {
     @Mapping(target = "companyName", source = "employerDtoIn.companyName") // Update from EmployerDtoIn
     @Mapping(target = "description", source = "employerDtoIn.description") // Update from EmployerDtoIn
     @Mapping(target = "location", source = "employerDtoIn", qualifiedByName = "mapLocation")
+    @Mapping(target = "successfulProfessionalsMatched", source = "employer.successfulProfessionalsMatched")
     Employer fromDtoIn(Employer employer, EmployerUpdateDto employerDtoIn, @Context LocationService locationService);
 
     @Mapping(source = "username", target = "username")
@@ -44,7 +45,9 @@ public interface EmployerMappers {
     @Mapping(source = "description", target = "description")
     @Mapping(source = "email", target = "email")
     @Mapping(source = "role.role", target = "role") // Nested mapping for role
-    @Mapping(source = "location.name", target = "location") // Nested mapping for location
+    @Mapping(source = "location.name", target = "location")// Nested mapping for location
+    @Mapping(target = "successfulMatches", expression =
+            "java(employer.getSuccessfulProfessionalsMatched() != null ? employer.getSuccessfulProfessionalsMatched().size() : 0)")
     EmployerOutDto toDtoOut(Employer employer);
 
     List<EmployerOutDto> toDtoOutList(List<Employer> employers);

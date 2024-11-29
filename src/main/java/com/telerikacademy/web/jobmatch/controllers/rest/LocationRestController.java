@@ -60,4 +60,6 @@ public class LocationRestController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
+
+    //TODO delete locations
 }
