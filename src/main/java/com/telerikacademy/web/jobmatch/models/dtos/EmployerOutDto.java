@@ -14,4 +14,5 @@ public class EmployerOutDto {
     private String email;
     private String role;
     private String location;
+    private int successfulMatches;
 }

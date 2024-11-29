@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 @Entity
 @Table(name = "job_ads")
@@ -42,4 +43,12 @@ public class JobAd {
     @ManyToOne
     @JoinColumn(name = "location_id")
     private Location location;
+
+    @ManyToMany
+    @JoinTable(
+            name = "match_requests",
+            joinColumns = @JoinColumn(name = "job_ad_id"),
+            inverseJoinColumns = @JoinColumn(name = "job_application_id")
+    )
+    private Set<JobApplication> matchedApplications;
 }

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 @Entity
 @Table(name = "job_applications")
@@ -39,4 +40,7 @@ public class JobApplication {
     @ManyToOne
     @JoinColumn(name = "location_id")
     private Location location;
+
+    @ManyToMany(mappedBy = "matchedApplications")
+    private Set<JobAd> matchedJobAds;
 }

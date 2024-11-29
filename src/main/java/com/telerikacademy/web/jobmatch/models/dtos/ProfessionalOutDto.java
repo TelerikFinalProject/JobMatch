@@ -16,4 +16,5 @@ public class ProfessionalOutDto {
     private String role;
     private String location;
     private String status;
+    private String successfulMatches;
 }

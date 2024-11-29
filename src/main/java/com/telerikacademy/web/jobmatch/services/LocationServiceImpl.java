@@ -135,7 +135,8 @@ public class LocationServiceImpl implements LocationService {
         }
         if (!validLocation) {
             Country country = getCountryByIsoCode(isoCode.toUpperCase());
-            throw new EntityNotFoundException(String.format("City with ID:%d is not a city in %s.", cityId, country.getName()));
+            throw new EntityNotFoundException(String.format("City with ID:%d is not a city in %s.",
+                    cityId, country.getName()));
         }
         addLocation(location, isoCode);
         return location;
