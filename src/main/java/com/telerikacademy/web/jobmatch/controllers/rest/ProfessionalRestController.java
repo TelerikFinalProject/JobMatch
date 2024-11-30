@@ -93,6 +93,8 @@ public class ProfessionalRestController {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         } catch (EntityNotFoundException e){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (ExternalResourceException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, e.getMessage());
         }
     }
 

@@ -1,11 +1,12 @@
 package com.telerikacademy.web.jobmatch.services.contracts;
 
 import com.telerikacademy.web.jobmatch.models.JobApplication;
+import com.telerikacademy.web.jobmatch.models.filter_options.JobApplicationFilterOptions;
 
 import java.util.List;
 
 public interface JobApplicationService {
-    List<JobApplication> getJobApplications();
+    List<JobApplication> getJobApplications(JobApplicationFilterOptions filterOptions);
 
     JobApplication getJobApplication(int id);
 

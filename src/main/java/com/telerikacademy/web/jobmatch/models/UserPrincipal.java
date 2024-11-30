@@ -1,5 +1,6 @@
 package com.telerikacademy.web.jobmatch.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -38,6 +39,7 @@ public class UserPrincipal {
     @JoinColumn(name = "location_id")
     private Location location;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RefreshTokenEntity> refreshTokens;
 }

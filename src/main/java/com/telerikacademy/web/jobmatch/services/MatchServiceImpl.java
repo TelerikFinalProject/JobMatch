@@ -2,6 +2,8 @@ package com.telerikacademy.web.jobmatch.services;
 
 import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.models.JobApplication;
+import com.telerikacademy.web.jobmatch.models.Skill;
+import com.telerikacademy.web.jobmatch.models.filter_options.JobApplicationFilterOptions;
 import com.telerikacademy.web.jobmatch.services.contracts.JobAdService;
 import com.telerikacademy.web.jobmatch.services.contracts.JobApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,7 @@ public class MatchServiceImpl {
         this.jobApplicationService = jobApplicationService;
     }
 
-    public Set<JobAd> getSuitableAds(JobApplication application){
+    public Set<JobAd> getSuitableAds(JobApplication application) {
         List<JobAd> allAds = jobAdService.getJobAds();
 
         Set<JobAd> suitableAds = new HashSet<>();
@@ -33,13 +35,32 @@ public class MatchServiceImpl {
         return suitableAds;
     }
 
-    public Set<JobApplication> getSuitableApplications(JobAd ads){
-        List<JobApplication> allApplications = jobApplicationService.getJobApplications();
+    public Set<JobApplication> getSuitableApplications(JobAd ad) {
+        double minSalary = ad.getMinSalary() - (ad.getMinSalary() * 20 / 100);
+        double maxSalary = ad.getMaxSalary() + (ad.getMaxSalary() * 20 / 100);
+        String location = ad.getLocation().getName();
+        String status = "Active";
+
+        JobApplicationFilterOptions filterOptions =
+                new JobApplicationFilterOptions(minSalary, maxSalary, null, location, status);
+        List<JobApplication> filteredApplications = jobApplicationService.getJobApplications(filterOptions);
 
         Set<JobApplication> suitableApplications = new HashSet<>();
-        for (JobApplication application : allApplications) {
-            //TODO check skills and salary and location
-            suitableApplications.add(application);
+        double minQuantitySkills = ad.getSkills().size() * 90.0 / 100;
+
+        for (JobApplication application : filteredApplications) {
+            if (application.getQualifications().size() < minQuantitySkills) {
+                continue;
+            }
+            double mutualSkills = 0;
+            for (Skill requirement : ad.getSkills()) {
+                if (application.getQualifications().contains(requirement)) {
+                    mutualSkills++;
+                }
+            }
+            if (mutualSkills >= minQuantitySkills) {
+                suitableApplications.add(application);
+            }
         }
         return suitableApplications;
     }

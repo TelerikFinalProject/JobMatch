@@ -24,10 +24,10 @@ public class JobAd {
     private String positionTitle;
 
     @Column(name = "min_salary")
-    private BigDecimal minSalary;
+    private double minSalary;
 
     @Column(name = "max_salary")
-    private BigDecimal maxSalary;
+    private double maxSalary;
 
     @Column(name = "job_description")
     private String jobDescription;
@@ -51,4 +51,12 @@ public class JobAd {
             inverseJoinColumns = @JoinColumn(name = "job_application_id")
     )
     private Set<JobApplication> matchedApplications;
+
+    @ManyToMany
+    @JoinTable(
+            name = "skills_required",
+            joinColumns = @JoinColumn(name = "job_ad_id"),
+            inverseJoinColumns = @JoinColumn(name = "skill_id")
+    )
+    private Set<Skill> skills;
 }

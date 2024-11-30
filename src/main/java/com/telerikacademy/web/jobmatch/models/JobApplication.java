@@ -24,10 +24,10 @@ public class JobApplication {
     private String description;
 
     @Column(name = "min_salary")
-    private BigDecimal minSalary;
+    private Double minSalary;
 
     @Column(name = "max_salary")
-    private BigDecimal maxSalary;
+    private Double maxSalary;
 
     @ManyToOne
     @JoinColumn(name = "professional_id")
@@ -43,4 +43,15 @@ public class JobApplication {
 
     @ManyToMany(mappedBy = "matchedApplications")
     private Set<JobAd> matchedJobAds;
+
+    @Column(name = "is_hybrid")
+    private boolean isHybrid;
+
+    @ManyToMany
+    @JoinTable(
+            name = "qualifications",
+            joinColumns = @JoinColumn(name = "job_application_id"),
+            inverseJoinColumns = @JoinColumn(name = "skill_id")
+    )
+    private Set<Skill> qualifications;
 }
