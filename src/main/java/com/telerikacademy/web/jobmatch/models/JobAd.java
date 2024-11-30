@@ -24,10 +24,10 @@ public class JobAd {
     private String positionTitle;
 
     @Column(name = "min_salary")
-    private BigDecimal minSalary;
+    private double minSalary;
 
     @Column(name = "max_salary")
-    private BigDecimal maxSalary;
+    private double maxSalary;
 
     @Column(name = "job_description")
     private String jobDescription;
@@ -43,6 +43,9 @@ public class JobAd {
     @ManyToOne
     @JoinColumn(name = "location_id")
     private Location location;
+
+    @Column(name = "is_hybrid")
+    private boolean hybrid;
 
     @ManyToMany
     @JoinTable(

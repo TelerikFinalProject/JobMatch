@@ -1,5 +1,6 @@
 package com.telerikacademy.web.jobmatch.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ public class Employer extends UserPrincipal{
     @Column(name = "description")
     private String description;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "successfulMatches")
     private Set<Professional> successfulProfessionalsMatched;
 }
