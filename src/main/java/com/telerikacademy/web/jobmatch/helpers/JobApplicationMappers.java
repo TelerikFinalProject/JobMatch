@@ -38,9 +38,9 @@ public interface JobApplicationMappers {
     @Mapping(source = "jobApplication.location.name", target = "location")
     @Mapping(source = "hybrid", target = "hybrid")
     @Mapping(source = "jobApplication.status.status", target = "status")
-    @Mapping(target = "qualifications", expression =
-            "java(jobApplication.getMatchedJobAds() != null ? jobApplication.getMatchedJobAds() : new java.util.HashSet<>())")
     @Mapping(target = "matchedJobAds", expression =
+            "java(jobApplication.getMatchedJobAds() != null ? jobApplication.getMatchedJobAds() : new java.util.HashSet<>())")
+    @Mapping(target = "qualifications", expression =
             "java(jobApplication.getQualifications() != null ? jobApplication.getQualifications() : new java.util.HashSet<>())")
     JobApplicationDtoOut toDtoOut(JobApplication jobApplication);
 

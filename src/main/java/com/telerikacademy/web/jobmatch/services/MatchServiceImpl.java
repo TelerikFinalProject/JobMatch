@@ -2,6 +2,9 @@ package com.telerikacademy.web.jobmatch.services;
 
 import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.models.JobApplication;
+import com.telerikacademy.web.jobmatch.models.Skill;
+import com.telerikacademy.web.jobmatch.models.filter_options.JobAdFilterOptions;
+import com.telerikacademy.web.jobmatch.models.filter_options.JobApplicationFilterOptions;
 import com.telerikacademy.web.jobmatch.services.contracts.JobAdService;
 import com.telerikacademy.web.jobmatch.services.contracts.JobApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +25,34 @@ public class MatchServiceImpl {
         this.jobApplicationService = jobApplicationService;
     }
 
-    public Set<JobAd> getSuitableAds(JobApplication application){
-        List<JobAd> allAds = jobAdService.getJobAds(new JobAdFilterOptions());
+    public Set<JobAd> getSuitableAds(JobApplication application) {
+        double minSalary = application.getMinSalary() + (application.getMinSalary() * 20 / 100);
+        double maxSalary = application.getMaxSalary() - (application.getMaxSalary() * 20 / 100);
+        String location = application.getLocation().getName();
+        String status = "Active";
+
+        JobAdFilterOptions filterOptions =
+                new JobAdFilterOptions(null, minSalary, maxSalary, location, null, status);
+
+        List<JobAd> filteredAps = jobAdService.getJobAds(filterOptions);
 
         Set<JobAd> suitableAds = new HashSet<>();
-        for (JobAd ad : allAds) {
-            //TODO check skills and salary and location
-            suitableAds.add(ad);
+        for (JobAd ad : filteredAps) {
+            if (ad.getSkills().size() > application.getQualifications().size()) {
+                continue;
+            }
+
+            double minQuantitySkills = ad.getSkills().size() * 90.0 / 100;
+            double mutualSkills = 0;
+
+            for (Skill qualification : application.getQualifications()) {
+                if (ad.getSkills().contains(qualification)) {
+                    mutualSkills++;
+                }
+            }
+            if (mutualSkills >= minQuantitySkills) {
+                suitableAds.add(ad);
+            }
         }
         return suitableAds;
     }
@@ -50,6 +74,7 @@ public class MatchServiceImpl {
             if (application.getQualifications().size() < minQuantitySkills) {
                 continue;
             }
+
             double mutualSkills = 0;
             for (Skill requirement : ad.getSkills()) {
                 if (application.getQualifications().contains(requirement)) {
