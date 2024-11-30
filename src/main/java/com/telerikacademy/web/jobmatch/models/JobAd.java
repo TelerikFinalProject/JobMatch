@@ -44,6 +44,9 @@ public class JobAd {
     @JoinColumn(name = "location_id")
     private Location location;
 
+    @Column(name = "is_hybrid")
+    private boolean hybrid;
+
     @ManyToMany
     @JoinTable(
             name = "match_requests",

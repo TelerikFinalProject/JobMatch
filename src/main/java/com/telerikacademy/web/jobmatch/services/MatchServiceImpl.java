@@ -2,8 +2,6 @@ package com.telerikacademy.web.jobmatch.services;
 
 import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.models.JobApplication;
-import com.telerikacademy.web.jobmatch.models.Skill;
-import com.telerikacademy.web.jobmatch.models.filter_options.JobApplicationFilterOptions;
 import com.telerikacademy.web.jobmatch.services.contracts.JobAdService;
 import com.telerikacademy.web.jobmatch.services.contracts.JobApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +22,8 @@ public class MatchServiceImpl {
         this.jobApplicationService = jobApplicationService;
     }
 
-    public Set<JobAd> getSuitableAds(JobApplication application) {
-        List<JobAd> allAds = jobAdService.getJobAds();
+    public Set<JobAd> getSuitableAds(JobApplication application){
+        List<JobAd> allAds = jobAdService.getJobAds(new JobAdFilterOptions());
 
         Set<JobAd> suitableAds = new HashSet<>();
         for (JobAd ad : allAds) {
