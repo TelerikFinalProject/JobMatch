@@ -2,15 +2,15 @@ package com.telerikacademy.web.jobmatch.controllers.rest;
 
 import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
 import com.telerikacademy.web.jobmatch.exceptions.ExternalResourceException;
+import com.telerikacademy.web.jobmatch.helpers.JobAdMappers;
 import com.telerikacademy.web.jobmatch.helpers.JobApplicationMappers;
+import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.models.JobApplication;
+import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoOut;
 import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoOut;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobApplicationFilterOptions;
-import com.telerikacademy.web.jobmatch.services.contracts.JobApplicationService;
-import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
-import com.telerikacademy.web.jobmatch.services.contracts.ProfessionalService;
-import com.telerikacademy.web.jobmatch.services.contracts.StatusService;
+import com.telerikacademy.web.jobmatch.services.contracts.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/job-applications")
@@ -29,16 +30,22 @@ public class JobApplicationRestController {
     private final LocationService locationService;
     private final StatusService statusService;
     private final ProfessionalService professionalService;
+    private final SkillService skillService;
+    private final MatchService matchService;
 
     @Autowired
     public JobApplicationRestController(JobApplicationService jobApplicationService,
                                         LocationService locationService,
                                         StatusService statusService,
-                                        ProfessionalService professionalService) {
+                                        ProfessionalService professionalService,
+                                        SkillService skillService,
+                                        MatchService matchService) {
         this.jobApplicationService = jobApplicationService;
         this.locationService = locationService;
         this.statusService = statusService;
         this.professionalService = professionalService;
+        this.skillService = skillService;
+        this.matchService = matchService;
     }
 
     @GetMapping
@@ -70,15 +77,16 @@ public class JobApplicationRestController {
     }
 
     @PostMapping
-    public ResponseEntity<JobApplication> createJobApplication(@Valid @RequestBody JobApplicationDtoIn jobApplicationDtoIn,
-                                                               Authentication authentication) {
+    public ResponseEntity<JobApplicationDtoOut> createJobApplication(@Valid @RequestBody JobApplicationDtoIn jobApplicationDtoIn,
+                                                                     Authentication authentication) {
         try {
             JobApplication jobApplication =
-                    JobApplicationMappers.INSTANCE.fromDtoIn(jobApplicationDtoIn, statusService, locationService);
+                    JobApplicationMappers.INSTANCE.fromDtoIn(jobApplicationDtoIn, statusService, locationService, skillService);
             jobApplication.setProfessional(professionalService.getProfessionalByUsername(authentication.getName()));
 
             jobApplicationService.addJobApplication(jobApplication);
-            return ResponseEntity.ok(jobApplication);
+            JobApplicationDtoOut jobApplicationDtoOut = JobApplicationMappers.INSTANCE.toDtoOut(jobApplication);
+            return ResponseEntity.ok(jobApplicationDtoOut);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (ExternalResourceException e) {
@@ -103,5 +111,18 @@ public class JobApplicationRestController {
     public ResponseEntity<String> deleteJobApplication(@PathVariable int id) {
         jobApplicationService.removeJobApplication(id);
         return ResponseEntity.ok("Job application has been deleted");
+    }
+
+    @GetMapping("/{id}/suitable-ads")
+    public ResponseEntity<Set<JobAdDtoOut>> getSuitableAds(@PathVariable int id) {
+        try {
+            JobApplication jobApplication = jobApplicationService.getJobApplication(id);
+            //TODO check if logged user is application's owner or admin
+
+            Set<JobAd> suitableJobAds = matchService.getSuitableAds(jobApplication);
+            return ResponseEntity.ok(JobAdMappers.INSTANCE.toDtoOutSet(suitableJobAds));
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 }

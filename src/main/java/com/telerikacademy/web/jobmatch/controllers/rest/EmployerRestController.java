@@ -8,11 +8,13 @@ import com.telerikacademy.web.jobmatch.models.Employer;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerOutDto;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerUpdateDto;
+import com.telerikacademy.web.jobmatch.repositories.contracts.RoleRepository;
 import com.telerikacademy.web.jobmatch.services.contracts.EmployersService;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,13 +26,18 @@ public class EmployerRestController {
 
     private final EmployersService employersService;
     private final LocationService locationService;
+    private final RoleRepository roleRepository;
 
     @Autowired
-    public EmployerRestController(EmployersService employersService, LocationService locationService) {
+    public EmployerRestController(EmployersService employersService,
+                                  LocationService locationService,
+                                  RoleRepository roleRepository) {
         this.employersService = employersService;
         this.locationService = locationService;
+        this.roleRepository = roleRepository;
     }
 
+    @PreAuthorize("hasRole('EMPLOYER')")
     @GetMapping
     public ResponseEntity<List<EmployerOutDto>> getAllEmployers() {
         List<EmployerOutDto> employerToCreate = EmployerMappers.INSTANCE.toDtoOutList(employersService.getEmployers());

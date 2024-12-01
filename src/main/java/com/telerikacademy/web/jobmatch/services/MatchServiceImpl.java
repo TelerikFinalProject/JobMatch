@@ -7,6 +7,7 @@ import com.telerikacademy.web.jobmatch.models.filter_options.JobAdFilterOptions;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobApplicationFilterOptions;
 import com.telerikacademy.web.jobmatch.services.contracts.JobAdService;
 import com.telerikacademy.web.jobmatch.services.contracts.JobApplicationService;
+import com.telerikacademy.web.jobmatch.services.contracts.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public class MatchServiceImpl {
+public class MatchServiceImpl implements MatchService {
     private final JobAdService jobAdService;
     private final JobApplicationService jobApplicationService;
 
@@ -27,12 +28,12 @@ public class MatchServiceImpl {
 
     public Set<JobAd> getSuitableAds(JobApplication application) {
         double minSalary = application.getMinSalary() + (application.getMinSalary() * 20 / 100);
-        double maxSalary = application.getMaxSalary() - (application.getMaxSalary() * 20 / 100);
+        //double maxSalary = application.getMaxSalary() - (application.getMaxSalary() * 20 / 100);
         String location = application.getLocation().getName();
         String status = "Active";
 
         JobAdFilterOptions filterOptions =
-                new JobAdFilterOptions(null, minSalary, maxSalary, location, null, status);
+                new JobAdFilterOptions(null, minSalary, null, location, null, status);
 
         List<JobAd> filteredAps = jobAdService.getJobAds(filterOptions);
 
@@ -59,12 +60,12 @@ public class MatchServiceImpl {
 
     public Set<JobApplication> getSuitableApplications(JobAd ad) {
         double minSalary = ad.getMinSalary() - (ad.getMinSalary() * 20 / 100);
-        double maxSalary = ad.getMaxSalary() + (ad.getMaxSalary() * 20 / 100);
+        //double maxSalary = ad.getMaxSalary() + (ad.getMaxSalary() * 20 / 100);
         String location = ad.getLocation().getName();
         String status = "Active";
 
         JobApplicationFilterOptions filterOptions =
-                new JobApplicationFilterOptions(minSalary, maxSalary, null, location, status);
+                new JobApplicationFilterOptions(minSalary, null, null, location, status);
         List<JobApplication> filteredApplications = jobApplicationService.getJobApplications(filterOptions);
 
         Set<JobApplication> suitableApplications = new HashSet<>();
