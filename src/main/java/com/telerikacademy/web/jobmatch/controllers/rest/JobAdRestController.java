@@ -69,14 +69,15 @@ public class JobAdRestController {
     }
 
     @PostMapping
-    public ResponseEntity<JobAd> createJobAd(Authentication authentication, @Valid @RequestBody JobAdDtoIn jobAdDtoIn) {
+    public ResponseEntity<JobAdDtoOut> createJobAd(Authentication authentication, @Valid @RequestBody JobAdDtoIn jobAdDtoIn) {
 
         try {
             JobAd jobAd = JobAdMappers.INSTANCE.fromDtoIn(jobAdDtoIn, locationService, statusService);
             Employer employer = employersService.getEmployer(authentication.getName());
             jobAd.setEmployer(employer);
             jobAdService.createJobAd(jobAd);
-            return ResponseEntity.status(HttpStatus.CREATED).body(jobAd);
+            JobAdDtoOut jobAdDtoOut = JobAdMappers.INSTANCE.toDtoOut(jobAd);
+            return ResponseEntity.status(HttpStatus.CREATED).body(jobAdDtoOut);
         } catch (ExternalResourceException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         } catch (EntityNotFoundException e) {

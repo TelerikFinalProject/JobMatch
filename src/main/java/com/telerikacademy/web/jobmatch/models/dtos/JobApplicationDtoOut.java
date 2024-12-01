@@ -1,17 +1,18 @@
 package com.telerikacademy.web.jobmatch.models.dtos;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.models.Skill;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Set;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class JobApplicationDtoOut {
     private String description;
     private String firstName;
