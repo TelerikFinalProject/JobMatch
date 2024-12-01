@@ -21,7 +21,6 @@ public class ProfessionalServiceImpl implements ProfessionalService {
     private final UserService userService;
     private final LocationService locationService;
     private final StatusService statusService;
-    private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -29,13 +28,11 @@ public class ProfessionalServiceImpl implements ProfessionalService {
                                    UserService userService,
                                    LocationService locationService,
                                    StatusService statusService,
-                                   RoleService roleService,
                                    PasswordEncoder passwordEncoder) {
         this.professionalRepository = professionalRepository;
         this.userService = userService;
         this.locationService = locationService;
         this.statusService = statusService;
-        this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -65,7 +62,7 @@ public class ProfessionalServiceImpl implements ProfessionalService {
     @Override
     public void registerProfessional(ProfessionalDtoIn professionalDtoIn) {
         Professional professionalToCreate = ProfessionalMappers.INSTANCE
-                .fromDtoIn(professionalDtoIn, locationService, roleService,statusService);
+                .fromDtoIn(professionalDtoIn, locationService, statusService);
         checkForDuplicateEmail(professionalToCreate);
         checkForDuplicateUsername(professionalToCreate);
 

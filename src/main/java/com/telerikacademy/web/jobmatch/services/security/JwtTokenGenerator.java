@@ -28,14 +28,12 @@ public class JwtTokenGenerator {
 
         String roles = getRolesOfUser(authentication);
 
-        String permissions = getPermissionsFromRoles(roles);
-
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("com.jobMatch.auth")
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plus(15, ChronoUnit.MINUTES))
                 .subject(authentication.getName())
-                .claim("scope", permissions)
+                .claim("roles", roles)
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
@@ -54,47 +52,6 @@ public class JwtTokenGenerator {
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-    }
-
-    private String getPermissionsFromRoles(String roles) {
-        Set<String> permissions = new HashSet<>();
-
-        if (roles.contains("ROLE_ADMIN")) {
-            permissions.addAll(List.of(
-                    "WELCOME:READ",
-                    "EMPLOYER:APPROVE",
-                    "PROFESSIONAL:APPROVE",
-                    "EMPLOYER:BLOCK",
-                    "PROFESSIONAL:BLOCK",
-                    "DATA:DELETE",
-                    "SKILL:MANAGE"
-            ));
-        }
-        if (roles.contains("ROLE_EMPLOYER")) {
-            permissions.addAll(List.of(
-                    "WELCOME:READ",
-                    "PROFILE:READ",
-                    "PROFILE:WRITE",
-                    "JOB_AD:READ",
-                    "JOB_AD:WRITE",
-                    "JOB_APPLICATION:READ",
-                    "PROFESSIONAL_PROFILE:READ"
-            ));
-        }
-
-        if (roles.contains("ROLE_PROFESSIONAL")) {
-            permissions.addAll(List.of(
-                    "WELCOME:READ",
-                    "PROFILE:READ",
-                    "PROFILE:WRITE",
-                    "JOB_APPLICATION:READ",
-                    "JOB_APPLICATION:WRITE",
-                    "JOB_AD:READ",
-                    "COMPANY_PROFILE:READ"
-            ));
-        }
-
-        return String.join(" ", permissions);
     }
 
     private String getRolesOfUser(Authentication authentication) {

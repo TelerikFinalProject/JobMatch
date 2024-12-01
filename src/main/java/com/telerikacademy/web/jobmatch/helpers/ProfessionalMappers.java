@@ -5,12 +5,9 @@ import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalOutDto;
 import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalUpdateDto;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
-import com.telerikacademy.web.jobmatch.services.contracts.RoleService;
 import com.telerikacademy.web.jobmatch.services.contracts.StatusService;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,17 +24,16 @@ public interface ProfessionalMappers {
     @Mapping(source = "lastName", target = "lastName")
     @Mapping(source = "summary", target = "summary")
     @Mapping(target = "location", source = "professionalDtoIn", qualifiedByName = "mapLocation")
-    @Mapping(target = "role", expression = "java(returnInitialRole(roleService))")
+    @Mapping(target = "roles", expression = "java(returnInitialRole())")
     @Mapping(target = "status", expression = "java(returnInitialStatus(statusService))")
     Professional fromDtoIn(ProfessionalDtoIn professionalDtoIn,
                            @Context LocationService locationService,
-                           @Context RoleService roleService,
                            @Context StatusService statusService);
 
 
     @Mapping(target = "id", source = "professional.id")
     @Mapping(target = "location", source = "professionalDtoIn", qualifiedByName = "mapLocation")
-    @Mapping(target = "role", source = "professional.role")
+    @Mapping(target = "roles", source = "professional.roles")
     @Mapping(target = "username", source = "professionalDtoIn.username")
     @Mapping(target = "password", source = "professionalDtoIn.password")
     @Mapping(target = "email", source = "professionalDtoIn.email")
@@ -55,7 +51,7 @@ public interface ProfessionalMappers {
     @Mapping(source = "firstName", target = "firstName")
     @Mapping(source = "lastName", target = "lastName")
     @Mapping(source = "summary", target = "summary")
-    @Mapping(source = "role.role", target = "role") // Nested mapping for role
+    @Mapping(source = "roles", target = "roles") // Nested mapping for role
     @Mapping(source = "location.name", target = "location")// Nested mapping for location
     @Mapping(source = "status.status", target = "status")
     @Mapping(target = "successfulMatches", source = "professional.successfulMatches", qualifiedByName = "returnSuccessfulMatches")
@@ -63,10 +59,9 @@ public interface ProfessionalMappers {
 
     @Mapping(source = "username", target = "username")
     @Mapping(source = "email", target = "email")
-    @Mapping(target = "role", expression = "java(returnInitialRole(roleService))")
+    @Mapping(target = "roles", expression = "java(returnInitialRole())")
     @Mapping(target = "location", source = "professionalDtoIn", qualifiedByName = "mapLocation")
     UserPrincipal toUserPrinciple(ProfessionalDtoIn professionalDtoIn,
-                                  @Context RoleService roleService,
                                   @Context LocationService locationService);
 
     List<ProfessionalOutDto> toDtoOutList(List<Professional> professionals);
@@ -78,8 +73,8 @@ public interface ProfessionalMappers {
     }
 
 
-    default Role returnInitialRole(@Context RoleService roleService){
-        return roleService.getRole("ROLE_PROFESSIONAL");
+    default String returnInitialRole(){
+        return "PROFESSIONAL";
     }
 
     default Status returnInitialStatus(@Context StatusService statusService){

@@ -2,13 +2,11 @@ package com.telerikacademy.web.jobmatch.helpers;
 
 import com.telerikacademy.web.jobmatch.models.Employer;
 import com.telerikacademy.web.jobmatch.models.Location;
-import com.telerikacademy.web.jobmatch.models.Role;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerOutDto;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.EmployerUpdateDto;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
-import com.telerikacademy.web.jobmatch.services.contracts.RoleService;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -24,14 +22,13 @@ public interface EmployerMappers {
     @Mapping(source = "email", target = "email")
     @Mapping(source = "companyName", target = "companyName")
     @Mapping(target = "location", source = "employerDtoIn", qualifiedByName = "mapLocation")
-    @Mapping(target = "role", expression = "java(returnInitialRole(roleService))")
+    @Mapping(target = "roles", expression = "java(returnInitialRole())")
     @Mapping(source = "description", target = "description")
     Employer fromDtoIn(EmployerDtoIn employerDtoIn,
-                       @Context LocationService locationService,
-                       @Context RoleService roleService);
+                       @Context LocationService locationService);
 
     @Mapping(target = "id", source = "employer.id") // Keep the `id` from the existing Employer
-    @Mapping(target = "role", source = "employer.role") // Keep the `role` from the existing Employer
+    @Mapping(target = "roles", source = "employer.roles") // Keep the `role` from the existing Employer
     @Mapping(target = "username", source = "employerDtoIn.username") // Update from EmployerDtoIn
     @Mapping(target = "password", source = "employerDtoIn.password") // Update from EmployerDtoIn
     @Mapping(target = "email", source = "employerDtoIn.email") // Update from EmployerDtoIn
@@ -45,7 +42,7 @@ public interface EmployerMappers {
     @Mapping(source = "companyName", target = "companyName")
     @Mapping(source = "description", target = "description")
     @Mapping(source = "email", target = "email")
-    @Mapping(source = "role.role", target = "role") // Nested mapping for role
+    @Mapping(source = "roles", target = "roles") // Nested mapping for role
     @Mapping(source = "location.name", target = "location")// Nested mapping for location
     @Mapping(target = "successfulMatches", expression =
             "java(employer.getSuccessfulProfessionalsMatched() != null ? employer.getSuccessfulProfessionalsMatched().size() : 0)")
@@ -54,11 +51,10 @@ public interface EmployerMappers {
 
     @Mapping(source = "username", target = "username")
     @Mapping(source = "email", target = "email")
-    @Mapping(target = "role", expression = "java(returnInitialRole(roleService))")
+    @Mapping(target = "roles", expression = "java(returnInitialRole())")
     @Mapping(target = "location", source = "employerDtoIn", qualifiedByName = "mapLocation")
     //@Mapping(source = "password", target = "password")
     UserPrincipal toUserPrinciple(EmployerDtoIn employerDtoIn,
-                                  @Context RoleService roleService,
                                   @Context LocationService locationService);
 
     List<EmployerOutDto> toDtoOutList(List<Employer> employers);
@@ -69,7 +65,7 @@ public interface EmployerMappers {
                 employerDtoIn.getLocCityId());
     }
 
-    default Role returnInitialRole(@Context RoleService roleService){
-        return roleService.getRole("ROLE_EMPLOYER");
+    default String returnInitialRole(){
+        return "EMPLOYER";
     }
 }
