@@ -15,9 +15,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
@@ -39,7 +41,18 @@ public class AuthenticationRestController {
         log.info("[AuthController:registerUser]Signup Process Started for user:{}", employerDtoIn.getUsername());
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bindingResult);
+            // Collect validation errors
+            List<String> errorMessages = bindingResult.getAllErrors().stream()
+                    .map(error -> {
+                        if (error instanceof FieldError) {
+                            FieldError fieldError = (FieldError) error;
+                            return fieldError.getField() + ": " + fieldError.getDefaultMessage();
+                        }
+                        return error.getDefaultMessage();
+                    })
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.badRequest().body(errorMessages); // Return errors as response
         }
 
         try {
@@ -58,7 +71,18 @@ public class AuthenticationRestController {
         log.info("[AuthController:registerUser]Signup Process Started for user:{}", professionalDtoIn.getUsername());
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bindingResult);
+            // Collect validation errors
+            List<String> errorMessages = bindingResult.getAllErrors().stream()
+                    .map(error -> {
+                        if (error instanceof FieldError) {
+                            FieldError fieldError = (FieldError) error;
+                            return fieldError.getField() + ": " + fieldError.getDefaultMessage();
+                        }
+                        return error.getDefaultMessage();
+                    })
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.badRequest().body(errorMessages); // Return errors as response
         }
 
         try {

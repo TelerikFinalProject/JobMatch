@@ -1,5 +1,6 @@
 package com.telerikacademy.web.jobmatch.models.dtos;
 
+import com.telerikacademy.web.jobmatch.annotations.PasswordMatches;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@PasswordMatches
 public class UserDtoIn {
     public static final String NULL_FIELD_ERROR = " should not be null!";
 
