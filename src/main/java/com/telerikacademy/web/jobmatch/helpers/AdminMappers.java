@@ -1,10 +1,8 @@
 package com.telerikacademy.web.jobmatch.helpers;
 
 import com.telerikacademy.web.jobmatch.models.Location;
-import com.telerikacademy.web.jobmatch.models.Role;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
 import com.telerikacademy.web.jobmatch.models.dtos.UserDtoIn;
-import com.telerikacademy.web.jobmatch.services.contracts.RoleService;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
@@ -17,10 +15,9 @@ public interface AdminMappers {
     @Mapping(source = "password", target = "password")
     @Mapping(source = "email", target = "email")
     @Mapping(target = "location", source = "userDtoIn", qualifiedByName = "mapLocation")
-    @Mapping(target = "role", expression = "java(returnInitialRole(roleService))")
+    @Mapping(target = "roles", expression = "java(returnInitialRole())")
     UserPrincipal fromDtoIn(UserDtoIn userDtoIn,
-                            @Context LocationService locationService,
-                            @Context RoleService roleService);
+                            @Context LocationService locationService);
 
     @Named("mapLocation")
     default Location mapLocation(UserDtoIn userDtoIn, @Context LocationService locationService) {
@@ -28,7 +25,7 @@ public interface AdminMappers {
                 userDtoIn.getLocCityId());
     }
 
-    default Role returnInitialRole(@Context RoleService roleService){
-        return roleService.getRole("ROLE_ADMIN");
+    default String returnInitialRole(){
+        return "ADMIN";
     }
 }

@@ -7,7 +7,6 @@ import com.telerikacademy.web.jobmatch.models.dtos.UserDtoIn;
 import com.telerikacademy.web.jobmatch.repositories.contracts.UserRepository;
 import com.telerikacademy.web.jobmatch.services.contracts.AdminService;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
-import com.telerikacademy.web.jobmatch.services.contracts.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,27 +17,24 @@ public class AdminServiceImpl implements AdminService {
 
     private final UserRepository userRepository;
     private final LocationService locationService;
-    private final RoleService roleService;
 
     @Autowired
     public AdminServiceImpl(UserRepository userRepository,
-                            LocationService locationService,
-                            RoleService roleService) {
+                            LocationService locationService) {
         this.userRepository = userRepository;
         this.locationService = locationService;
-        this.roleService = roleService;
     }
 
     @Override
     public List<UserPrincipal> getAdmins() {
         //TODO only admins can access this resource
-        return userRepository.findAllByRole("ROLE_ADMIN");
+        return userRepository.findAllByRole("ADMIN");
     }
 
     @Override
     public void createAdmin(UserDtoIn userDtoIn) {
         //TODO only admins can access this resource
-        UserPrincipal admin = AdminMappers.INSTANCE.fromDtoIn(userDtoIn, locationService, roleService);
+        UserPrincipal admin = AdminMappers.INSTANCE.fromDtoIn(userDtoIn, locationService);
         userRepository.save(admin);
     }
 
@@ -50,7 +46,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void deleteAdmin(int id) {
         UserPrincipal user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Admin", id));
-        if (!user.getRole().getRole().equals("ROLE_ADMIN")) {
+        if (!user.getRoles().equals("ADMIN")) {
             throw new EntityNotFoundException("Admin", id);
         }
         userRepository.delete(user);

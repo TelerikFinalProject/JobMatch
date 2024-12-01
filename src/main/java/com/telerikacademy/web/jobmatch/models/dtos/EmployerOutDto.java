@@ -12,7 +12,7 @@ public class EmployerOutDto {
     private String companyName;
     private String description;
     private String email;
-    private String role;
+    private String roles;
     private String location;
     private int successfulMatches;
 }

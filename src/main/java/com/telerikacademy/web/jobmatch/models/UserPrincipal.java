@@ -28,9 +28,8 @@ public class UserPrincipal {
     @Column(name = "password")
     private String password;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id")
-    private Role role;
+    @Column(name = "roles")
+    private String roles;
 
     @Column(name = "email")
     private String email;

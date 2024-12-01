@@ -43,7 +43,6 @@ public class AuthenticationRestService {
     private final LocationService locationService;
     private final UserInfoMapper userInfoMapper;
     private final StatusService statusService;
-    private final RoleService roleService;
 
     public AuthResponseDto getJwtTokensAfterAuthentication(Authentication authentication, HttpServletResponse response) {
         try {
@@ -126,7 +125,7 @@ public class AuthenticationRestService {
         // Extract user details from UserDetailsEntity
         String username = userInfoEntity.getUsername();
         String password = userInfoEntity.getPassword();
-        String roles = userInfoEntity.getRole().getRole();
+        String roles = userInfoEntity.getRoles();
 
         // Extract authorities from roles (comma-separated)
         String[] roleArray = roles.split(",");

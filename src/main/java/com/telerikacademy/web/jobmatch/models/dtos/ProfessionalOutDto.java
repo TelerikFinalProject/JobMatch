@@ -13,7 +13,7 @@ public class ProfessionalOutDto {
     private String firstName;
     private String lastName;
     private String summary;
-    private String role;
+    private String roles;
     private String location;
     private String status;
     private String successfulMatches;
