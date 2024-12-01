@@ -3,15 +3,15 @@ package com.telerikacademy.web.jobmatch.controllers.rest;
 import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
 import com.telerikacademy.web.jobmatch.exceptions.ExternalResourceException;
 import com.telerikacademy.web.jobmatch.helpers.JobAdMappers;
+import com.telerikacademy.web.jobmatch.helpers.JobApplicationMappers;
 import com.telerikacademy.web.jobmatch.models.Employer;
 import com.telerikacademy.web.jobmatch.models.JobAd;
+import com.telerikacademy.web.jobmatch.models.JobApplication;
 import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoOut;
+import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoOut;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobAdFilterOptions;
-import com.telerikacademy.web.jobmatch.services.contracts.EmployersService;
-import com.telerikacademy.web.jobmatch.services.contracts.JobAdService;
-import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
-import com.telerikacademy.web.jobmatch.services.contracts.StatusService;
+import com.telerikacademy.web.jobmatch.services.contracts.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/job-ads")
@@ -30,24 +31,27 @@ public class JobAdRestController {
     private final EmployersService employersService;
     private final LocationService locationService;
     private final StatusService statusService;
+    private final MatchService matchService;
 
     public JobAdRestController(JobAdService jobAdService,
                                EmployersService employersService,
                                LocationService locationService,
-                               StatusService statusService) {
+                               StatusService statusService,
+                               MatchService matchService) {
         this.jobAdService = jobAdService;
         this.employersService = employersService;
         this.locationService = locationService;
         this.statusService = statusService;
+        this.matchService = matchService;
     }
 
     @GetMapping
     public ResponseEntity<List<JobAdDtoOut>> getJobAds(@RequestParam(required = false) String positionTitle,
-                                                 @RequestParam(required = false) Double minSalary,
-                                                 @RequestParam(required = false) Double maxSalary,
-                                                 @RequestParam(required = false) String location,
-                                                 @RequestParam(required = false) String creator,
-                                                 @RequestParam(required = false) String status) {
+                                                       @RequestParam(required = false) Double minSalary,
+                                                       @RequestParam(required = false) Double maxSalary,
+                                                       @RequestParam(required = false) String location,
+                                                       @RequestParam(required = false) String creator,
+                                                       @RequestParam(required = false) String status) {
 
         JobAdFilterOptions filterOptions = new JobAdFilterOptions(positionTitle, minSalary, maxSalary, location, creator, status);
         List<JobAd> jobAds = jobAdService.getJobAds(filterOptions);
@@ -96,5 +100,18 @@ public class JobAdRestController {
     public ResponseEntity<String> deleteJobAd(@PathVariable int id) {
         jobAdService.removeJobAd(id);
         return ResponseEntity.ok("Job application has been deleted");
+    }
+
+    @GetMapping("/{id}/suitable-applications")
+    public ResponseEntity<Set<JobApplicationDtoOut>> getSuitableApplications(@PathVariable int id) {
+        try {
+            JobAd jobAd = jobAdService.getJobAd(id);
+            //TODO check if logged user is ad's owner or admin
+
+            Set<JobApplication> suitableJobApplications = matchService.getSuitableApplications(jobAd);
+            return ResponseEntity.ok(JobApplicationMappers.INSTANCE.toDtoOutSet(suitableJobApplications));
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 }

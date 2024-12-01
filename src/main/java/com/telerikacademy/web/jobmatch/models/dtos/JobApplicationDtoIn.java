@@ -12,9 +12,9 @@ import lombok.Setter;
 public class JobApplicationDtoIn {
     public static final String NULL_FIELD_ERROR = " should not be null!";
 
-    String description;
-    double minSalary;
-    double maxSalary;
+    private String description;
+    private double minSalary;
+    private double maxSalary;
     @NotNull(message = "Country Iso code" + NULL_FIELD_ERROR)
     @Size(min = 2, max = 3)
     private String locCountryIsoCode;
@@ -22,5 +22,7 @@ public class JobApplicationDtoIn {
     @NotNull(message = "City ID" + NULL_FIELD_ERROR)
     private int locCityId;
 
-    boolean isHybrid;
+    private boolean isHybrid;
+
+    private String skills;
 }

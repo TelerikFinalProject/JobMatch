@@ -13,6 +13,8 @@ import com.telerikacademy.web.jobmatch.services.contracts.ProfessionalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -31,8 +33,10 @@ public class ProfessionalRestController {
         this.locationService = locationService;
     }
 
+    //@PreAuthorize("hasRole('PROFESSIONAL')")
     @GetMapping
-    public ResponseEntity<List<ProfessionalOutDto>> getAllProfessionals() {
+    public ResponseEntity<List<ProfessionalOutDto>> getAllProfessionals(Authentication authentication) {
+        authentication.getAuthorities();
         List<ProfessionalOutDto> professionalOutDtoList = ProfessionalMappers.INSTANCE
                 .toDtoOutList(professionalService.getProfessionals());
         return ResponseEntity.ok(professionalOutDtoList);

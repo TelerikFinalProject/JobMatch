@@ -23,6 +23,6 @@ public class JobApplicationDtoOut {
     private String location;
     private String status;
     private Set<JobAd> matchedJobAds;
-    private Set<Skill> qualifications;
     private boolean isHybrid;
+    private String skills;
 }

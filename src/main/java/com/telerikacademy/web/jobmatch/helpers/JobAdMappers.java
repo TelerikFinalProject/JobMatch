@@ -13,6 +13,7 @@ import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
+import java.util.Set;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface JobAdMappers {
@@ -40,6 +41,8 @@ public interface JobAdMappers {
     JobAdDtoOut toDtoOut(JobAd jobAd);
 
     List<JobAdDtoOut> toDtoOutList(List<JobAd> jobAds);
+
+    Set<JobAdDtoOut> toDtoOutSet(Set<JobAd> jobAds);
 
 
     @Named("mapLocation")
