@@ -13,8 +13,10 @@ import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoOut;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobAdFilterOptions;
 import com.telerikacademy.web.jobmatch.services.contracts.*;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/job-ads")
 public class JobAdRestController {
 
@@ -31,38 +34,53 @@ public class JobAdRestController {
     private final LocationService locationService;
     private final StatusService statusService;
     private final MatchService matchService;
+    private final SkillService skillService;
 
-    public JobAdRestController(JobAdService jobAdService,
-                               EmployersService employersService,
-                               LocationService locationService,
-                               StatusService statusService,
-                               MatchService matchService) {
-        this.jobAdService = jobAdService;
-        this.employersService = employersService;
-        this.locationService = locationService;
-        this.statusService = statusService;
-        this.matchService = matchService;
-    }
-
+    @PreAuthorize("hasAnyRole('ROLE_PROFESSIONAL', 'ROLE_EMPLOYER', 'ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<List<JobAdDtoOut>> getJobAds(@RequestParam(required = false) String positionTitle,
                                                        @RequestParam(required = false) Double minSalary,
                                                        @RequestParam(required = false) Double maxSalary,
                                                        @RequestParam(required = false) String location,
                                                        @RequestParam(required = false) String creator,
-                                                       @RequestParam(required = false) String status) {
+                                                       @RequestParam(required = false) String status,
+                                                       Authentication authentication) {
 
-        JobAdFilterOptions filterOptions = new JobAdFilterOptions(positionTitle, minSalary, maxSalary, location, creator, status);
+        JobAdFilterOptions filterOptions;
+        boolean isEmployer = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_EMPLOYER"));
+
+        if (isEmployer) {
+            Employer employer = employersService.getEmployer(authentication.getName());
+            filterOptions = new JobAdFilterOptions(positionTitle, minSalary, maxSalary, location, employer.getCompanyName(), status);
+        } else {
+            filterOptions = new JobAdFilterOptions(positionTitle, minSalary, maxSalary, location, creator, status);
+        }
+
         List<JobAd> jobAds = jobAdService.getJobAds(filterOptions);
         List<JobAdDtoOut> jobAdDtoOuts = JobAdMappers.INSTANCE.toDtoOutList(jobAds);
 
         return ResponseEntity.ok(jobAdDtoOuts);
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_PROFESSIONAL', 'ROLE_EMPLOYER', 'ROLE_ADMIN')")
     @GetMapping("/{id}")
-    public ResponseEntity<JobAdDtoOut> getJobAdById(@PathVariable int id) {
+    public ResponseEntity<JobAdDtoOut> getJobAdById(@PathVariable int id,
+                                                    Authentication authentication) {
+
+        boolean isEmployer = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_EMPLOYER"));
+
         try {
             JobAd jobAd = jobAdService.getJobAd(id);
+
+            if (isEmployer) {
+                Employer employer = employersService.getEmployer(authentication.getName());
+
+                if (!jobAd.getEmployer().getCompanyName().equals(employer.getCompanyName())) {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                }
+            }
             JobAdDtoOut jobAdDtoOut = JobAdMappers.INSTANCE.toDtoOut(jobAd);
 
             return ResponseEntity.ok(jobAdDtoOut);
@@ -71,11 +89,12 @@ public class JobAdRestController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_EMPLOYER', 'ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<JobAdDtoOut> createJobAd(Authentication authentication, @Valid @RequestBody JobAdDtoIn jobAdDtoIn) {
 
         try {
-            JobAd jobAd = JobAdMappers.INSTANCE.fromDtoIn(jobAdDtoIn, locationService, statusService);
+            JobAd jobAd = JobAdMappers.INSTANCE.fromDtoIn(jobAdDtoIn, locationService, statusService, skillService);
             Employer employer = employersService.getEmployer(authentication.getName());
             jobAd.setEmployer(employer);
             jobAdService.createJobAd(jobAd);
@@ -88,29 +107,77 @@ public class JobAdRestController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_EMPLOYER', 'ROLE_ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<JobAdDtoOut> updateJobAd(@PathVariable int id, @RequestBody JobAdDtoIn jobAdDtoIn) {
-        JobAd jobAd;
+    public ResponseEntity<JobAdDtoOut> updateJobAd(@PathVariable int id,
+                                                   @RequestBody JobAdDtoIn jobAdDtoIn,
+                                                   Authentication authentication) {
+        boolean isEmployer = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_EMPLOYER"));
+
         try {
-            jobAd = jobAdService.getJobAd(id);
+            JobAd jobAd = jobAdService.getJobAd(id);
+
+            if (isEmployer) {
+                Employer employer = employersService.getEmployer(authentication.getName());
+
+                if (!jobAd.getEmployer().getCompanyName().equals(employer.getCompanyName())) {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                }
+            }
+
+            JobAd updatedJobAd = JobAdMappers.INSTANCE.fromDtoIn(jobAd, jobAdDtoIn, locationService, statusService, skillService);
+            jobAdService.updateJobAd(updatedJobAd);
+            return ResponseEntity.ok(JobAdMappers.INSTANCE.toDtoOut(updatedJobAd));
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (ExternalResourceException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, e.getMessage());
+        }
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_EMPLOYER')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteJobAd(@PathVariable int id,
+                                              Authentication authentication) {
+        boolean isEmployer = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_EMPLOYER"));
+
+        try {
+            JobAd jobAd = jobAdService.getJobAd(id);
+
+            if (isEmployer) {
+                Employer employer = employersService.getEmployer(authentication.getName());
+
+                if (!jobAd.getEmployer().getCompanyName().equals(employer.getCompanyName())) {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                }
+            }
+
+            jobAdService.removeJobAd(id);
+            return ResponseEntity.ok("Job application has been deleted");
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
-        jobAdService.updateJobAd(jobAd);
-        return ResponseEntity.ok(JobAdMappers.INSTANCE.toDtoOut(jobAd));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteJobAd(@PathVariable int id) {
-        jobAdService.removeJobAd(id);
-        return ResponseEntity.ok("Job application has been deleted");
-    }
-
+    @PreAuthorize("hasAnyRole('ROLE_EMPLOYER', 'ROLE_ADMIN')")
     @GetMapping("/{id}/suitable-applications")
-    public ResponseEntity<Set<JobApplicationDtoOut>> getSuitableApplications(@PathVariable int id) {
+    public ResponseEntity<Set<JobApplicationDtoOut>> getSuitableApplications(@PathVariable int id,
+                                                                             Authentication authentication) {
+
+        boolean isEmployer = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_EMPLOYER"));
         try {
             JobAd jobAd = jobAdService.getJobAd(id);
-            //TODO check if logged user is ad's owner or admin
+
+            if (isEmployer) {
+                Employer employer = employersService.getEmployer(authentication.getName());
+
+                if (!jobAd.getEmployer().getCompanyName().equals(employer.getCompanyName())) {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                }
+            }
 
             Set<JobApplication> suitableJobApplications = matchService.getSuitableApplications(jobAd);
             return ResponseEntity.ok(JobApplicationMappers.INSTANCE.toDtoOutSet(suitableJobApplications));

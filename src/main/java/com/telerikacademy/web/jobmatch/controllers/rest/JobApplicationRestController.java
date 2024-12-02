@@ -6,6 +6,7 @@ import com.telerikacademy.web.jobmatch.helpers.JobAdMappers;
 import com.telerikacademy.web.jobmatch.helpers.JobApplicationMappers;
 import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.models.JobApplication;
+import com.telerikacademy.web.jobmatch.models.Professional;
 import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoOut;
 import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoOut;
@@ -15,6 +16,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -48,14 +50,24 @@ public class JobApplicationRestController {
         this.matchService = matchService;
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_PROFESSIONAL', 'ROLE_EMPLOYER')")
     @GetMapping
     public ResponseEntity<List<JobApplicationDtoOut>> getJobApplications(@RequestParam(required = false) Double minSalary,
                                                                          @RequestParam(required = false) Double maxSalary,
                                                                          @RequestParam(required = false) String creator,
                                                                          @RequestParam(required = false) String location,
-                                                                         @RequestParam(required = false) String status) {
-        JobApplicationFilterOptions filterOptions =
-                new JobApplicationFilterOptions(minSalary, maxSalary, creator, location, status);
+                                                                         @RequestParam(required = false) String status,
+                                                                         Authentication authentication) {
+
+        boolean isProfessional = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_PROFESSIONAL"));
+        JobApplicationFilterOptions filterOptions;
+
+        if (isProfessional) {
+            filterOptions = new JobApplicationFilterOptions(minSalary, maxSalary, authentication.getName(), location, status);
+        } else {
+            filterOptions = new JobApplicationFilterOptions(minSalary, maxSalary, creator, location, status);
+        }
 
         List<JobApplication> jobApplications = jobApplicationService.getJobApplications(filterOptions);
 
@@ -64,10 +76,23 @@ public class JobApplicationRestController {
         return ResponseEntity.ok(jobApplicationDtoOuts);
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_PROFESSIONAL', 'ROLE_EMPLOYER')")
     @GetMapping("/{id}")
-    public ResponseEntity<JobApplicationDtoOut> getJobApplicationById(@PathVariable int id) {
+    public ResponseEntity<JobApplicationDtoOut> getJobApplicationById(@PathVariable int id,
+                                                                      Authentication authentication) {
+
+        boolean isProfessional = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_PROFESSIONAL"));
         try {
             JobApplication jobApplication = jobApplicationService.getJobApplication(id);
+
+            if (isProfessional) {
+                Professional professional = professionalService.getProfessionalByUsername(authentication.getName());
+                if (!jobApplication.getProfessional().getUsername().equals(professional.getUsername())) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                }
+            }
+
             JobApplicationDtoOut jobApplicationDtoOut = JobApplicationMappers.INSTANCE.toDtoOut(jobApplication);
 
             return ResponseEntity.ok(jobApplicationDtoOut);
@@ -76,6 +101,7 @@ public class JobApplicationRestController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_PROFESSIONAL')")
     @PostMapping
     public ResponseEntity<JobApplicationDtoOut> createJobApplication(@Valid @RequestBody JobApplicationDtoIn jobApplicationDtoIn,
                                                                      Authentication authentication) {
@@ -94,11 +120,24 @@ public class JobApplicationRestController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_PROFESSIONAL')")
     @PutMapping("/{id}")
     public ResponseEntity<JobApplicationDtoOut> updateJobApplication(@PathVariable int id,
-                                                                     @RequestBody JobApplicationDtoIn jobApplicationDtoIn) {
+                                                                     @RequestBody JobApplicationDtoIn jobApplicationDtoIn,
+                                                                     Authentication authentication) {
+
+        boolean isProfessional = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_PROFESSIONAL"));
+
         try {
             JobApplication jobApplication = jobApplicationService.getJobApplication(id);
+
+            if (isProfessional) {
+                Professional professional = professionalService.getProfessionalByUsername(authentication.getName());
+                if (!jobApplication.getProfessional().getUsername().equals(professional.getUsername())) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                }
+            }
 
             JobApplication updatedJobApplication = JobApplicationMappers.INSTANCE.fromDtoIn(jobApplication,
                     jobApplicationDtoIn, statusService, locationService, skillService);
@@ -112,17 +151,43 @@ public class JobApplicationRestController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_PROFESSIONAL')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteJobApplication(@PathVariable int id) {
+    public ResponseEntity<String> deleteJobApplication(@PathVariable int id,
+                                                       Authentication authentication) {
+        JobApplication jobApplication = jobApplicationService.getJobApplication(id);
+
+        boolean isProfessional = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_PROFESSIONAL"));
+
+        if (isProfessional) {
+            Professional professional = professionalService.getProfessionalByUsername(authentication.getName());
+            if (!jobApplication.getProfessional().getUsername().equals(professional.getUsername())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        }
+
         jobApplicationService.removeJobApplication(id);
         return ResponseEntity.ok("Job application has been deleted");
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_PROFESSIONAL')")
     @GetMapping("/{id}/suitable-ads")
-    public ResponseEntity<Set<JobAdDtoOut>> getSuitableAds(@PathVariable int id) {
+    public ResponseEntity<Set<JobAdDtoOut>> getSuitableAds(@PathVariable int id,
+                                                           Authentication authentication) {
+
+        boolean isProfessional = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_PROFESSIONAL"));
+
         try {
             JobApplication jobApplication = jobApplicationService.getJobApplication(id);
-            //TODO check if logged user is application's owner or admin
+
+            if (isProfessional) {
+                Professional professional = professionalService.getProfessionalByUsername(authentication.getName());
+                if (!jobApplication.getProfessional().getUsername().equals(professional.getUsername())) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                }
+            }
 
             Set<JobAd> suitableJobAds = matchService.getSuitableAds(jobApplication);
             return ResponseEntity.ok(JobAdMappers.INSTANCE.toDtoOutSet(suitableJobAds));
