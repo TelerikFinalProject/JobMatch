@@ -1,6 +1,7 @@
 package com.telerikacademy.web.jobmatch.controllers.rest;
 
 import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
+import com.telerikacademy.web.jobmatch.exceptions.EntityStatusException;
 import com.telerikacademy.web.jobmatch.exceptions.ExternalResourceException;
 import com.telerikacademy.web.jobmatch.helpers.JobAdMappers;
 import com.telerikacademy.web.jobmatch.helpers.JobApplicationMappers;
@@ -30,6 +31,7 @@ import java.util.Set;
 public class JobAdRestController {
 
     private final JobAdService jobAdService;
+    private final JobApplicationService jobApplicationService;
     private final EmployersService employersService;
     private final LocationService locationService;
     private final StatusService statusService;
@@ -183,6 +185,38 @@ public class JobAdRestController {
             return ResponseEntity.ok(JobApplicationMappers.INSTANCE.toDtoOutSet(suitableJobApplications));
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (EntityStatusException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/{adId}/requests/{applicationId}/approve")
+    public ResponseEntity<JobApplicationDtoOut> approveJobAd(@PathVariable int adId, @PathVariable int applicationId) {
+        try {
+            JobAd jobAd = jobAdService.getJobAd(adId);
+            JobApplication jobApplicationToApprove = jobApplicationService.getJobApplication(applicationId);
+
+            return ResponseEntity.ok(JobApplicationMappers.INSTANCE
+                    .toDtoOut(matchService.approveJobApplication(jobAd, jobApplicationToApprove)));
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (EntityStatusException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/{adId}/requests/{applicationId}/decline")
+    public ResponseEntity<String> declineJobAd(@PathVariable int adId, @PathVariable int applicationId) {
+        try {
+            JobAd jobAd = jobAdService.getJobAd(adId);
+            JobApplication jobApplicationToDecline = jobApplicationService.getJobApplication(applicationId);
+
+            matchService.declineJobApplication(jobAd, jobApplicationToDecline);
+            return ResponseEntity.ok("Job application has been declined");
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (EntityStatusException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 }

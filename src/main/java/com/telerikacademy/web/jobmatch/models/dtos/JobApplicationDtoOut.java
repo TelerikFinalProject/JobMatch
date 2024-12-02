@@ -1,8 +1,6 @@
 package com.telerikacademy.web.jobmatch.models.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.telerikacademy.web.jobmatch.models.JobAd;
-import com.telerikacademy.web.jobmatch.models.Skill;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +12,7 @@ import java.util.Set;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class JobApplicationDtoOut {
+    private int id;
     private String description;
     private String firstName;
     private String lastName;
@@ -22,7 +21,7 @@ public class JobApplicationDtoOut {
     private double maxSalary;
     private String location;
     private String status;
-    private Set<JobAd> matchedJobAds;
+    private Set<JobAdDtoOut> matchedJobAds;
     private boolean isHybrid;
     private String skills;
 }

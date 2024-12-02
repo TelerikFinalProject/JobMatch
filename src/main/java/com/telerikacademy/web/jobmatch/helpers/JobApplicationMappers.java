@@ -1,6 +1,7 @@
 package com.telerikacademy.web.jobmatch.helpers;
 
 import com.telerikacademy.web.jobmatch.models.*;
+import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoOut;
 import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoOut;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
@@ -53,8 +54,7 @@ public interface JobApplicationMappers {
     @Mapping(source = "hybrid", target = "hybrid")
     @Mapping(source = "jobApplication.status.status", target = "status")
     @Mapping(source = "qualifications", target = "skills", qualifiedByName = "setToString")
-    @Mapping(target = "matchedJobAds", expression =
-            "java(jobApplication.getMatchedJobAds() != null ? jobApplication.getMatchedJobAds() : new java.util.HashSet<>())")
+    @Mapping(target = "matchedJobAds", expression = "java(mapMatchedJobAds(jobApplication.getMatchesSentToJobAds()))")
     JobApplicationDtoOut toDtoOut(JobApplication jobApplication);
 
     List<JobApplicationDtoOut> toDtoOutList(List<JobApplication> jobApplication);
@@ -92,5 +92,9 @@ public interface JobApplicationMappers {
         return qualifications.stream()
                 .map(Skill::getName) // Convert Skill to its name
                 .collect(Collectors.joining(", "));
+    }
+
+    default Set<JobAdDtoOut> mapMatchedJobAds(Set<JobAd> matchesSentToJobAds) {
+        return (matchesSentToJobAds != null) ? JobAdMappers.INSTANCE.toDtoOutSet(matchesSentToJobAds) : new HashSet<>();
     }
 }

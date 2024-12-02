@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JobAdDtoOut {
-
+    private int id;
     private String positionTitle;
     private Double minSalary;
     private Double maxSalary;

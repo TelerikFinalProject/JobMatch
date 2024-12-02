@@ -9,4 +9,8 @@ public interface MatchService {
     Set<JobApplication> getSuitableApplications(JobAd ad);
 
     Set<JobAd> getSuitableAds(JobApplication application);
+
+    JobApplication approveJobApplication(JobAd jobAd, JobApplication jobApplicationToApprove);
+
+    void declineJobApplication(JobAd jobAd, JobApplication jobApplicationToDecline);
 }

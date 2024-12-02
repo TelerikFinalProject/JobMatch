@@ -50,6 +50,7 @@ public interface JobAdMappers {
                     @Context StatusService statusService,
                     @Context SkillService skillService);
 
+    @Mapping(source = "id", target = "id")
     @Mapping(source = "positionTitle", target = "positionTitle")
     @Mapping(source = "minSalary", target = "minSalary")
     @Mapping(source = "maxSalary", target = "maxSalary")

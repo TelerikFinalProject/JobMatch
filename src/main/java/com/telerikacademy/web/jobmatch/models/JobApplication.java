@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.util.Set;
 
 @Entity
@@ -41,8 +40,16 @@ public class JobApplication {
     @JoinColumn(name = "location_id")
     private Location location;
 
-    @ManyToMany(mappedBy = "matchedApplications")
-    private Set<JobAd> matchedJobAds;
+    @ManyToMany
+    @JoinTable(
+            name = "job_applications_match_requests",
+            joinColumns = @JoinColumn(name = "job_application_id"),
+            inverseJoinColumns = @JoinColumn(name = "job_ad_id")
+    )
+    private Set<JobAd> matchesSentToJobAds;
+
+    @ManyToMany(mappedBy = "matchesSentToJobApplications") //those waiting for approval
+    private Set<JobAd> matchRequestedAds;
 
     @Column(name = "is_hybrid")
     private boolean isHybrid;

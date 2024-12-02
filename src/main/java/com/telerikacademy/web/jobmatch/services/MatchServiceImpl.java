@@ -1,16 +1,18 @@
 package com.telerikacademy.web.jobmatch.services;
 
+import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
+import com.telerikacademy.web.jobmatch.exceptions.EntityStatusException;
 import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.models.JobApplication;
+import com.telerikacademy.web.jobmatch.models.Professional;
 import com.telerikacademy.web.jobmatch.models.Skill;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobAdFilterOptions;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobApplicationFilterOptions;
-import com.telerikacademy.web.jobmatch.services.contracts.JobAdService;
-import com.telerikacademy.web.jobmatch.services.contracts.JobApplicationService;
-import com.telerikacademy.web.jobmatch.services.contracts.MatchService;
+import com.telerikacademy.web.jobmatch.services.contracts.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,21 +21,33 @@ import java.util.Set;
 public class MatchServiceImpl implements MatchService {
     private final JobAdService jobAdService;
     private final JobApplicationService jobApplicationService;
+    private final StatusService statusService;
+    private final ProfessionalService professionalService;
+    private final EmployersService employersService;
 
     @Autowired
-    public MatchServiceImpl(JobAdService jobAdService, JobApplicationService jobApplicationService) {
+    public MatchServiceImpl(JobAdService jobAdService,
+                            JobApplicationService jobApplicationService,
+                            ProfessionalService professionalService,
+                            EmployersService employersService,
+                            StatusService statusService) {
         this.jobAdService = jobAdService;
         this.jobApplicationService = jobApplicationService;
+        this.professionalService = professionalService;
+        this.employersService = employersService;
+        this.statusService = statusService;
     }
 
     public Set<JobAd> getSuitableAds(JobApplication application) {
-        double minSalary = application.getMinSalary() + (application.getMinSalary() * 20 / 100);
-        //double maxSalary = application.getMaxSalary() - (application.getMaxSalary() * 20 / 100);
+        checkEntityStatus(application.getStatus().getStatus(), "Job application");
+
+        double minSalary = application.getMinSalary() - (application.getMinSalary() * 20 / 100);
+        double maxSalary = application.getMaxSalary() + (application.getMaxSalary() * 20 / 100);
         String location = application.getLocation().getName();
         String status = "Active";
 
         JobAdFilterOptions filterOptions =
-                new JobAdFilterOptions(null, minSalary, null, location, null, status);
+                new JobAdFilterOptions(null, minSalary, maxSalary, location, null, status);
 
         List<JobAd> filteredAps = jobAdService.getJobAds(filterOptions);
 
@@ -59,17 +73,19 @@ public class MatchServiceImpl implements MatchService {
     }
 
     public Set<JobApplication> getSuitableApplications(JobAd ad) {
+        checkEntityStatus(ad.getStatus().getStatus(), "Job ad");
+
         double minSalary = ad.getMinSalary() - (ad.getMinSalary() * 20 / 100);
-        //double maxSalary = ad.getMaxSalary() + (ad.getMaxSalary() * 20 / 100);
+        double maxSalary = ad.getMaxSalary() + (ad.getMaxSalary() * 20 / 100);
         String location = ad.getLocation().getName();
         String status = "Active";
 
         JobApplicationFilterOptions filterOptions =
-                new JobApplicationFilterOptions(minSalary, null, null, location, status);
+                new JobApplicationFilterOptions(minSalary, maxSalary, null, location, status);
         List<JobApplication> filteredApplications = jobApplicationService.getJobApplications(filterOptions);
 
         Set<JobApplication> suitableApplications = new HashSet<>();
-        double minQuantitySkills = ad.getSkills().size() * 90.0 / 100;
+        double minQuantitySkills = ad.getSkills().size() * 60.0 / 100;
 
         for (JobApplication application : filteredApplications) {
             if (application.getQualifications().size() < minQuantitySkills) {
@@ -87,5 +103,48 @@ public class MatchServiceImpl implements MatchService {
             }
         }
         return suitableApplications;
+    }
+
+    @Override
+    public JobApplication approveJobApplication(JobAd jobAd, JobApplication jobApplicationToApprove) {
+        checkIfActionIsValid(jobAd, jobApplicationToApprove);
+
+        //Change status of Professional, add the Employer in a successful matches set
+        Professional applicant = jobApplicationToApprove.getProfessional();
+        applicant.setStatus(statusService.getStatus("Busy"));
+        applicant.getSuccessfulMatches().add(jobAd.getEmployer());
+        professionalService.updateProfessional(applicant);
+
+        jobAd.setMatchesSentToJobApplications(new HashSet<>());
+        jobAd.setMatchRequestedApplications(new HashSet<>());
+        jobAd.setStatus(statusService.getStatus("Archived"));
+        jobAdService.updateJobAd(jobAd);
+
+        jobApplicationToApprove.setMatchesSentToJobAds(new HashSet<>());
+        jobApplicationToApprove.setMatchRequestedAds(new HashSet<>());
+        jobApplicationToApprove.setStatus(statusService.getStatus("Matched"));
+        jobApplicationService.updateJobApplication(jobApplicationToApprove);
+
+        return jobApplicationToApprove;
+    }
+
+    @Override
+    public void declineJobApplication(JobAd jobAd, JobApplication jobApplicationToDecline) {
+        checkIfActionIsValid(jobAd, jobApplicationToDecline);
+
+        jobAd.getMatchRequestedApplications().remove(jobApplicationToDecline);
+        jobAdService.updateJobAd(jobAd);
+    }
+
+    private static void checkIfActionIsValid(JobAd jobAd, JobApplication jobApplicationToDecline) {
+        if (!jobAd.getMatchRequestedApplications().contains(jobApplicationToDecline)) {
+            throw new EntityNotFoundException("No such application request exists!");
+        }
+    }
+
+    private static void checkEntityStatus(String status, String entityType) {
+        if (!status.equals("Active")){
+            throw new EntityStatusException(entityType, status);
+        }
     }
 }
