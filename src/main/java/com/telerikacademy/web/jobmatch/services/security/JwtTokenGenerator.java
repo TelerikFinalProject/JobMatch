@@ -31,7 +31,7 @@ public class JwtTokenGenerator {
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("com.jobMatch.auth")
                 .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plus(15, ChronoUnit.MINUTES))
+                .expiresAt(Instant.now().plus(1, ChronoUnit.DAYS))
                 .subject(authentication.getName())
                 .claim("roles", roles)
                 .build();

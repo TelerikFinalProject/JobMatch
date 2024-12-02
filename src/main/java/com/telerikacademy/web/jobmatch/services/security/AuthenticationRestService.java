@@ -55,7 +55,7 @@ public class AuthenticationRestService {
             log.info("[AuthService:userSignInAuth] Access token for user:{}, has been generated", userPrinciple.getUsername());
             return AuthResponseDto.builder()
                     .accessToken(accessToken)
-                    .accessTokenExpiry(15 * 60)
+                    .accessTokenExpiry(24 * 60 * 60)
                     .username(userPrinciple.getUsername())
                     .tokenType(TokenType.Bearer)
                     .build();
@@ -67,9 +67,7 @@ public class AuthenticationRestService {
     }
 
     private void saveUserRefreshToken(UserPrincipal userPrinciple, String refreshToken) {
-        List<RefreshTokenEntity> refreshTokens = refreshTokenRepository.findAllRefreshTokenByUsername(userPrinciple.getUsername());
-        refreshTokens.forEach(r -> r.setRevoked(true));
-        refreshTokenRepository.saveAll(refreshTokens);
+        refreshTokenRepository.deleteAllByUserId(userPrinciple.getId());
 
 
         var refreshTokenEntity = RefreshTokenEntity.builder()
