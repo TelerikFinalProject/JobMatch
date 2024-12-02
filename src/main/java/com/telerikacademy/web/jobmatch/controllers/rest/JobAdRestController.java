@@ -136,8 +136,6 @@ public class JobAdRestController {
         } catch (ExternalResourceException e) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, e.getMessage());
         }
-        jobAdService.updateJobAd(jobAd);
-        return ResponseEntity.ok(JobAdMappers.INSTANCE.toDtoOut(jobAd));
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_EMPLOYER')")
