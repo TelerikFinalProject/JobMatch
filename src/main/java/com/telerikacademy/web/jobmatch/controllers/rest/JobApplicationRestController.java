@@ -126,13 +126,12 @@ public class JobApplicationRestController {
     public ResponseEntity<Set<JobAdDtoOut>> getSuitableAds(@PathVariable int id) {
         try {
             JobApplication jobApplication = jobApplicationService.getJobApplication(id);
-            //TODO check if logged user is application's owner or admin
 
             Set<JobAd> suitableJobAds = matchService.getSuitableAds(jobApplication);
             return ResponseEntity.ok(JobAdMappers.INSTANCE.toDtoOutSet(suitableJobAds));
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        } catch (EntityStatusException e){
+        } catch (EntityStatusException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
@@ -148,15 +147,52 @@ public class JobApplicationRestController {
                         String.format("Job %s with ID:%d is not suitable for your %s!", "ad", jobAdId, "application"));
             }
 
-            if (!jobApplication.getMatchesSentToJobAds().add(jobAdToMatchWith)){
+            if (!jobApplication.getMatchesSentToJobAds().add(jobAdToMatchWith)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         String.format("A match request for Job %s with ID:%d has already been initiated!", "ad", jobAdId));
+            }
+
+            if (jobApplication.getMatchRequestedAds().contains(jobAdToMatchWith)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        String.format("A match request for Job %s with ID:%d already exists, " +
+                                "please reach out to the Job %s creator!", "ad", jobAdId, "ad"));
             }
 
             jobApplicationService.updateJobApplication(jobApplication);
             return ResponseEntity.ok(JobAdMappers.INSTANCE.toDtoOutSet(jobApplication.getMatchesSentToJobAds()));
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
+
+    @PostMapping("/{applicationId}/requests/{adId}/approve")
+    public ResponseEntity<JobAdDtoOut> approveJobAd(@PathVariable int applicationId, @PathVariable int adId) {
+        try {
+            JobAd jobAd = jobAdService.getJobAd(adId);
+            JobApplication jobApplicationToApprove = jobApplicationService.getJobApplication(applicationId);
+
+            return ResponseEntity.ok(JobAdMappers.INSTANCE
+                    .toDtoOut(matchService.approveJobAd(jobAd, jobApplicationToApprove)));
+
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (EntityStatusException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/{applicationId}/requests/{adId}/decline")
+    public ResponseEntity<String> declineJobAd(@PathVariable int applicationId, @PathVariable int adId) {
+        try {
+            JobAd jobAd = jobAdService.getJobAd(adId);
+            JobApplication jobApplicationToDecline = jobApplicationService.getJobApplication(applicationId);
+
+            matchService.declineAd(jobAd, jobApplicationToDecline);
+            return ResponseEntity.ok("Job ad has been declined");
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (EntityStatusException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 }

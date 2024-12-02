@@ -21,7 +21,8 @@ public class JobApplicationDtoOut {
     private double maxSalary;
     private String location;
     private String status;
-    private Set<JobAdDtoOut> matchedJobAds;
+    private Set<JobAdDtoOut> sentMatches;
+    private Set<JobAdDtoOut> requestedMatches;
     private boolean isHybrid;
     private String skills;
 }

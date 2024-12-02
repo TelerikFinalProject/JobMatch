@@ -75,23 +75,23 @@ public interface ProfessionalMappers {
                 professionalDtoIn.getLocCityId());
     }
 
-    default String returnInitialRole(){
+    default String returnInitialRole() {
         return "PROFESSIONAL";
     }
 
-    default Status returnInitialStatus(@Context StatusService statusService){
+    default Status returnInitialStatus(@Context StatusService statusService) {
         return statusService.getStatus("Active");
     }
 
     @Named("returnUpdatedStatus")
     default Status returnUpdatedStatus(ProfessionalUpdateDto professionalUpdateDto,
-                                       @Context StatusService statusService){
+                                       @Context StatusService statusService) {
         return statusService.getStatus(professionalUpdateDto.getUpdatedStatus());
     }
 
     @Named("returnSuccessfulMatches")
-    default String returnSuccessfulMatches(Set<Employer> successfulMatches){
-        if (successfulMatches != null){
+    default String returnSuccessfulMatches(Set<Employer> successfulMatches) {
+        if (successfulMatches != null) {
             List<String> companyNames = new ArrayList<>();
 
             for (Employer employer : successfulMatches) {

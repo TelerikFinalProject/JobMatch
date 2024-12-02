@@ -12,7 +12,6 @@ import com.telerikacademy.web.jobmatch.services.contracts.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,18 +22,15 @@ public class MatchServiceImpl implements MatchService {
     private final JobApplicationService jobApplicationService;
     private final StatusService statusService;
     private final ProfessionalService professionalService;
-    private final EmployersService employersService;
 
     @Autowired
     public MatchServiceImpl(JobAdService jobAdService,
                             JobApplicationService jobApplicationService,
                             ProfessionalService professionalService,
-                            EmployersService employersService,
                             StatusService statusService) {
         this.jobAdService = jobAdService;
         this.jobApplicationService = jobApplicationService;
         this.professionalService = professionalService;
-        this.employersService = employersService;
         this.statusService = statusService;
     }
 
@@ -57,7 +53,7 @@ public class MatchServiceImpl implements MatchService {
                 continue;
             }
 
-            double minQuantitySkills = ad.getSkills().size() * 90.0 / 100;
+            double minQuantitySkills = ad.getSkills().size() * 50.0 / 100;
             double mutualSkills = 0;
 
             for (Skill qualification : application.getQualifications()) {
@@ -107,9 +103,41 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public JobApplication approveJobApplication(JobAd jobAd, JobApplication jobApplicationToApprove) {
-        checkIfActionIsValid(jobAd, jobApplicationToApprove);
+        checkIfApplicationRequestIsValid(jobAd, jobApplicationToApprove);
 
         //Change status of Professional, add the Employer in a successful matches set
+        approvalProcess(jobAd, jobApplicationToApprove);
+
+        return jobApplicationToApprove;
+    }
+
+    @Override
+    public JobAd approveJobAd(JobAd jobAd, JobApplication jobApplicationToApprove) {
+        checkIfAdRequestIsValid(jobAd, jobApplicationToApprove);
+
+        //Change status of Professional, add the Employer in a successful matches set
+        approvalProcess(jobAd, jobApplicationToApprove);
+
+        return jobAd;
+    }
+
+    @Override
+    public void declineJobApplication(JobAd jobAd, JobApplication jobApplicationToDecline) {
+        checkIfApplicationRequestIsValid(jobAd, jobApplicationToDecline);
+
+        jobAd.getMatchRequestedApplications().remove(jobApplicationToDecline);
+        jobAdService.updateJobAd(jobAd);
+    }
+
+    @Override
+    public void declineAd(JobAd jobAdToDecline, JobApplication jobApplication) {
+        checkIfAdRequestIsValid(jobAdToDecline, jobApplication);
+
+        jobApplication.getMatchRequestedAds().remove(jobAdToDecline);
+        jobApplicationService.updateJobApplication(jobApplication);
+    }
+
+    private void approvalProcess(JobAd jobAd, JobApplication jobApplicationToApprove) {
         Professional applicant = jobApplicationToApprove.getProfessional();
         applicant.setStatus(statusService.getStatus("Busy"));
         applicant.getSuccessfulMatches().add(jobAd.getEmployer());
@@ -124,26 +152,22 @@ public class MatchServiceImpl implements MatchService {
         jobApplicationToApprove.setMatchRequestedAds(new HashSet<>());
         jobApplicationToApprove.setStatus(statusService.getStatus("Matched"));
         jobApplicationService.updateJobApplication(jobApplicationToApprove);
-
-        return jobApplicationToApprove;
     }
 
-    @Override
-    public void declineJobApplication(JobAd jobAd, JobApplication jobApplicationToDecline) {
-        checkIfActionIsValid(jobAd, jobApplicationToDecline);
-
-        jobAd.getMatchRequestedApplications().remove(jobApplicationToDecline);
-        jobAdService.updateJobAd(jobAd);
-    }
-
-    private static void checkIfActionIsValid(JobAd jobAd, JobApplication jobApplicationToDecline) {
+    private static void checkIfApplicationRequestIsValid(JobAd jobAd, JobApplication jobApplicationToDecline) {
         if (!jobAd.getMatchRequestedApplications().contains(jobApplicationToDecline)) {
             throw new EntityNotFoundException("No such application request exists!");
         }
     }
 
+    private static void checkIfAdRequestIsValid(JobAd jobAd, JobApplication jobApplicationToDecline) {
+        if (!jobApplicationToDecline.getMatchRequestedAds().contains(jobAd)) {
+            throw new EntityNotFoundException("No such application request exists!");
+        }
+    }
+
     private static void checkEntityStatus(String status, String entityType) {
-        if (!status.equals("Active")){
+        if (!status.equals("Active")) {
             throw new EntityStatusException(entityType, status);
         }
     }

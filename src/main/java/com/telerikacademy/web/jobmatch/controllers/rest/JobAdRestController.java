@@ -33,19 +33,22 @@ public class JobAdRestController {
     private final LocationService locationService;
     private final StatusService statusService;
     private final MatchService matchService;
+    private final SkillService skillService;
 
     public JobAdRestController(JobAdService jobAdService,
                                EmployersService employersService,
                                LocationService locationService,
                                StatusService statusService,
                                MatchService matchService,
-                               JobApplicationService jobApplicationService) {
+                               JobApplicationService jobApplicationService,
+                               SkillService skillService) {
         this.jobAdService = jobAdService;
         this.employersService = employersService;
         this.locationService = locationService;
         this.statusService = statusService;
         this.matchService = matchService;
         this.jobApplicationService = jobApplicationService;
+        this.skillService = skillService;
     }
 
     @GetMapping
@@ -79,7 +82,7 @@ public class JobAdRestController {
     public ResponseEntity<JobAdDtoOut> createJobAd(Authentication authentication, @Valid @RequestBody JobAdDtoIn jobAdDtoIn) {
 
         try {
-            JobAd jobAd = JobAdMappers.INSTANCE.fromDtoIn(jobAdDtoIn, locationService, statusService);
+            JobAd jobAd = JobAdMappers.INSTANCE.fromDtoIn(jobAdDtoIn, locationService, statusService, skillService);
             Employer employer = employersService.getEmployer(authentication.getName());
             jobAd.setEmployer(employer);
             jobAdService.createJobAd(jobAd);
@@ -95,6 +98,7 @@ public class JobAdRestController {
     @PutMapping("/{id}")
     public ResponseEntity<JobAdDtoOut> updateJobAd(@PathVariable int id, @RequestBody JobAdDtoIn jobAdDtoIn) {
         JobAd jobAd;
+        //TODO
         try {
             jobAd = jobAdService.getJobAd(id);
         } catch (EntityNotFoundException e) {
@@ -114,7 +118,6 @@ public class JobAdRestController {
     public ResponseEntity<Set<JobApplicationDtoOut>> getSuitableApplications(@PathVariable int id) {
         try {
             JobAd jobAd = jobAdService.getJobAd(id);
-            //TODO check if logged user is ad's owner or admin
 
             Set<JobApplication> suitableJobApplications = matchService.getSuitableApplications(jobAd);
             return ResponseEntity.ok(JobApplicationMappers.INSTANCE.toDtoOutSet(suitableJobApplications));
@@ -122,6 +125,35 @@ public class JobAdRestController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (EntityStatusException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/{jobAdId}/request-match/{jobApplicationId}")
+    public ResponseEntity<Set<JobApplicationDtoOut>> requestMatch(@PathVariable int jobAdId, @PathVariable int jobApplicationId) {
+        try {
+            JobAd jobAdToMatchWith = jobAdService.getJobAd(jobAdId);
+            JobApplication jobApplication = jobApplicationService.getJobApplication(jobApplicationId);
+
+            if (!matchService.getSuitableApplications(jobAdToMatchWith).contains(jobApplication)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        String.format("Job %s with ID:%d is not suitable for your %s!", "application", jobApplicationId, "ad"));
+            }
+
+            if (!jobAdToMatchWith.getMatchesSentToJobApplications().add(jobApplication)){
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        String.format("A match request for Job %s with ID:%d has already been initiated!", "application", jobApplicationId));
+            }
+
+            if (jobAdToMatchWith.getMatchRequestedApplications().contains(jobApplication)){
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        String.format("A match request for Job %s with ID:%d already exists, " +
+                                "please reach out to the Job %s creator!", "application", jobAdId, "application"));
+            }
+
+            jobAdService.updateJobAd(jobAdToMatchWith);
+            return ResponseEntity.ok(JobApplicationMappers.INSTANCE.toDtoOutSet(jobAdToMatchWith.getMatchesSentToJobApplications()));
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
 

@@ -12,5 +12,9 @@ public interface MatchService {
 
     JobApplication approveJobApplication(JobAd jobAd, JobApplication jobApplicationToApprove);
 
+    JobAd approveJobAd(JobAd jobAd, JobApplication jobApplicationToApprove);
+
     void declineJobApplication(JobAd jobAd, JobApplication jobApplicationToDecline);
+
+    void declineAd(JobAd jobAd, JobApplication jobApplicationToDecline);
 }

@@ -54,7 +54,8 @@ public interface JobApplicationMappers {
     @Mapping(source = "hybrid", target = "hybrid")
     @Mapping(source = "jobApplication.status.status", target = "status")
     @Mapping(source = "qualifications", target = "skills", qualifiedByName = "setToString")
-    @Mapping(target = "matchedJobAds", expression = "java(mapMatchedJobAds(jobApplication.getMatchesSentToJobAds()))")
+    @Mapping(target = "sentMatches", expression = "java(mapMatchedJobAds(jobApplication.getMatchesSentToJobAds()))")
+    @Mapping(target = "requestedMatches", expression = "java(mapMatchedJobAds(jobApplication.getMatchRequestedAds()))")
     JobApplicationDtoOut toDtoOut(JobApplication jobApplication);
 
     List<JobApplicationDtoOut> toDtoOutList(List<JobApplication> jobApplication);

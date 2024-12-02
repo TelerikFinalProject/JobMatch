@@ -4,9 +4,7 @@ import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.models.Location;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobAdFilterOptions;
 import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
