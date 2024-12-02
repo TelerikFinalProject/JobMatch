@@ -34,6 +34,7 @@ public class JwtTokenGenerator {
                 .expiresAt(Instant.now().plus(1, ChronoUnit.DAYS))
                 .subject(authentication.getName())
                 .claim("roles", roles)
+                .claim("scope", "delete")
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
