@@ -23,9 +23,9 @@ public class JobApplicationSpecification implements Specification<JobApplication
 
         List<Predicate> predicates = new ArrayList<>();
         filterOptions.getMinSalary().ifPresent(minSalary ->
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("minSalary"), minSalary)));
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("maxSalary"), minSalary)));
         filterOptions.getMaxSalary().ifPresent(maxSalary ->
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("maxSalary"), maxSalary)));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("minSalary"), maxSalary)));
         filterOptions.getCreator().ifPresent(creator -> {
             Join<JobApplication, Professional> professionalJoin = root.join("professional", JoinType.LEFT);
             predicates.add(criteriaBuilder.equal(professionalJoin.get("username"), creator));

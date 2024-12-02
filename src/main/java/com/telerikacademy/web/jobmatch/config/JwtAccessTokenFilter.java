@@ -3,6 +3,7 @@ package com.telerikacademy.web.jobmatch.config;
 import com.telerikacademy.web.jobmatch.models.enums.TokenType;
 import com.telerikacademy.web.jobmatch.records.RSAKeyRecord;
 import com.telerikacademy.web.jobmatch.utils.JwtTokenUtils;
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +22,6 @@ import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 
@@ -34,13 +34,13 @@ public class JwtAccessTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+                                    @Nonnull HttpServletResponse response,
+                                    @Nonnull FilterChain filterChain) throws ServletException, IOException {
 
         try {
             log.info("[JwtAccessTokenFilter:doFilterInternal] :: Started ");
 
-            log.info("[JwtAccessTokenFilter:doFilterInternal]Filtering the Http Request:{}",request.getRequestURI());
+            log.info("[JwtAccessTokenFilter:doFilterInternal]Filtering the Http Request:{}", request.getRequestURI());
 
             final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
@@ -78,8 +78,11 @@ public class JwtAccessTokenFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
         } catch (JwtValidationException jwtValidationException) {
-            log.error("[JwtAccessTokenFilter:doFilterInternal] Exception due to :{}",jwtValidationException.getMessage());
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, jwtValidationException.getMessage());
+            log.error("[JwtAccessTokenFilter:doFilterInternal] JWT validation failed: {}", jwtValidationException.getMessage());
+            response.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"JWT validation failed: " + jwtValidationException.getMessage() + "\"}");
+            response.getWriter().flush();
         }
     }
 }

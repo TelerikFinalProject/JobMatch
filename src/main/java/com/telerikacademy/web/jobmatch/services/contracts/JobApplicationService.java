@@ -1,5 +1,6 @@
 package com.telerikacademy.web.jobmatch.services.contracts;
 
+import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.models.JobApplication;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobApplicationFilterOptions;
 

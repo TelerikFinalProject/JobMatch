@@ -1,6 +1,7 @@
 package com.telerikacademy.web.jobmatch.controllers.rest;
 
 import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
+import com.telerikacademy.web.jobmatch.exceptions.EntityStatusException;
 import com.telerikacademy.web.jobmatch.exceptions.ExternalResourceException;
 import com.telerikacademy.web.jobmatch.helpers.JobAdMappers;
 import com.telerikacademy.web.jobmatch.helpers.JobApplicationMappers;
@@ -27,6 +28,7 @@ import java.util.Set;
 public class JobApplicationRestController {
 
     private final JobApplicationService jobApplicationService;
+    private final JobAdService jobAdService;
     private final LocationService locationService;
     private final StatusService statusService;
     private final ProfessionalService professionalService;
@@ -39,13 +41,15 @@ public class JobApplicationRestController {
                                         StatusService statusService,
                                         ProfessionalService professionalService,
                                         SkillService skillService,
-                                        MatchService matchService) {
+                                        MatchService matchService,
+                                        JobAdService jobAdService) {
         this.jobApplicationService = jobApplicationService;
         this.locationService = locationService;
         this.statusService = statusService;
         this.professionalService = professionalService;
         this.skillService = skillService;
         this.matchService = matchService;
+        this.jobAdService = jobAdService;
     }
 
     @GetMapping
@@ -126,6 +130,31 @@ public class JobApplicationRestController {
 
             Set<JobAd> suitableJobAds = matchService.getSuitableAds(jobApplication);
             return ResponseEntity.ok(JobAdMappers.INSTANCE.toDtoOutSet(suitableJobAds));
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (EntityStatusException e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/{jobApplicationId}/request-match/{jobAdId}")
+    public ResponseEntity<Set<JobAdDtoOut>> requestMatch(@PathVariable int jobApplicationId, @PathVariable int jobAdId) {
+        try {
+            JobAd jobAdToMatchWith = jobAdService.getJobAd(jobAdId);
+            JobApplication jobApplication = jobApplicationService.getJobApplication(jobApplicationId);
+
+            if (!matchService.getSuitableAds(jobApplication).contains(jobAdToMatchWith)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        String.format("Job %s with ID:%d is not suitable for your %s!", "ad", jobAdId, "application"));
+            }
+
+            if (!jobApplication.getMatchesSentToJobAds().add(jobAdToMatchWith)){
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        String.format("A match request for Job %s with ID:%d has already been initiated!", "ad", jobAdId));
+            }
+
+            jobApplicationService.updateJobApplication(jobApplication);
+            return ResponseEntity.ok(JobAdMappers.INSTANCE.toDtoOutSet(jobApplication.getMatchesSentToJobAds()));
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }

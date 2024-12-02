@@ -29,6 +29,7 @@ public interface JobAdMappers {
                     @Context LocationService locationService,
                     @Context StatusService statusService);
 
+    @Mapping(source = "id", target = "id")
     @Mapping(source = "positionTitle", target = "positionTitle")
     @Mapping(source = "minSalary", target = "minSalary")
     @Mapping(source = "maxSalary", target = "maxSalary")

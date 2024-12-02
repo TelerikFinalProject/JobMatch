@@ -30,13 +30,13 @@ public class JobAdSpecifications {
 
             jobAdFilterOptions.getMinSalary().ifPresent(minSalary ->
                     predicates.add(
-                            criteriaBuilder.greaterThanOrEqualTo(root.get("minSalary"), minSalary)
+                            criteriaBuilder.greaterThanOrEqualTo(root.get("maxSalary"), minSalary)
                     )
             );
 
             jobAdFilterOptions.getMaxSalary().ifPresent(maxSalary ->
                     predicates.add(
-                            criteriaBuilder.lessThanOrEqualTo(root.get("maxSalary"), maxSalary)
+                            criteriaBuilder.lessThanOrEqualTo(root.get("minSalary"), maxSalary)
                     )
             );
 
@@ -49,10 +49,10 @@ public class JobAdSpecifications {
             );
 
             jobAdFilterOptions.getLocation().ifPresent(location -> {
-                Join<JobAd, Location> locationJoin = root.join("location");
-                Predicate locationPredicate = criteriaBuilder.equal(locationJoin.get("name"), location);
-                Predicate homePredicate = criteriaBuilder.equal(locationJoin.get("name"), "Home");
-                predicates.add(criteriaBuilder.or(locationPredicate, homePredicate));
+                        Join<JobAd, Location> locationJoin = root.join("location");
+                        Predicate locationPredicate = criteriaBuilder.equal(locationJoin.get("name"), location);
+                        Predicate homePredicate = criteriaBuilder.equal(locationJoin.get("name"), "Home");
+                        predicates.add(criteriaBuilder.or(locationPredicate, homePredicate));
                     }
 
             );
