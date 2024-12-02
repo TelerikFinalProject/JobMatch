@@ -5,7 +5,7 @@ import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
 import com.telerikacademy.web.jobmatch.helpers.EmployerMappers;
 import com.telerikacademy.web.jobmatch.models.Employer;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
-import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
+import com.telerikacademy.web.jobmatch.models.dtos.users.EmployerDtoIn;
 import com.telerikacademy.web.jobmatch.repositories.contracts.EmployerRepository;
 import com.telerikacademy.web.jobmatch.services.contracts.EmployersService;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;

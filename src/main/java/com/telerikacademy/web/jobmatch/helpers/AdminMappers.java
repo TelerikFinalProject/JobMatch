@@ -2,7 +2,7 @@ package com.telerikacademy.web.jobmatch.helpers;
 
 import com.telerikacademy.web.jobmatch.models.Location;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
-import com.telerikacademy.web.jobmatch.models.dtos.UserDtoIn;
+import com.telerikacademy.web.jobmatch.models.dtos.users.UserDtoIn;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;

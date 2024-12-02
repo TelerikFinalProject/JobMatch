@@ -1,8 +1,8 @@
 package com.telerikacademy.web.jobmatch.helpers;
 
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
-import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
-import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalDtoIn;
+import com.telerikacademy.web.jobmatch.models.dtos.users.EmployerDtoIn;
+import com.telerikacademy.web.jobmatch.models.dtos.users.ProfessionalDtoIn;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

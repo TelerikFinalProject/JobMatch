@@ -1,8 +1,6 @@
 package com.telerikacademy.web.jobmatch.helpers;
 
 import com.telerikacademy.web.jobmatch.models.*;
-import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
-import com.telerikacademy.web.jobmatch.models.dtos.EmployerOutDto;
 import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoOut;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
@@ -10,9 +8,7 @@ import com.telerikacademy.web.jobmatch.services.contracts.SkillService;
 import com.telerikacademy.web.jobmatch.services.contracts.StatusService;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
-import org.springframework.stereotype.Controller;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,11 +21,24 @@ public interface JobApplicationMappers {
     @Mapping(source = "description", target = "description")
     @Mapping(source = "minSalary", target = "minSalary")
     @Mapping(source = "maxSalary", target = "maxSalary")
-    @Mapping(expression = "java(returnInitialStatus(statusService))", target = "status")
+    @Mapping(source = "jobApplicationDtoIn", target = "status", qualifiedByName = "returnStatus")
     @Mapping(target = "location", source = "jobApplicationDtoIn", qualifiedByName = "mapLocation")
     @Mapping(source = "hybrid", target = "hybrid")
     @Mapping(source = "skills", target = "qualifications", qualifiedByName = "mapSkills")
     JobApplication fromDtoIn(JobApplicationDtoIn jobApplicationDtoIn,
+                             @Context StatusService statusService,
+                             @Context LocationService locationService,
+                             @Context SkillService skillService);
+
+    @Mapping(source = "jobApplication.id", target = "id")
+    @Mapping(source = "jobApplicationDtoIn.description", target = "description")
+    @Mapping(source = "jobApplicationDtoIn.minSalary", target = "minSalary")
+    @Mapping(source = "jobApplicationDtoIn.maxSalary", target = "maxSalary")
+    @Mapping(source = "jobApplicationDtoIn", target = "status", qualifiedByName = "returnStatus")
+    @Mapping(target = "location", source = "jobApplicationDtoIn", qualifiedByName = "mapLocation")
+    @Mapping(source = "jobApplicationDtoIn.hybrid", target = "hybrid")
+    @Mapping(source = "jobApplicationDtoIn.skills", target = "qualifications", qualifiedByName = "mapSkills")
+    JobApplication fromDtoIn(JobApplication jobApplication, JobApplicationDtoIn jobApplicationDtoIn,
                              @Context StatusService statusService,
                              @Context LocationService locationService,
                              @Context SkillService skillService);
@@ -58,8 +67,10 @@ public interface JobApplicationMappers {
                 jobApplicationDtoIn.getLocCityId());
     }
 
-    default Status returnInitialStatus(@Context StatusService statusService) {
-        return statusService.getStatus("Active");
+    @Named("returnStatus")
+    default Status returnUpdatedStatus(JobApplicationDtoIn jobApplicationDtoIn,
+                                       @Context StatusService statusService){
+        return statusService.getStatus(jobApplicationDtoIn.getStatus());
     }
 
     @Named("mapSkills")

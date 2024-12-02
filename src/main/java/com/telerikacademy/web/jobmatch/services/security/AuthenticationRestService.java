@@ -2,14 +2,12 @@ package com.telerikacademy.web.jobmatch.services.security;
 
 import com.telerikacademy.web.jobmatch.exceptions.EntityDuplicateException;
 import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
-import com.telerikacademy.web.jobmatch.helpers.EmployerMappers;
-import com.telerikacademy.web.jobmatch.helpers.ProfessionalMappers;
 import com.telerikacademy.web.jobmatch.helpers.UserInfoMapper;
 import com.telerikacademy.web.jobmatch.models.RefreshTokenEntity;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
-import com.telerikacademy.web.jobmatch.models.dtos.AuthResponseDto;
-import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
-import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalDtoIn;
+import com.telerikacademy.web.jobmatch.models.dtos.users.AuthResponseDto;
+import com.telerikacademy.web.jobmatch.models.dtos.users.EmployerDtoIn;
+import com.telerikacademy.web.jobmatch.models.dtos.users.ProfessionalDtoIn;
 import com.telerikacademy.web.jobmatch.models.enums.TokenType;
 import com.telerikacademy.web.jobmatch.repositories.contracts.RefreshTokenRepository;
 import com.telerikacademy.web.jobmatch.services.contracts.*;

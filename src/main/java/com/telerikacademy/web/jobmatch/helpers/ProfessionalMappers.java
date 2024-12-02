@@ -1,9 +1,9 @@
 package com.telerikacademy.web.jobmatch.helpers;
 
 import com.telerikacademy.web.jobmatch.models.*;
-import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalDtoIn;
-import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalOutDto;
-import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalUpdateDto;
+import com.telerikacademy.web.jobmatch.models.dtos.users.ProfessionalDtoIn;
+import com.telerikacademy.web.jobmatch.models.dtos.users.ProfessionalOutDto;
+import com.telerikacademy.web.jobmatch.models.dtos.users.ProfessionalUpdateDto;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import com.telerikacademy.web.jobmatch.services.contracts.StatusService;
 import org.mapstruct.*;
@@ -40,11 +40,13 @@ public interface ProfessionalMappers {
     @Mapping(target = "firstName", source = "professionalDtoIn.firstName")
     @Mapping(target = "lastName", source = "professionalDtoIn.lastName")
     @Mapping(target = "summary", source = "professionalDtoIn.summary")
-    @Mapping(target = "status", source = "professional.status")
     @Mapping(target = "successfulMatches", source = "professional.successfulMatches")
+    @Mapping(target = "status", source = "professionalDtoIn",
+            qualifiedByName = "returnUpdatedStatus")
     Professional fromDtoIn(Professional professional,
                            ProfessionalUpdateDto professionalDtoIn,
-                           @Context LocationService locationService);
+                           @Context LocationService locationService,
+                           @Context StatusService statusService);
 
     @Mapping(source = "username", target = "username")
     @Mapping(source = "email", target = "email")
@@ -54,7 +56,8 @@ public interface ProfessionalMappers {
     @Mapping(source = "roles", target = "roles") // Nested mapping for role
     @Mapping(source = "location.name", target = "location")// Nested mapping for location
     @Mapping(source = "status.status", target = "status")
-    @Mapping(target = "successfulMatches", source = "professional.successfulMatches", qualifiedByName = "returnSuccessfulMatches")
+    @Mapping(target = "successfulMatches", source = "professional.successfulMatches",
+            qualifiedByName = "returnSuccessfulMatches")
     ProfessionalOutDto toDtoOut(Professional professional);
 
     @Mapping(source = "username", target = "username")
@@ -72,13 +75,18 @@ public interface ProfessionalMappers {
                 professionalDtoIn.getLocCityId());
     }
 
-
     default String returnInitialRole(){
         return "PROFESSIONAL";
     }
 
     default Status returnInitialStatus(@Context StatusService statusService){
         return statusService.getStatus("Active");
+    }
+
+    @Named("returnUpdatedStatus")
+    default Status returnUpdatedStatus(ProfessionalUpdateDto professionalUpdateDto,
+                                       @Context StatusService statusService){
+        return statusService.getStatus(professionalUpdateDto.getUpdatedStatus());
     }
 
     @Named("returnSuccessfulMatches")

@@ -5,10 +5,8 @@ import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
 import com.telerikacademy.web.jobmatch.exceptions.ExternalResourceException;
 import com.telerikacademy.web.jobmatch.helpers.EmployerMappers;
 import com.telerikacademy.web.jobmatch.models.Employer;
-import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
-import com.telerikacademy.web.jobmatch.models.dtos.EmployerOutDto;
-import com.telerikacademy.web.jobmatch.models.dtos.EmployerUpdateDto;
-import com.telerikacademy.web.jobmatch.repositories.contracts.RoleRepository;
+import com.telerikacademy.web.jobmatch.models.dtos.users.EmployerOutDto;
+import com.telerikacademy.web.jobmatch.models.dtos.users.EmployerUpdateDto;
 import com.telerikacademy.web.jobmatch.services.contracts.EmployersService;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,18 +24,14 @@ public class EmployerRestController {
 
     private final EmployersService employersService;
     private final LocationService locationService;
-    private final RoleRepository roleRepository;
 
     @Autowired
     public EmployerRestController(EmployersService employersService,
-                                  LocationService locationService,
-                                  RoleRepository roleRepository) {
+                                  LocationService locationService) {
         this.employersService = employersService;
         this.locationService = locationService;
-        this.roleRepository = roleRepository;
     }
 
-    @PreAuthorize("hasRole('EMPLOYER')")
     @GetMapping
     public ResponseEntity<List<EmployerOutDto>> getAllEmployers() {
         List<EmployerOutDto> employerToCreate = EmployerMappers.INSTANCE.toDtoOutList(employersService.getEmployers());
@@ -51,24 +45,6 @@ public class EmployerRestController {
             return ResponseEntity.ok(employerOutDto);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        }
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<String> createEmployer(@RequestBody EmployerDtoIn employerDtoIn) {
-        if (!employerDtoIn.getPassword().equals(employerDtoIn.getConfirmPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passwords do not match");
-        }
-
-        try {
-            employersService.createEmployer(employerDtoIn);
-            return ResponseEntity.ok("Employer created");
-        } catch (EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        } catch (EntityDuplicateException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-        } catch (ExternalResourceException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, e.getMessage());
         }
     }
 

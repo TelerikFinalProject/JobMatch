@@ -1,14 +1,13 @@
 package com.telerikacademy.web.jobmatch.controllers.rest;
 
-import com.telerikacademy.web.jobmatch.models.dtos.AuthResponseDto;
-import com.telerikacademy.web.jobmatch.models.dtos.EmployerDtoIn;
-import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalDtoIn;
+import com.telerikacademy.web.jobmatch.models.dtos.users.AuthResponseDto;
+import com.telerikacademy.web.jobmatch.models.dtos.users.EmployerDtoIn;
+import com.telerikacademy.web.jobmatch.models.dtos.users.ProfessionalDtoIn;
 import com.telerikacademy.web.jobmatch.services.security.AuthenticationRestService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -5,15 +5,14 @@ import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
 import com.telerikacademy.web.jobmatch.exceptions.ExternalResourceException;
 import com.telerikacademy.web.jobmatch.helpers.ProfessionalMappers;
 import com.telerikacademy.web.jobmatch.models.Professional;
-import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalDtoIn;
-import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalOutDto;
-import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalUpdateDto;
+import com.telerikacademy.web.jobmatch.models.dtos.users.ProfessionalOutDto;
+import com.telerikacademy.web.jobmatch.models.dtos.users.ProfessionalUpdateDto;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import com.telerikacademy.web.jobmatch.services.contracts.ProfessionalService;
+import com.telerikacademy.web.jobmatch.services.contracts.StatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -25,15 +24,17 @@ import java.util.List;
 public class ProfessionalRestController {
     private final ProfessionalService professionalService;
     private final LocationService locationService;
+    private final StatusService statusService;
 
     @Autowired
     public ProfessionalRestController(ProfessionalService professionalService,
-                                      LocationService locationService) {
+                                      LocationService locationService,
+                                      StatusService statusService) {
         this.professionalService = professionalService;
         this.locationService = locationService;
+        this.statusService = statusService;
     }
 
-    //@PreAuthorize("hasRole('PROFESSIONAL')")
     @GetMapping
     public ResponseEntity<List<ProfessionalOutDto>> getAllProfessionals(Authentication authentication) {
         authentication.getAuthorities();
@@ -50,24 +51,6 @@ public class ProfessionalRestController {
             return ResponseEntity.ok(professional);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        }
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<String> createProfessional(@RequestBody ProfessionalDtoIn professionalDtoIn) {
-        if (!professionalDtoIn.getPassword().equals(professionalDtoIn.getConfirmPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passwords do not match");
-        }
-
-        try {
-            professionalService.registerProfessional(professionalDtoIn);
-            return ResponseEntity.ok("Employee created");
-        } catch (EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        } catch (EntityDuplicateException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-        } catch (ExternalResourceException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, e.getMessage());
         }
     }
 
@@ -90,12 +73,12 @@ public class ProfessionalRestController {
 
         try {
             Professional updatedProfessional = ProfessionalMappers.INSTANCE
-                    .fromDtoIn(professionalToUpdate, professionalDto, locationService);
+                    .fromDtoIn(professionalToUpdate, professionalDto, locationService, statusService);
             professionalService.updateProfessional(updatedProfessional);
             return ResponseEntity.ok(ProfessionalMappers.INSTANCE.toDtoOut(updatedProfessional));
         } catch (EntityDuplicateException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-        } catch (EntityNotFoundException e){
+        } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (ExternalResourceException e) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, e.getMessage());

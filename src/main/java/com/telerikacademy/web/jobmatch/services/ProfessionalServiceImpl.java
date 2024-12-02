@@ -5,7 +5,7 @@ import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
 import com.telerikacademy.web.jobmatch.helpers.ProfessionalMappers;
 import com.telerikacademy.web.jobmatch.models.Professional;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
-import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalDtoIn;
+import com.telerikacademy.web.jobmatch.models.dtos.users.ProfessionalDtoIn;
 import com.telerikacademy.web.jobmatch.repositories.contracts.ProfessionalRepository;
 import com.telerikacademy.web.jobmatch.services.contracts.*;
 import org.springframework.beans.factory.annotation.Autowired;

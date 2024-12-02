@@ -78,9 +78,9 @@ public class SecurityConfig {
                 .securityMatcher(new AntPathRequestMatcher("/api/**"))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/employers/**").hasAnyRole("EMPLOYER", "ADMIN")
-                        .requestMatchers("/api/professionals/**").hasAnyRole("PROFESSIONAL", "ADMIN")
-                        .requestMatchers("/api/admins/**").hasRole("ADMIN"))
+                        .requestMatchers("/api/employers/**").hasAnyRole("ADMIN", "EMPLOYER")
+                        .requestMatchers("/api/professionals/**").hasAnyRole("ADMIN", "PROFESSIONAL")
+                        .requestMatchers("/api/**").hasRole("ADMIN"))
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))  // Use JwtAuthenticationConverter to extract roles
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -1,4 +1,4 @@
-package com.telerikacademy.web.jobmatch.models.dtos;
+package com.telerikacademy.web.jobmatch.models.dtos.users;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class EmployerDtoIn extends UserDtoIn{
+public class EmployerDtoIn extends UserDtoIn {
     @NotNull(message = "Company name" + NULL_FIELD_ERROR)
     @Size(min = 3, max = 32)
     private String companyName;

@@ -1,4 +1,4 @@
-package com.telerikacademy.web.jobmatch.models.dtos;
+package com.telerikacademy.web.jobmatch.models.dtos.users;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

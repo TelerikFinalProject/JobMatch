@@ -1,4 +1,4 @@
-package com.telerikacademy.web.jobmatch.models.dtos;
+package com.telerikacademy.web.jobmatch.models.dtos.users;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.telerikacademy.web.jobmatch.models.enums.TokenType;
@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 
 @Data
 @Builder

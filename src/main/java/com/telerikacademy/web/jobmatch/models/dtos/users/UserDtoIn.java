@@ -1,4 +1,4 @@
-package com.telerikacademy.web.jobmatch.models.dtos;
+package com.telerikacademy.web.jobmatch.models.dtos.users;
 
 import com.telerikacademy.web.jobmatch.annotations.PasswordMatches;
 import jakarta.validation.constraints.NotNull;

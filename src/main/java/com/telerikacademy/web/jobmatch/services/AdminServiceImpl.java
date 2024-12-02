@@ -3,7 +3,7 @@ package com.telerikacademy.web.jobmatch.services;
 import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
 import com.telerikacademy.web.jobmatch.helpers.AdminMappers;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
-import com.telerikacademy.web.jobmatch.models.dtos.UserDtoIn;
+import com.telerikacademy.web.jobmatch.models.dtos.users.UserDtoIn;
 import com.telerikacademy.web.jobmatch.repositories.contracts.UserRepository;
 import com.telerikacademy.web.jobmatch.services.contracts.AdminService;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;

@@ -1,6 +1,7 @@
 package com.telerikacademy.web.jobmatch.models.dtos;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,18 +12,30 @@ import lombok.Setter;
 @NoArgsConstructor
 public class JobApplicationDtoIn {
     public static final String NULL_FIELD_ERROR = " should not be null!";
+    public static final String SALARY_ERROR = "Salary should always be positive!";
 
-    private String description;
-    private double minSalary;
-    private double maxSalary;
     @NotNull(message = "Country Iso code" + NULL_FIELD_ERROR)
-    @Size(min = 2, max = 3)
+    @Size(min = 10, max = 200)
+    private String description;
+
+    @Positive(message = SALARY_ERROR)
+    private double minSalary;
+
+    @Positive(message = SALARY_ERROR)
+    private double maxSalary;
+
+    @NotNull(message = "Country Iso code" + NULL_FIELD_ERROR)
+    @Size(min = 2, max = 2)
     private String locCountryIsoCode;
 
     @NotNull(message = "City ID" + NULL_FIELD_ERROR)
     private int locCityId;
 
+    @NotNull(message = "Remote spec" + NULL_FIELD_ERROR)
     private boolean isHybrid;
+
+    @NotNull(message = "Status" + NULL_FIELD_ERROR)
+    private String status;
 
     private String skills;
 }

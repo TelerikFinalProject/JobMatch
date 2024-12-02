@@ -95,11 +95,16 @@ public class JobApplicationRestController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<JobApplication> updateJobApplication(@PathVariable int id, @RequestBody JobApplication jobApplication) {
+    public ResponseEntity<JobApplicationDtoOut> updateJobApplication(@PathVariable int id,
+                                                                     @RequestBody JobApplicationDtoIn jobApplicationDtoIn) {
         try {
-            jobApplication.setId(id);
-            jobApplicationService.updateJobApplication(jobApplication);
-            return ResponseEntity.ok(jobApplication);
+            JobApplication jobApplication = jobApplicationService.getJobApplication(id);
+
+            JobApplication updatedJobApplication = JobApplicationMappers.INSTANCE.fromDtoIn(jobApplication,
+                    jobApplicationDtoIn, statusService, locationService, skillService);
+            jobApplicationService.updateJobApplication(updatedJobApplication);
+
+            return ResponseEntity.ok(JobApplicationMappers.INSTANCE.toDtoOut(updatedJobApplication));
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (ExternalResourceException e) {

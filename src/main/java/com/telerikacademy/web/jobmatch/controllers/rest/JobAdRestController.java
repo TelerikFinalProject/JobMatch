@@ -19,7 +19,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -90,10 +89,15 @@ public class JobAdRestController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<JobAd> updateJobAd(@PathVariable int id, @RequestBody JobAd jobAd) {
-        jobAd.setId(id);
+    public ResponseEntity<JobAdDtoOut> updateJobAd(@PathVariable int id, @RequestBody JobAdDtoIn jobAdDtoIn) {
+        JobAd jobAd;
+        try {
+            jobAd = jobAdService.getJobAd(id);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
         jobAdService.updateJobAd(jobAd);
-        return ResponseEntity.ok(jobAd);
+        return ResponseEntity.ok(JobAdMappers.INSTANCE.toDtoOut(jobAd));
     }
 
     @DeleteMapping("/{id}")

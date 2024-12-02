@@ -1,10 +1,8 @@
 package com.telerikacademy.web.jobmatch.helpers;
 
-import com.telerikacademy.web.jobmatch.models.Employer;
 import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.models.Location;
 import com.telerikacademy.web.jobmatch.models.Status;
-import com.telerikacademy.web.jobmatch.models.dtos.EmployerOutDto;
 import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoOut;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
@@ -43,7 +41,6 @@ public interface JobAdMappers {
     List<JobAdDtoOut> toDtoOutList(List<JobAd> jobAds);
 
     Set<JobAdDtoOut> toDtoOutSet(Set<JobAd> jobAds);
-
 
     @Named("mapLocation")
     default Location mapLocation(JobAdDtoIn jobAdDtoIn, @Context LocationService locationService) {

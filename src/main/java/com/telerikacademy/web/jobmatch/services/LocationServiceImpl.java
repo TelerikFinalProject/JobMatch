@@ -82,7 +82,7 @@ public class LocationServiceImpl implements LocationService {
             List<Location> cities = objectMapper.readValue(response.body(), new TypeReference<>() {
             });
 
-            if (cities.isEmpty()){
+            if (cities.isEmpty()) {
                 throw new EntityNotFoundException("Country", "Iso", isoCode);
             }
 
@@ -125,18 +125,28 @@ public class LocationServiceImpl implements LocationService {
             location = getLocationById(cityId);
             if (!location.getIsoCode().equals(isoCode)) {
                 validLocation = false;
+            } else {
+                return location;
             }
-            return location;
         } catch (EntityNotFoundException e) {
-            location = getLocationsByCountry(isoCode.toUpperCase()).get(cityId);
-            if (location == null){
-                validLocation = false;
+            try {
+                Map<Integer, Location> locations = getLocationsByCountry(isoCode.toUpperCase());
+                location = locations.get(cityId);
+                if (location == null) {
+                    validLocation = false;
+                }
+            } catch (EntityNotFoundException exception) {
+                throw new EntityNotFoundException("Country", "Iso", isoCode);
             }
         }
         if (!validLocation) {
-            Country country = getCountryByIsoCode(isoCode.toUpperCase());
-            throw new EntityNotFoundException(String.format("City with ID:%d is not a city in %s.",
-                    cityId, country.getName()));
+            try {
+                Country country = getCountryByIsoCode(isoCode.toUpperCase());
+                throw new EntityNotFoundException(String.format("City with ID:%d is not a city in %s.",
+                        cityId, country.getName()));
+            } catch (EntityNotFoundException exception) {
+                throw new EntityNotFoundException("Country", "Iso", isoCode);
+            }
         }
         addLocation(location, isoCode);
         return location;
@@ -166,14 +176,14 @@ public class LocationServiceImpl implements LocationService {
         locationRepository.save(location);
     }
 
-    private void checkAccessToExternalApi(HttpResponse<String> response){
-        if (response.statusCode() == 401){
+    private void checkAccessToExternalApi(HttpResponse<String> response) {
+        if (response.statusCode() == 401) {
             throw new AuthorizationException("access", "resource");
         }
     }
 
-    private void checkIfResourceExistsOnExternalApi(HttpResponse<String> response){
-        if (response.statusCode() == 404){
+    private void checkIfResourceExistsOnExternalApi(HttpResponse<String> response) {
+        if (response.statusCode() == 404) {
             throw new EntityNotFoundException("Resource cannot be found on external API");
         }
     }

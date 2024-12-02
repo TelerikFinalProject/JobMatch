@@ -1,7 +1,7 @@
 package com.telerikacademy.web.jobmatch.helpers;
 
 import com.telerikacademy.web.jobmatch.annotations.PasswordMatches;
-import com.telerikacademy.web.jobmatch.models.dtos.UserDtoIn;
+import com.telerikacademy.web.jobmatch.models.dtos.users.UserDtoIn;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

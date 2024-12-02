@@ -1,8 +1,7 @@
 package com.telerikacademy.web.jobmatch.services.contracts;
 
 import com.telerikacademy.web.jobmatch.models.Professional;
-import com.telerikacademy.web.jobmatch.models.UserPrincipal;
-import com.telerikacademy.web.jobmatch.models.dtos.ProfessionalDtoIn;
+import com.telerikacademy.web.jobmatch.models.dtos.users.ProfessionalDtoIn;
 
 import java.util.List;
 
