@@ -31,9 +31,10 @@ At **JobMatch**, our mission is to simplify the hiring process and create meanin
 
 ## 📜 Installation Guide
 
-1. **Clone the Repository**  
+1. Clone the Repository  
    ```bash
    git clone https://github.com/TelerikFinalProject/JobMatch.git
-
+2. Set up the database, you can use the provided SQL script.
+[Download the SQL script](db_script.sql)
 
 
