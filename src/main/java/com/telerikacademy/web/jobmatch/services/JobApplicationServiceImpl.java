@@ -38,7 +38,7 @@ public class JobApplicationServiceImpl implements JobApplicationService {
 
     @Override
     public void updateJobApplication(JobApplication jobApplication) {
-        JobApplication existingJobApplication = jobApplicationRepository.findById(jobApplication.getId())
+        jobApplicationRepository.findById(jobApplication.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Job application", jobApplication.getId()));
 
         jobApplicationRepository.save(jobApplication);

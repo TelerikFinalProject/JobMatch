@@ -11,6 +11,7 @@ import com.telerikacademy.web.jobmatch.models.Professional;
 import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoOut;
 import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoOut;
+import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoUpdate;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobApplicationFilterOptions;
 import com.telerikacademy.web.jobmatch.services.contracts.*;
 import jakarta.validation.Valid;
@@ -36,6 +37,7 @@ public class JobApplicationRestController {
     private final ProfessionalService professionalService;
     private final SkillService skillService;
     private final MatchService matchService;
+    private final MailService mailService;
 
     @Autowired
     public JobApplicationRestController(JobApplicationService jobApplicationService,
@@ -44,7 +46,8 @@ public class JobApplicationRestController {
                                         ProfessionalService professionalService,
                                         SkillService skillService,
                                         MatchService matchService,
-                                        JobAdService jobAdService) {
+                                        JobAdService jobAdService,
+                                        MailService mailService) {
         this.jobApplicationService = jobApplicationService;
         this.locationService = locationService;
         this.statusService = statusService;
@@ -52,6 +55,7 @@ public class JobApplicationRestController {
         this.skillService = skillService;
         this.matchService = matchService;
         this.jobAdService = jobAdService;
+        this.mailService = mailService;
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_PROFESSIONAL', 'ROLE_EMPLOYER')")
@@ -127,7 +131,7 @@ public class JobApplicationRestController {
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_PROFESSIONAL')")
     @PutMapping("/{id}")
     public ResponseEntity<JobApplicationDtoOut> updateJobApplication(@PathVariable int id,
-                                                                     @RequestBody JobApplicationDtoIn jobApplicationDtoIn,
+                                                                     @RequestBody JobApplicationDtoUpdate jobApplicationDtoUpdate,
                                                                      Authentication authentication) {
 
         boolean isProfessional = authentication.getAuthorities().stream()
@@ -144,7 +148,7 @@ public class JobApplicationRestController {
             }
 
             JobApplication updatedJobApplication = JobApplicationMappers.INSTANCE.fromDtoIn(jobApplication,
-                    jobApplicationDtoIn, statusService, locationService, skillService);
+                    jobApplicationDtoUpdate, statusService, locationService, skillService);
             jobApplicationService.updateJobApplication(updatedJobApplication);
 
             return ResponseEntity.ok(JobApplicationMappers.INSTANCE.toDtoOut(updatedJobApplication));
@@ -224,6 +228,7 @@ public class JobApplicationRestController {
                                 "please reach out to the Job %s creator!", "ad", jobAdId, "ad"));
             }
 
+            mailService.sendNotificationViaEmailToEmployer(jobApplication, jobAdToMatchWith);
             jobApplicationService.updateJobApplication(jobApplication);
             return ResponseEntity.ok(JobAdMappers.INSTANCE.toDtoOutSet(jobApplication.getMatchesSentToJobAds()));
         } catch (EntityNotFoundException e) {

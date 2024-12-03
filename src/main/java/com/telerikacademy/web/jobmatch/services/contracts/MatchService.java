@@ -17,4 +17,8 @@ public interface MatchService {
     void declineJobApplication(JobAd jobAd, JobApplication jobApplicationToDecline);
 
     void declineAd(JobAd jobAd, JobApplication jobApplicationToDecline);
+
+    void deleteJobAdRequests(JobAd jobAd);
+
+    void deleteJobApplicationRequests(JobApplication jobApplication);
 }
