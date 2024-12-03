@@ -8,6 +8,7 @@ import com.telerikacademy.web.jobmatch.models.Professional;
 import com.telerikacademy.web.jobmatch.models.Skill;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobAdFilterOptions;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobApplicationFilterOptions;
+import com.telerikacademy.web.jobmatch.repositories.contracts.JobMatchRepository;
 import com.telerikacademy.web.jobmatch.services.contracts.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,16 +23,19 @@ public class MatchServiceImpl implements MatchService {
     private final JobApplicationService jobApplicationService;
     private final StatusService statusService;
     private final ProfessionalService professionalService;
+    private final JobMatchRepository jobMatchRepository;
 
     @Autowired
     public MatchServiceImpl(JobAdService jobAdService,
                             JobApplicationService jobApplicationService,
                             ProfessionalService professionalService,
-                            StatusService statusService) {
+                            StatusService statusService,
+                            JobMatchRepository jobMatchRepository) {
         this.jobAdService = jobAdService;
         this.jobApplicationService = jobApplicationService;
         this.professionalService = professionalService;
         this.statusService = statusService;
+        this.jobMatchRepository = jobMatchRepository;
     }
 
     public Set<JobAd> getSuitableAds(JobApplication application) {
@@ -45,15 +49,15 @@ public class MatchServiceImpl implements MatchService {
         JobAdFilterOptions filterOptions =
                 new JobAdFilterOptions(null, minSalary, maxSalary, location, null, status);
 
-        List<JobAd> filteredAps = jobAdService.getJobAds(filterOptions);
+        List<JobAd> filteredAds = jobAdService.getJobAds(filterOptions);
 
         Set<JobAd> suitableAds = new HashSet<>();
-        for (JobAd ad : filteredAps) {
-            if (ad.getSkills().size() > application.getQualifications().size()) {
+        for (JobAd ad : filteredAds) {
+            double minQuantitySkills = ad.getSkills().size() * 50.0 / 100;
+
+            if (application.getQualifications().size() < minQuantitySkills) {
                 continue;
             }
-
-            double minQuantitySkills = ad.getSkills().size() * 50.0 / 100;
             double mutualSkills = 0;
 
             for (Skill qualification : application.getQualifications()) {
@@ -73,7 +77,11 @@ public class MatchServiceImpl implements MatchService {
 
         double minSalary = ad.getMinSalary() - (ad.getMinSalary() * 20 / 100);
         double maxSalary = ad.getMaxSalary() + (ad.getMaxSalary() * 20 / 100);
-        String location = ad.getLocation().getName();
+
+        String location = null;
+        if (!ad.getLocation().getName().equals("Home")) {
+            location = ad.getLocation().getName();
+        }
         String status = "Active";
 
         JobApplicationFilterOptions filterOptions =
@@ -81,7 +89,7 @@ public class MatchServiceImpl implements MatchService {
         List<JobApplication> filteredApplications = jobApplicationService.getJobApplications(filterOptions);
 
         Set<JobApplication> suitableApplications = new HashSet<>();
-        double minQuantitySkills = ad.getSkills().size() * 60.0 / 100;
+        double minQuantitySkills = ad.getSkills().size() * 50.0 / 100;
 
         for (JobApplication application : filteredApplications) {
             if (application.getQualifications().size() < minQuantitySkills) {
@@ -143,10 +151,16 @@ public class MatchServiceImpl implements MatchService {
         applicant.getSuccessfulMatches().add(jobAd.getEmployer());
         professionalService.updateProfessional(applicant);
 
+        jobMatchRepository.deleteJobAdInJobAdReq(jobAd.getId());
+        jobMatchRepository.deleteJobAppInJobAdReq(jobApplicationToApprove.getId());
+
         jobAd.setMatchesSentToJobApplications(new HashSet<>());
         jobAd.setMatchRequestedApplications(new HashSet<>());
         jobAd.setStatus(statusService.getStatus("Archived"));
         jobAdService.updateJobAd(jobAd);
+
+        jobMatchRepository.deleteJobAppInJobAppReq(jobApplicationToApprove.getId());
+        jobMatchRepository.deleteJobAdInJobAppReq(jobAd.getId());
 
         jobApplicationToApprove.setMatchesSentToJobAds(new HashSet<>());
         jobApplicationToApprove.setMatchRequestedAds(new HashSet<>());
