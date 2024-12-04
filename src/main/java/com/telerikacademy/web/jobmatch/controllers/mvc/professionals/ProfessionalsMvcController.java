@@ -27,6 +27,6 @@ public class ProfessionalsMvcController {
         JobAdFilterOptions jobAdFilterOptions = new JobAdFilterOptions(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
         List<JobAd> jobAds = jobAdService.getJobAds(jobAdFilterOptions);
         model.addAttribute("jobAds", jobAds);
-        return "search";
+        return "job_listing";
     }
 }
