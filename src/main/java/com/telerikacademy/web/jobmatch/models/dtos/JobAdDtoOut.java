@@ -20,4 +20,5 @@ public class JobAdDtoOut {
     private String city;
     private boolean hybrid;
     private String skills;
+    private String status;
 }

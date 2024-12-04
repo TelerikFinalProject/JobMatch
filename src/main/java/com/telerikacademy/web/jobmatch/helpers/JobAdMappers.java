@@ -61,6 +61,7 @@ public interface JobAdMappers {
     @Mapping(source = "jobAd.employer.companyName", target = "companyName")// Nested mapping for location
     @Mapping(target = "hybrid", source = "hybrid")
     @Mapping(source = "skills", target = "skills", qualifiedByName = "setToString")
+    @Mapping(source = "jobAd.status.status", target = "status")
     JobAdDtoOut toDtoOut(JobAd jobAd);
 
     List<JobAdDtoOut> toDtoOutList(List<JobAd> jobAds);

@@ -31,7 +31,7 @@ public class JobAdDtoIn {
     private double maxSalary;
 
     @NotNull(message = "Description" + NULL_FIELD_ERROR)
-    @Size(min = 5, max = 200)
+    @Size(min = 5, max = 500)
     private String jobDescription;
 
     @NotNull
