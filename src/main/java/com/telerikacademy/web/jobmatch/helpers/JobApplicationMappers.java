@@ -88,6 +88,10 @@ public interface JobApplicationMappers {
 
     @Named("mapSkills")
     default Set<Skill> returnSetOfSkills(@Context SkillService skillService, String skillsStr) {
+        if (skillsStr == null){
+            return new HashSet<>();
+        }
+
         String[] skillList = skillsStr.split(", ");
 
         Set<Skill> skills = new HashSet<>();

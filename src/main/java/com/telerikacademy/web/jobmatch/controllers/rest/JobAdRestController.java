@@ -13,6 +13,7 @@ import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoOut;
 import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoUpdate;
 import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoOut;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobAdFilterOptions;
+import com.telerikacademy.web.jobmatch.services.TweeterClient;
 import com.telerikacademy.web.jobmatch.services.contracts.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -103,6 +104,11 @@ public class JobAdRestController {
             jobAd.setEmployer(employer);
             jobAdService.createJobAd(jobAd);
             JobAdDtoOut jobAdDtoOut = JobAdMappers.INSTANCE.toDtoOut(jobAd);
+
+            TweeterClient tweeterClient = new TweeterClient();
+            tweeterClient.sendTweet(String.format("Job ad '%s' has been added from company '%s'"
+                    , jobAd.getPositionTitle(), jobAd.getEmployer().getCompanyName()));
+
             return ResponseEntity.status(HttpStatus.CREATED).body(jobAdDtoOut);
         } catch (ExternalResourceException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());

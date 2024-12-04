@@ -16,9 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -85,8 +82,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**").hasRole("ADMIN")
                         .requestMatchers("/api/job-ads/**").permitAll()
+                        .requestMatchers("/api/job-applications/**").permitAll()
                         .requestMatchers("/api/employers/**").hasAnyRole("ADMIN", "EMPLOYER")
                         .requestMatchers("/api/professionals/**").hasAnyRole("ADMIN", "PROFESSIONAL"))
                 .oauth2ResourceServer(oauth2 ->

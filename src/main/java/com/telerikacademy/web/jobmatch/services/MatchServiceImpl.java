@@ -43,7 +43,7 @@ public class MatchServiceImpl implements MatchService {
 
         double minSalary = application.getMinSalary() - (application.getMinSalary() * 20 / 100);
         double maxSalary = application.getMaxSalary() + (application.getMaxSalary() * 20 / 100);
-        String location = application.getLocation().getName();
+        String location = String.format("%s, %s", application.getLocation().getName(), "Home");
         String status = "Active";
 
         JobAdFilterOptions filterOptions =
@@ -78,10 +78,11 @@ public class MatchServiceImpl implements MatchService {
         double minSalary = ad.getMinSalary() - (ad.getMinSalary() * 20 / 100);
         double maxSalary = ad.getMaxSalary() + (ad.getMaxSalary() * 20 / 100);
 
-        String location = null;
-        if (!ad.getLocation().getName().equals("Home")) {
-            location = ad.getLocation().getName();
+        String location = ad.getLocation().getName();
+        if (location.equals("Home")) {
+            location = null;
         }
+
         String status = "Active";
 
         JobApplicationFilterOptions filterOptions =

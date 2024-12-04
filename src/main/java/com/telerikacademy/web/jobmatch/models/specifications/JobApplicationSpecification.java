@@ -24,6 +24,8 @@ public class JobApplicationSpecification implements Specification<JobApplication
         List<Predicate> predicates = new ArrayList<>();
         filterOptions.getMinSalary().ifPresent(minSalary ->
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("maxSalary"), minSalary)));
+
+
         filterOptions.getMaxSalary().ifPresent(maxSalary ->
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("minSalary"), maxSalary)));
         filterOptions.getCreator().ifPresent(creator -> {
@@ -31,14 +33,30 @@ public class JobApplicationSpecification implements Specification<JobApplication
             predicates.add(criteriaBuilder.equal(professionalJoin.get("username"), creator));
         });
         filterOptions.getLocation().ifPresent(location -> {
-            Join<JobApplication, Location> locationJoin = root.join("location", JoinType.LEFT);
-            Predicate locationPredicate = criteriaBuilder.equal(locationJoin.get("name"), location);
-            Predicate homePredicate = criteriaBuilder.equal(locationJoin.get("name"), "Home");
-            predicates.add(criteriaBuilder.or(locationPredicate, homePredicate));
+            Join<JobAd, Location> locationJoin = root.join("location");
+            String[] locations = location.split(",\\s*");
+            List<Predicate> locationPredicates = new ArrayList<>();
+            for (String loc : locations) {
+                locationPredicates.add(criteriaBuilder.equal(locationJoin.get("name"), loc.trim()));
+            }
+            Predicate combinedPredicate = criteriaBuilder.or(locationPredicates.toArray(new Predicate[0]));
+            predicates.add(combinedPredicate);
         });
         filterOptions.getStatus().ifPresent(status -> {
-            Join<JobApplication, Status> statusJoin = root.join("status", JoinType.LEFT);
-            predicates.add(criteriaBuilder.equal(statusJoin.get("status"), status));
+            String[] statuses = status.split(",\\s*");
+            Join<JobAd, Status> statusJoin = root.join("status");
+            List<Predicate> statusPredicates = new ArrayList<>();
+
+            for (String stat : statuses) {
+                statusPredicates.add(
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(statusJoin.get("status")),
+                                "%" + stat.trim().toLowerCase() + "%"
+                        )
+                );
+            }
+            Predicate combinedStatusPredicate = criteriaBuilder.or(statusPredicates.toArray(new Predicate[0]));
+            predicates.add(combinedStatusPredicate);
         });
 
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
