@@ -87,6 +87,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/**").hasRole("ADMIN")
                         .requestMatchers("/api/job-ads/**").permitAll()
+                        .requestMatchers("/api/job-applications/**").permitAll()
                         .requestMatchers("/api/employers/**").hasAnyRole("ADMIN", "EMPLOYER")
                         .requestMatchers("/api/professionals/**").hasAnyRole("ADMIN", "PROFESSIONAL"))
                 .oauth2ResourceServer(oauth2 ->
