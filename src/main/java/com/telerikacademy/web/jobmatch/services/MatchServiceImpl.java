@@ -43,7 +43,7 @@ public class MatchServiceImpl implements MatchService {
 
         double minSalary = application.getMinSalary() - (application.getMinSalary() * 20 / 100);
         double maxSalary = application.getMaxSalary() + (application.getMaxSalary() * 20 / 100);
-        String location = application.getLocation().getName();
+        String location = String.format("%s, %s", application.getLocation().getName(), "Home");
         String status = "Active";
 
         JobAdFilterOptions filterOptions =
@@ -78,10 +78,11 @@ public class MatchServiceImpl implements MatchService {
         double minSalary = ad.getMinSalary() - (ad.getMinSalary() * 20 / 100);
         double maxSalary = ad.getMaxSalary() + (ad.getMaxSalary() * 20 / 100);
 
-        String location = null;
-        if (!ad.getLocation().getName().equals("Home")) {
-            location = ad.getLocation().getName();
+        String location = ad.getLocation().getName();
+        if (location.equals("Home")) {
+            location = null;
         }
+
         String status = "Active";
 
         JobApplicationFilterOptions filterOptions =
@@ -145,22 +146,31 @@ public class MatchServiceImpl implements MatchService {
         jobApplicationService.updateJobApplication(jobApplication);
     }
 
+    @Override
+    public void deleteJobAdRequests(JobAd jobAd) {
+        jobMatchRepository.deleteJobAdInJobAppReq(jobAd.getId());
+        jobMatchRepository.deleteJobAdInJobAdReq(jobAd.getId());
+    }
+
+    @Override
+    public void deleteJobApplicationRequests(JobApplication jobApplication) {
+        jobMatchRepository.deleteJobAppInJobAdReq(jobApplication.getId());
+        jobMatchRepository.deleteJobAppInJobAppReq(jobApplication.getId());
+    }
+
     private void approvalProcess(JobAd jobAd, JobApplication jobApplicationToApprove) {
         Professional applicant = jobApplicationToApprove.getProfessional();
         applicant.setStatus(statusService.getStatus("Busy"));
         applicant.getSuccessfulMatches().add(jobAd.getEmployer());
         professionalService.updateProfessional(applicant);
 
-        jobMatchRepository.deleteJobAdInJobAdReq(jobAd.getId());
-        jobMatchRepository.deleteJobAppInJobAdReq(jobApplicationToApprove.getId());
+        deleteJobApplicationRequests(jobApplicationToApprove);
+        deleteJobAdRequests(jobAd);
 
         jobAd.setMatchesSentToJobApplications(new HashSet<>());
         jobAd.setMatchRequestedApplications(new HashSet<>());
         jobAd.setStatus(statusService.getStatus("Archived"));
         jobAdService.updateJobAd(jobAd);
-
-        jobMatchRepository.deleteJobAppInJobAppReq(jobApplicationToApprove.getId());
-        jobMatchRepository.deleteJobAdInJobAppReq(jobAd.getId());
 
         jobApplicationToApprove.setMatchesSentToJobAds(new HashSet<>());
         jobApplicationToApprove.setMatchRequestedAds(new HashSet<>());
@@ -185,4 +195,6 @@ public class MatchServiceImpl implements MatchService {
             throw new EntityStatusException(entityType, status);
         }
     }
+
+
 }

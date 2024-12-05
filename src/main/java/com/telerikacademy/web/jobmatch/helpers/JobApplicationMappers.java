@@ -1,9 +1,11 @@
 package com.telerikacademy.web.jobmatch.helpers;
 
+import com.telerikacademy.web.jobmatch.exceptions.EntityStatusException;
 import com.telerikacademy.web.jobmatch.models.*;
 import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoOut;
 import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoOut;
+import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoUpdate;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import com.telerikacademy.web.jobmatch.services.contracts.SkillService;
 import com.telerikacademy.web.jobmatch.services.contracts.StatusService;
@@ -22,24 +24,26 @@ public interface JobApplicationMappers {
     @Mapping(source = "description", target = "description")
     @Mapping(source = "minSalary", target = "minSalary")
     @Mapping(source = "maxSalary", target = "maxSalary")
-    @Mapping(source = "jobApplicationDtoIn", target = "status", qualifiedByName = "returnStatus")
     @Mapping(target = "location", source = "jobApplicationDtoIn", qualifiedByName = "mapLocation")
     @Mapping(source = "hybrid", target = "hybrid")
     @Mapping(source = "skills", target = "qualifications", qualifiedByName = "mapSkills")
+    @Mapping(target = "status", expression = "java(returnInitialStatus(statusService))")
     JobApplication fromDtoIn(JobApplicationDtoIn jobApplicationDtoIn,
                              @Context StatusService statusService,
                              @Context LocationService locationService,
                              @Context SkillService skillService);
 
     @Mapping(source = "jobApplication.id", target = "id")
-    @Mapping(source = "jobApplicationDtoIn.description", target = "description")
-    @Mapping(source = "jobApplicationDtoIn.minSalary", target = "minSalary")
-    @Mapping(source = "jobApplicationDtoIn.maxSalary", target = "maxSalary")
-    @Mapping(source = "jobApplicationDtoIn", target = "status", qualifiedByName = "returnStatus")
-    @Mapping(target = "location", source = "jobApplicationDtoIn", qualifiedByName = "mapLocation")
-    @Mapping(source = "jobApplicationDtoIn.hybrid", target = "hybrid")
-    @Mapping(source = "jobApplicationDtoIn.skills", target = "qualifications", qualifiedByName = "mapSkills")
-    JobApplication fromDtoIn(JobApplication jobApplication, JobApplicationDtoIn jobApplicationDtoIn,
+    @Mapping(source = "jobApplicationDtoUpdate.description", target = "description")
+    @Mapping(source = "jobApplicationDtoUpdate.minSalary", target = "minSalary")
+    @Mapping(source = "jobApplicationDtoUpdate.maxSalary", target = "maxSalary")
+    @Mapping(target = "status",
+            expression = "java(returnUpdatedStatus(jobApplication, jobApplicationDtoUpdate, statusService))")
+    @Mapping(target = "location", source = "jobApplicationDtoUpdate", qualifiedByName = "mapLocation")
+    @Mapping(source = "jobApplicationDtoUpdate.hybrid", target = "hybrid")
+    @Mapping(source = "jobApplicationDtoUpdate.skills", target = "qualifications", qualifiedByName = "mapSkills")
+    JobApplication fromDtoIn(JobApplication jobApplication,
+                             JobApplicationDtoUpdate jobApplicationDtoUpdate,
                              @Context StatusService statusService,
                              @Context LocationService locationService,
                              @Context SkillService skillService);
@@ -68,14 +72,26 @@ public interface JobApplicationMappers {
                 jobApplicationDtoIn.getLocCityId());
     }
 
-    @Named("returnStatus")
-    default Status returnUpdatedStatus(JobApplicationDtoIn jobApplicationDtoIn,
-                                       @Context StatusService statusService){
-        return statusService.getStatus(jobApplicationDtoIn.getStatus());
+    default Status returnUpdatedStatus(JobApplication jobApplication, JobApplicationDtoUpdate jobApplicationDtoUpdate,
+                                       @Context StatusService statusService) {
+
+        if (jobApplication.getStatus().getStatus().equals("Matched") &&
+                !jobApplicationDtoUpdate.getStatus().equals("Matched")) {
+            throw new EntityStatusException("Application", "Matched");
+        }
+        return statusService.getStatus(jobApplicationDtoUpdate.getStatus());
+    }
+
+    default Status returnInitialStatus(@Context StatusService statusService) {
+        return statusService.getStatus("Active");
     }
 
     @Named("mapSkills")
     default Set<Skill> returnSetOfSkills(@Context SkillService skillService, String skillsStr) {
+        if (skillsStr == null){
+            return new HashSet<>();
+        }
+
         String[] skillList = skillsStr.split(", ");
 
         Set<Skill> skills = new HashSet<>();

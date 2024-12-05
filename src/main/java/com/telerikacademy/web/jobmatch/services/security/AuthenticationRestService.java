@@ -25,22 +25,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AuthenticationRestService {
 
-    public static final String USER_WITH_THE_SAME_USERNAME_ALREADY_EXISTS = "User with the same username already exists";
     private final UserService userService;
     private final JwtTokenGenerator jwtTokenGenerator;
     private final RefreshTokenRepository refreshTokenRepository;
     private final EmployersService employersService;
     private final ProfessionalService professionalService;
-    private final LocationService locationService;
     private final UserInfoMapper userInfoMapper;
-    private final StatusService statusService;
 
     public AuthResponseDto getJwtTokensAfterAuthentication(Authentication authentication, HttpServletResponse response) {
         try {
@@ -136,13 +132,13 @@ public class AuthenticationRestService {
         boolean isUsernameExist = true;
         boolean isEmailExist = true;
         try {
-            UserPrincipal user = userService.findByUsername(employerDtoIn.getUsername());
+            userService.findByUsername(employerDtoIn.getUsername());
         } catch (EntityNotFoundException e) {
             isUsernameExist = false;
         }
 
         try {
-            UserPrincipal user = userService.findByEmail(employerDtoIn.getEmail());
+            userService.findByEmail(employerDtoIn.getEmail());
         } catch (EntityNotFoundException e) {
             isEmailExist = false;
         }
@@ -181,13 +177,13 @@ public class AuthenticationRestService {
         boolean isUsernameExist = true;
         boolean isEmailExist = true;
         try {
-            UserPrincipal user = userService.findByUsername(professionalDtoIn.getUsername());
+            userService.findByUsername(professionalDtoIn.getUsername());
         } catch (EntityNotFoundException e) {
             isUsernameExist = false;
         }
 
         try {
-            UserPrincipal user = userService.findByEmail(professionalDtoIn.getEmail());
+            userService.findByEmail(professionalDtoIn.getEmail());
         } catch (EntityNotFoundException e) {
             isEmailExist = false;
         }

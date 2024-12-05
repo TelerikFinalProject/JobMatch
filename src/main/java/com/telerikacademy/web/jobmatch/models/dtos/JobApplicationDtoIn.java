@@ -18,9 +18,11 @@ public class JobApplicationDtoIn {
     @Size(min = 10, max = 200)
     private String description;
 
+    @NotNull(message = "Salary" + NULL_FIELD_ERROR)
     @Positive(message = SALARY_ERROR)
     private double minSalary;
 
+    @NotNull(message = "Salary" + NULL_FIELD_ERROR)
     @Positive(message = SALARY_ERROR)
     private double maxSalary;
 
@@ -33,9 +35,6 @@ public class JobApplicationDtoIn {
 
     @NotNull(message = "Remote spec" + NULL_FIELD_ERROR)
     private boolean isHybrid;
-
-    @NotNull(message = "Status" + NULL_FIELD_ERROR)
-    private String status;
 
     private String skills;
 }

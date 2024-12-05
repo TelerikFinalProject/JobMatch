@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zxx" class="no-js" xmlns:th="http://www.thymeleaf.org">
+<form th:replace="~{head-fragment.html :: head('Job Ad')}"></form>
+<body style="overflow: visible">
+
+<form th:replace="~{preloader-fragment.html :: preloader}"></form>
+
+<form th:replace="~{header-fragment.html :: header}"></form>
+<main>
+
+    <!-- Hero Area Start-->
+    <div class="slider-area ">
+        <div class="single-slider section-overly slider-height2 d-flex align-items-center"
+             data-background="assets/img/hero/about.jpg">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="hero-cap text-center">
+                            <h2 th:text="${jobAd.positionTitle}">Job Title</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Hero Area End -->
+    <!-- job post company Start -->
+    <div class="job-post-company pt-120 pb-120">
+        <div class="container">
+            <div class="row justify-content-between">
+                <!-- Left Content -->
+                <div class="col-xl-7 col-lg-8">
+                    <!-- job single -->
+                    <div class="single-job-items mb-50">
+                        <div class="job-items">
+                            <div class="company-img company-img-details">
+                                <a href="#"><img src="/img/icon/job-list1.png" alt=""></a>
+                            </div>
+                            <div class="job-tittle">
+
+                                <h4 th:text="${jobAd.positionTitle}">Job Title</h4>
+
+                                <ul>
+                                    <li th:text="${jobAd.employer.companyName}">Company Name</li>
+                                    <li>
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <!-- Case 1: Not 'Home' and not Hybrid -->
+                                        <a th:if="${jobAd.location.name != 'Home' and !jobAd.hybrid}"
+                                           th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode}"></a>
+
+                                        <!-- Case 2: Not 'Home' and Hybrid -->
+                                        <a th:if="${jobAd.location.name != 'Home' and jobAd.hybrid}"
+                                           th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode + ' (Hybrid)'}"></a>
+
+                                        <!-- Case 3: Location is 'Home' -->
+                                        <a th:if="${jobAd.location.name == 'Home'}">Remote</a>
+                                    </li>
+                                    <li th:text="${#numbers.formatDecimal(jobAd.minSalary, 0, 0)} + ' - ' + ${#numbers.formatDecimal(jobAd.maxSalary, 0, 0)}">
+                                        Salary range
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- job single End -->
+
+                    <div class="job-post-details">
+                        <div class="post-details1 mb-50">
+                            <!-- Small Section Tittle -->
+                            <div class="small-section-tittle">
+                                <h4>Job Description</h4>
+                            </div>
+                            <p th:text="${jobAd.jobDescription}">Description</p>
+                        </div>
+                        <div class="post-details2  mb-50">
+                            <!-- Small Section Tittle -->
+                            <div class="small-section-tittle">
+                                <h4>Required Knowledge, Skills, and Abilities</h4>
+                            </div>
+                            <ul th:each="skill : ${jobAd.skills}">
+                                <li th:text="${skill.name}">Skill</li>
+                            </ul>
+                        </div>
+                        <div class="post-details2  mb-50">
+                        </div>
+                    </div>
+
+                </div>
+                <!-- Right Content -->
+                <div class="col-xl-4 col-lg-4">
+                    <div class="post-details3  mb-50">
+                        <!-- Small Section Tittle -->
+                        <div class="small-section-tittle">
+                            <h4>Job Overview</h4>
+                        </div>
+                        <ul>
+                            <li>
+                                Location :
+                                <span th:if="${jobAd.location.name != 'Home' and !jobAd.hybrid}"
+                                      th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode}">
+                                </span>
+                                <span th:if="${jobAd.location.name != 'Home' and jobAd.hybrid}"
+                                      th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode + ' (Hybrid)'}">
+                                </span>
+                                <span th:if="${jobAd.location.name == 'Home'}" th:text="'Remote'">
+                                </span>
+                            </li>
+                            <li>Job nature : <span>Full time</span></li>
+                            <li>Salary : <span
+                                    th:text="${#numbers.formatDecimal(jobAd.minSalary, 0, 0)} + ' - ' + ${#numbers.formatDecimal(jobAd.maxSalary, 0, 0)}">Salary</span>
+                            </li>
+                        </ul>
+                        <div class="apply-btn2">
+                            <a href="#" class="btn">Apply Now</a>
+                        </div>
+                    </div>
+                    <div class="post-details4  mb-50">
+                        <!-- Small Section Tittle -->
+                        <div class="small-section-tittle">
+                            <h4>Company Information</h4>
+                        </div>
+                        <span th:text="${jobAd.employer.companyName}">Company Name</span>
+                        <p th:text="${jobAd.employer.description}">Company Description</p>
+                        <ul>
+                            <li>Name: <span th:text="${jobAd.employer.companyName}">Company Name </span></li>
+                            <li>Email: <span th:text="${jobAd.employer.email}">Company email</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- job post company End -->
+
+</main>
+
+<form th:replace="~{footer-fragment.html ::footer}"></form>
+
+<!-- JS here -->
+
+<form th:replace="~{scripts-fragment.html :: scripts}"></form>
+
+</body>
+</html>

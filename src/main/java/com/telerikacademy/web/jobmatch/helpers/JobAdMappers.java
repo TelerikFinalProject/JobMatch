@@ -1,11 +1,13 @@
 package com.telerikacademy.web.jobmatch.helpers;
 
+import com.telerikacademy.web.jobmatch.exceptions.EntityStatusException;
 import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.models.Location;
 import com.telerikacademy.web.jobmatch.models.Skill;
 import com.telerikacademy.web.jobmatch.models.Status;
 import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoOut;
+import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoUpdate;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import com.telerikacademy.web.jobmatch.services.contracts.SkillService;
 import com.telerikacademy.web.jobmatch.services.contracts.StatusService;
@@ -36,16 +38,16 @@ public interface JobAdMappers {
                     @Context SkillService skillService);
 
     @Mapping(source = "jobAd.id", target = "id")
-    @Mapping(source = "jobAdDtoIn.positionTitle", target = "positionTitle")
-    @Mapping(source = "jobAdDtoIn.minSalary", target = "minSalary")
-    @Mapping(source = "jobAdDtoIn.maxSalary", target = "maxSalary")
-    @Mapping(source = "jobAdDtoIn.jobDescription", target = "jobDescription")
-    @Mapping(source = "jobAdDtoIn.hybrid", target = "hybrid")
-    @Mapping(target = "location", source = "jobAdDtoIn", qualifiedByName = "mapLocation")
-    @Mapping(target = "status", expression = "java(returnInitialStatus(statusService))")
-    @Mapping(source = "jobAdDtoIn.skills", target = "skills", qualifiedByName = "mapSkills")
+    @Mapping(source = "jobAdDtoUpdate.positionTitle", target = "positionTitle")
+    @Mapping(source = "jobAdDtoUpdate.minSalary", target = "minSalary")
+    @Mapping(source = "jobAdDtoUpdate.maxSalary", target = "maxSalary")
+    @Mapping(source = "jobAdDtoUpdate.jobDescription", target = "jobDescription")
+    @Mapping(source = "jobAdDtoUpdate.hybrid", target = "hybrid")
+    @Mapping(target = "location", source = "jobAdDtoUpdate", qualifiedByName = "mapLocation")
+    @Mapping(target = "status", expression = "java(returnUpdatedStatus(jobAd, jobAdDtoUpdate, statusService))")
+    @Mapping(source = "jobAdDtoUpdate.skills", target = "skills", qualifiedByName = "mapSkills")
     JobAd fromDtoIn(JobAd jobAd,
-                    JobAdDtoIn jobAdDtoIn,
+                    JobAdDtoUpdate jobAdDtoUpdate,
                     @Context LocationService locationService,
                     @Context StatusService statusService,
                     @Context SkillService skillService);
@@ -59,6 +61,7 @@ public interface JobAdMappers {
     @Mapping(source = "jobAd.employer.companyName", target = "companyName")// Nested mapping for location
     @Mapping(target = "hybrid", source = "hybrid")
     @Mapping(source = "skills", target = "skills", qualifiedByName = "setToString")
+    @Mapping(source = "jobAd.status.status", target = "status")
     JobAdDtoOut toDtoOut(JobAd jobAd);
 
     List<JobAdDtoOut> toDtoOutList(List<JobAd> jobAds);
@@ -71,12 +74,22 @@ public interface JobAdMappers {
                 jobAdDtoIn.getLocCityId());
     }
 
-    default Status returnInitialStatus(@Context StatusService statusService){
+    default Status returnInitialStatus(@Context StatusService statusService) {
         return statusService.getStatus("Active");
+    }
+
+    default Status returnUpdatedStatus(JobAd jobAd, JobAdDtoUpdate jobAdDtoUpdate, @Context StatusService statusService) {
+        if (jobAd.getStatus().getStatus().equals("Archived") && !jobAdDtoUpdate.getStatus().equals("Archived")) {
+            throw new EntityStatusException("Ad", "Archived");
+        }
+        return statusService.getStatus(jobAdDtoUpdate.getStatus());
     }
 
     @Named("mapSkills")
     default Set<Skill> returnSetOfSkills(@Context SkillService skillService, String skillsStr) {
+        if (skillsStr == null){
+            return new HashSet<>();
+        }
         String[] skillList = skillsStr.split(", ");
 
         Set<Skill> skills = new HashSet<>();

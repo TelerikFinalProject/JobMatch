@@ -2,6 +2,7 @@ package com.telerikacademy.web.jobmatch.models.specifications;
 
 import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.models.Location;
+import com.telerikacademy.web.jobmatch.models.Status;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobAdFilterOptions;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Join;
@@ -47,21 +48,35 @@ public class JobAdSpecifications {
             );
 
             jobAdFilterOptions.getLocation().ifPresent(location -> {
-                        Join<JobAd, Location> locationJoin = root.join("location");
-                        Predicate locationPredicate = criteriaBuilder.equal(locationJoin.get("name"), location);
-                        Predicate homePredicate = criteriaBuilder.equal(locationJoin.get("name"), "Home");
-                        predicates.add(criteriaBuilder.or(locationPredicate, homePredicate));
-                    }
+                Join<JobAd, Location> locationJoin = root.join("location");
+                String[] locations = location.split(",\\s*");
+                List<Predicate> locationPredicates = new ArrayList<>();
+                for (String loc : locations) {
+                    locationPredicates.add(criteriaBuilder.equal(locationJoin.get("name"), loc.trim()));
+                }
+                Predicate combinedPredicate = criteriaBuilder.or(locationPredicates.toArray(new Predicate[0]));
+                predicates.add(combinedPredicate);
+            });
 
-            );
+            jobAdFilterOptions.getStatus().ifPresent(status -> {
+                String[] statuses = status.split(",\\s*"); // Split by ", " or just ","
+                Join<JobAd, Status> statusJoin = root.join("status");
+                List<Predicate> statusPredicates = new ArrayList<>();
 
-            jobAdFilterOptions.getStatus().ifPresent(status ->
-                    predicates.add(
+                for (String stat : statuses) {
+                    statusPredicates.add(
                             criteriaBuilder.like(
-                                    criteriaBuilder.lower(root.join("status").get("status")), "%" + status.toLowerCase() + "%"
+                                    criteriaBuilder.lower(statusJoin.get("status")),
+                                    "%" + stat.trim().toLowerCase() + "%"
                             )
-                    )
-            );
+                    );
+                }
+
+                // Combine all status predicates with an OR
+                Predicate combinedStatusPredicate = criteriaBuilder.or(statusPredicates.toArray(new Predicate[0]));
+                predicates.add(combinedStatusPredicate);
+            });
+
 
             // Convert List<Predicate> to an array of Predicate for criteriaBuilder.and()
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

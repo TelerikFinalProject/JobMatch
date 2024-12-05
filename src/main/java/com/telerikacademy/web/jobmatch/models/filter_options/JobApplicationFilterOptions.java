@@ -10,8 +10,8 @@ import java.util.Optional;
 public class JobApplicationFilterOptions {
     private Optional<Double> minSalary;
     private Optional<Double> maxSalary;
-    private Optional<String> creator;
     private Optional<String> location;
+    private Optional<String> creator;
     private Optional<String> status;
 
     public JobApplicationFilterOptions(Double minSalary, Double maxSalary, String creator, String location, String status) {

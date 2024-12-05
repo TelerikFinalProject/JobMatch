@@ -1,6 +1,5 @@
 package com.telerikacademy.web.jobmatch.models.filter_options;
 
-import com.telerikacademy.web.jobmatch.models.JobAd;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

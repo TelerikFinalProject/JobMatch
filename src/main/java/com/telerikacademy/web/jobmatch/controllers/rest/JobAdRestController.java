@@ -10,8 +10,10 @@ import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.models.JobApplication;
 import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoOut;
+import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoUpdate;
 import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoOut;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobAdFilterOptions;
+import com.telerikacademy.web.jobmatch.services.TweeterClient;
 import com.telerikacademy.web.jobmatch.services.contracts.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,7 @@ public class JobAdRestController {
     private final StatusService statusService;
     private final MatchService matchService;
     private final SkillService skillService;
+    private final MailService mailService;
 
     @PreAuthorize("hasAnyRole('ROLE_PROFESSIONAL', 'ROLE_EMPLOYER', 'ROLE_ADMIN')")
     @GetMapping
@@ -101,6 +104,11 @@ public class JobAdRestController {
             jobAd.setEmployer(employer);
             jobAdService.createJobAd(jobAd);
             JobAdDtoOut jobAdDtoOut = JobAdMappers.INSTANCE.toDtoOut(jobAd);
+
+            TweeterClient tweeterClient = new TweeterClient();
+            tweeterClient.sendTweet(String.format("Job ad '%s' has been added from company '%s'"
+                    , jobAd.getPositionTitle(), jobAd.getEmployer().getCompanyName()));
+
             return ResponseEntity.status(HttpStatus.CREATED).body(jobAdDtoOut);
         } catch (ExternalResourceException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
@@ -112,7 +120,7 @@ public class JobAdRestController {
     @PreAuthorize("hasAnyRole('ROLE_EMPLOYER', 'ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<JobAdDtoOut> updateJobAd(@PathVariable int id,
-                                                   @RequestBody JobAdDtoIn jobAdDtoIn,
+                                                   @RequestBody JobAdDtoUpdate jobAdDtoUpdate,
                                                    Authentication authentication) {
         boolean isEmployer = authentication.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_EMPLOYER"));
@@ -128,7 +136,8 @@ public class JobAdRestController {
                 }
             }
 
-            JobAd updatedJobAd = JobAdMappers.INSTANCE.fromDtoIn(jobAd, jobAdDtoIn, locationService, statusService, skillService);
+            JobAd updatedJobAd = JobAdMappers.INSTANCE.fromDtoIn(jobAd, jobAdDtoUpdate,
+                    locationService, statusService, skillService);
             jobAdService.updateJobAd(updatedJobAd);
             return ResponseEntity.ok(JobAdMappers.INSTANCE.toDtoOut(updatedJobAd));
         } catch (EntityNotFoundException e) {
@@ -211,6 +220,8 @@ public class JobAdRestController {
                         String.format("A match request for Job %s with ID:%d already exists, " +
                                 "please reach out to the Job %s creator!", "application", jobAdId, "application"));
             }
+
+            mailService.sendNotificationViaEmailToApplicant(jobApplication, jobAdToMatchWith);
 
             jobAdService.updateJobAd(jobAdToMatchWith);
             return ResponseEntity.ok(JobApplicationMappers.INSTANCE.toDtoOutSet(jobAdToMatchWith.getMatchesSentToJobApplications()));
