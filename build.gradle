@@ -39,6 +39,11 @@ dependencies {
 	// Documentation
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 
+	//Twitter (X)
+	implementation 'org.twitter4j:twitter4j-core:4.0.7'
+	implementation 'com.mashape.unirest:unirest-java:1.4.9'
+	implementation("commons-codec:commons-codec:1.15")
+
 	// Object mapping
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 

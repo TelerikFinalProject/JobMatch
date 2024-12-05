@@ -118,6 +118,11 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
+    public List<Location> getAllSavedLocations(){
+        return locationRepository.findAll();
+    }
+
+    @Override
     public Location returnIfExistOrCreate(String isoCode, int cityId) {
         Location location;
         boolean validLocation = true;

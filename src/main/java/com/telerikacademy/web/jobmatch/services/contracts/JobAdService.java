@@ -17,4 +17,6 @@ public interface JobAdService {
     void updateJobAd(JobAd jobAd);
 
     void removeJobAd(int id);
+
+    List<JobAd> getPaginatedJobAds(List<JobAd> jobAds, int page, int size);
 }
