@@ -47,43 +47,30 @@
                         </div>
                     </div>
                     <!-- Job Category Listing start -->
-                    <form th:action="@{/professionals/job-ads}" method="get" th:object="${filterOptions}">
+                    <form th:action="@{/professionals/job-ads}" method="get" th:object="${jobAdFilterOptions}">
                         <div class="job-category-listing mb-50">
                             <!-- single one -->
                             <div class="single-listing">
                                 <div class="small-section-tittle2">
-                                    <h4>Job Category</h4>
+                                    <h4>Job Employer</h4>
                                 </div>
                                 <!-- Select job items start -->
                                 <div class="select-job-items2">
-                                    <select name="select">
-                                        <option value="">All Category</option>
-                                        <option value="">Category 1</option>
-                                        <option value="">Category 2</option>
-                                        <option value="">Category 3</option>
-                                        <option value="">Category 4</option>
+                                    <select name="creator" th:field="*{creator}">
+                                        <option value="" selected>Choose Employer</option>
+                                        <option th:each="employer : ${employers}"
+                                                th:value="${employer.companyName}"
+                                                th:text="${employer.companyName}"></option>
                                     </select>
                                 </div>
                                 <!--  Select job items End-->
                                 <!-- select-Categories start -->
-                                <div class="select-Categories pt-80 pb-50">
+                                <div class="select-Categories pt-80 pb-30">
                                     <div class="small-section-tittle2">
                                         <h4>Job Type</h4>
                                     </div>
-                                    <label class="container">Full Time
-                                        <input type="checkbox">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                    <label class="container">Part Time
-                                        <input type="checkbox" checked="checked active">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                    <label class="container">Remote
-                                        <input type="checkbox">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                    <label class="container">Freelance
-                                        <input type="checkbox">
+                                    <label class="container">Hybrid
+                                        <input type="checkbox" th:field="*{hybrid}">
                                         <span class="checkmark"></span>
                                     </label>
                                 </div>
@@ -96,93 +83,52 @@
                                 </div>
                                 <!-- Select job items start -->
                                 <div class="select-job-items2">
-                                    <select name="select" th:field="*{location}">
-                                        <option value="" th:value="${name}">Location</option>
+                                    <select name="location" th:field="*{location}">
+                                        <option value="" selected>Choose a Location</option>
+                                        <option th:each="location : ${locations}" th:value="${location.name}"
+                                                th:text="${location.name}"></option>
                                     </select>
                                 </div>
                                 <!--  Select job items End-->
                                 <!-- select-Categories start -->
-                                <div class="select-Categories pt-80 pb-50">
-                                    <div class="small-section-tittle2">
-                                        <h4>Experience</h4>
-                                    </div>
-                                    <label class="container">1-2 Years
-                                        <input type="checkbox">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                    <label class="container">2-3 Years
-                                        <input type="checkbox" checked="checked active">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                    <label class="container">3-6 Years
-                                        <input type="checkbox">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                    <label class="container">6-more..
-                                        <input type="checkbox">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                </div>
                                 <!-- select-Categories End -->
                             </div>
                             <!-- single three -->
                             <div class="single-listing">
-                                <!-- select-Categories start -->
-                                <div class="select-Categories pb-50">
-                                    <div class="small-section-tittle2">
-                                        <h4>Posted Within</h4>
-                                    </div>
-                                    <label class="container">Any
-                                        <input type="checkbox">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                    <label class="container">Today
-                                        <input type="checkbox" checked="checked active">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                    <label class="container">Last 2 days
-                                        <input type="checkbox">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                    <label class="container">Last 3 days
-                                        <input type="checkbox">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                    <label class="container">Last 5 days
-                                        <input type="checkbox">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                    <label class="container">Last 10 days
-                                        <input type="checkbox">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                </div>
-                                <!-- select-Categories End -->
-                            </div>
-                            <div class="single-listing">
                                 <!-- Range Slider Start -->
                                 <aside class="left_widgets p_filter_widgets price_rangs_aside sidebar_box_shadow">
-                                    <div class="small-section-tittle2">
-                                        <h4>Filter Jobs</h4>
-                                    </div>
-                                    <div class="widgets_inner">
-                                        <div class="range_item">
-                                            <!-- <div id="slider-range"></div> -->
-                                            <input type="text" class="js-range-slider" value=""/>
-                                            <div class="d-flex align-items-center">
-                                                <div class="price_text">
-                                                    <p>Price :</p>
-                                                </div>
-                                                <div class="price_value d-flex justify-content-center">
-                                                    <input type="text" class="js-input-from" readonly/>
-                                                    <span>to</span>
-                                                    <input type="text" class="js-input-to" id="amount" readonly/>
+                                    <div class="select-Categories pt-80 pb-35">
+                                        <div class="small-section-tittle2">
+                                            <h4>Filter Salary</h4>
+                                        </div>
+                                        <div class="widgets_inner">
+                                            <div class="range_item">
+                                                <!-- <div id="slider-range"></div> -->
+                                                <input type="text" class="js-range-slider" value=""/>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="price_text">
+                                                        <p>Salary :</p>
+                                                    </div>
+                                                    <div class="price_value d-flex justify-content-center">
+                                                        <input type="text" class="js-input-from" readonly
+                                                               th:field="*{minSalary}"/>
+                                                        <span>to</span>
+                                                        <input type="text" class="js-input-to" id="amount" readonly
+                                                               th:field="*{maxSalary}"/>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </aside>
                                 <!-- Range Slider End -->
+                            </div>
+                            <div class="items-link">
+                                <input type="submit" value="Filter" style="margin-bottom: 0px;
+                                padding-left: 60px;
+                                padding-right: 60px;
+                                padding-top: 9px;
+                                padding-bottom: 9px;"/>
                             </div>
                         </div>
                     </form>
@@ -267,7 +213,12 @@
                                 <!-- Previous Button -->
                                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                                     <a class="page-link"
-                                       th:href="@{/professionals/job-ads(page=${currentPage - 1}, size=7)}"
+                                       th:href="@{/professionals/job-ads(page=${currentPage - 1}, size=7,
+                                       minSalary=${filterOptions.minSalary},
+                                       maxSalary=${filterOptions.maxSalary},
+                                       location=${filterOptions.location},
+                                       creator=${filterOptions.creator},
+                                       hybrid=${filterOptions.hybrid})}"
                                        aria-label="Previous">
                                         <span class="ti-angle-left"></span>
                                     </a>
@@ -276,14 +227,25 @@
                                 <!-- Page Numbers -->
                                 <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                                     th:classappend="${currentPage == i} ? 'active'">
-                                    <a class="page-link" th:href="@{/professionals/job-ads(page=${i}, size=7)}"
+                                    <a class="page-link"
+                                       th:href="@{/professionals/job-ads(page=${i}, size=7,
+                                       minSalary=${filterOptions.minSalary},
+                                       maxSalary=${filterOptions.maxSalary},
+                                       location=${filterOptions.location},
+                                       creator=${filterOptions.creator},
+                                       hybrid=${filterOptions.hybrid})}"
                                        th:text="${i + 1}"></a>
                                 </li>
 
                                 <!-- Next Button -->
                                 <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
                                     <a class="page-link"
-                                       th:href="@{/professionals/job-ads(page=${currentPage + 1}, size=7)}"
+                                       th:href="@{/professionals/job-ads(page=${currentPage + 1}, size=7,
+                                       minSalary=${filterOptions.minSalary},
+                                       maxSalary=${filterOptions.maxSalary},
+                                       location=${filterOptions.location},
+                                       creator=${filterOptions.creator},
+                                       hybrid=${filterOptions.hybrid})}"
                                        aria-label="Next">
                                         <span class="ti-angle-right"></span>
                                     </a>

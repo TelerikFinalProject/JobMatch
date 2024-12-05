@@ -77,6 +77,12 @@ public class JobAdSpecifications {
                 predicates.add(combinedStatusPredicate);
             });
 
+            jobAdFilterOptions.getHybrid().ifPresent(hybrid ->
+                        predicates.add(
+                                criteriaBuilder.equal(root.get("hybrid"), hybrid)
+                        )
+            );
+
 
             // Convert List<Predicate> to an array of Predicate for criteriaBuilder.and()
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

@@ -65,6 +65,7 @@ public class JobApplicationRestController {
                                                                          @RequestParam(required = false) String creator,
                                                                          @RequestParam(required = false) String location,
                                                                          @RequestParam(required = false) String status,
+                                                                         @RequestParam(required = false) Boolean hybrid,
                                                                          Authentication authentication) {
 
         boolean isProfessional = authentication.getAuthorities().stream()
@@ -72,9 +73,9 @@ public class JobApplicationRestController {
         JobApplicationFilterOptions filterOptions;
 
         if (isProfessional) {
-            filterOptions = new JobApplicationFilterOptions(minSalary, maxSalary, authentication.getName(), location, status);
+            filterOptions = new JobApplicationFilterOptions(minSalary, maxSalary, authentication.getName(), location, status, hybrid);
         } else {
-            filterOptions = new JobApplicationFilterOptions(minSalary, maxSalary, creator, location, status);
+            filterOptions = new JobApplicationFilterOptions(minSalary, maxSalary, creator, location, status, hybrid);
         }
 
         List<JobApplication> jobApplications = jobApplicationService.getJobApplications(filterOptions);

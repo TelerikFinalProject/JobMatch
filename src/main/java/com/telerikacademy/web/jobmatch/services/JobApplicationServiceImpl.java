@@ -1,6 +1,7 @@
 package com.telerikacademy.web.jobmatch.services;
 
 import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
+import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.models.JobApplication;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobApplicationFilterOptions;
 import com.telerikacademy.web.jobmatch.models.specifications.JobApplicationSpecification;
@@ -46,6 +47,13 @@ public class JobApplicationServiceImpl implements JobApplicationService {
 
     @Override
     public void removeJobApplication(int id) {
+        jobApplicationRepository.deleteById(id);
+    }
 
+    @Override
+    public List<JobApplication> getPaginatedJobApplications(List<JobApplication> jobApplications, int page, int size) {
+        int start = page * size;
+        int end = Math.min(start + size, jobApplications.size());
+        return jobApplications.subList(start, end);
     }
 }
