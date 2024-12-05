@@ -18,4 +18,6 @@ public interface LocationService {
     Location getLocationById(int id);
 
     void addLocation(Location location, String countryIsoCode);
+
+    List<Location> getAllSavedLocations();
 }

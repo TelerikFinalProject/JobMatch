@@ -45,4 +45,11 @@ public class JobAdServiceImpl implements JobAdService {
     public void removeJobAd(int id) {
         jobAdRepository.deleteById(id);
     }
+
+    @Override
+    public List<JobAd> getPaginatedJobAds(List<JobAd> jobAds, int page, int size) {
+        int start = page * size;
+        int end = Math.min(start + size, jobAds.size());
+        return jobAds.subList(start, end);
+    }
 }
