@@ -1,7 +1,6 @@
 package com.telerikacademy.web.jobmatch.services.contracts;
 
 import com.telerikacademy.web.jobmatch.models.JobAd;
-import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoIn;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobAdFilterOptions;
 
 import java.util.List;
@@ -17,6 +16,8 @@ public interface JobAdService {
     void updateJobAd(JobAd jobAd);
 
     void removeJobAd(int id);
+
+    int getNumberOfActiveJobAds();
 
     List<JobAd> getPaginatedJobAds(List<JobAd> jobAds, int page, int size);
 }

@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zxx" class="no-js" xmlns:th="http://www.thymeleaf.org">
-<form th:replace="~{head-fragment.html :: head('Job Ad')}"></form>
+<form th:replace="~{head-fragment.html :: head('Job Application')}"></form>
 <body style="overflow: visible">
 
 <form th:replace="~{preloader-fragment.html :: preloader}"></form>
@@ -16,7 +16,8 @@
                 <div class="row">
                     <div class="col-xl-12">
                         <div class="hero-cap text-center">
-                            <h2 th:text="${jobAd.positionTitle}">Job Title</h2>
+                            <h2 th:text="${jobApplication.professional.firstName} + ' ' +
+                            ${jobApplication.professional.lastName}">Professional Names</h2>
                         </div>
                     </div>
                 </div>
@@ -38,24 +39,25 @@
                             </div>
                             <div class="job-tittle">
 
-                                <h4 th:text="${jobAd.positionTitle}">Job Title</h4>
+                                <h4 th:text="${jobApplication.professional.firstName} + ' ' +
+                            ${jobApplication.professional.lastName}">Professional Names</h4>
 
                                 <ul>
-                                    <li th:text="${jobAd.employer.companyName}">Company Name</li>
                                     <li>
                                         <i class="fas fa-map-marker-alt"></i>
                                         <!-- Case 1: Not 'Home' and not Hybrid -->
-                                        <a th:if="${jobAd.location.name != 'Home' and !jobAd.hybrid}"
-                                           th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode}"></a>
+                                        <a th:if="${jobApplication.location.name != 'Home' and !jobApplication.hybrid}"
+                                           th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode}"></a>
 
                                         <!-- Case 2: Not 'Home' and Hybrid -->
-                                        <a th:if="${jobAd.location.name != 'Home' and jobAd.hybrid}"
-                                           th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode + ' (Hybrid)'}"></a>
+                                        <a th:if="${jobApplication.location.name != 'Home' and jobApplication.hybrid}"
+                                           th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode + ' (Hybrid)'}"></a>
 
                                         <!-- Case 3: Location is 'Home' -->
-                                        <a th:if="${jobAd.location.name == 'Home'}">Remote</a>
+                                        <a th:if="${jobApplication.location.name == 'Home'}">Remote</a>
                                     </li>
-                                    <li th:text="${#numbers.formatDecimal(jobAd.minSalary, 0, 0)} + ' - ' + ${#numbers.formatDecimal(jobAd.maxSalary, 0, 0)}">
+                                    <li th:text="${#numbers.formatDecimal(jobApplication.minSalary, 0, 0)} + ' - '
+                                    + ${#numbers.formatDecimal(jobApplication.maxSalary, 0, 0)}">
                                         Salary range
                                     </li>
                                 </ul>
@@ -68,16 +70,16 @@
                         <div class="post-details1 mb-50">
                             <!-- Small Section Tittle -->
                             <div class="small-section-tittle">
-                                <h4>Job Description</h4>
+                                <h4>Application Description</h4>
                             </div>
-                            <p th:text="${jobAd.jobDescription}">Description</p>
+                            <p th:text="${jobApplication.description}">Description</p>
                         </div>
-                        <div class="post-details2  mb-50" th:unless="${jobAd.skills.isEmpty()}">
+                        <div class="post-details2  mb-50" th:unless="${jobApplication.qualifications.isEmpty()}">
                             <!-- Small Section Tittle -->
                             <div class="small-section-tittle">
-                                <h4>Required Knowledge, Skills, and Abilities</h4>
+                                <h4>Knowledge, Skills, and Abilities</h4>
                             </div>
-                            <ul th:each="skill : ${jobAd.skills}">
+                            <ul th:each="skill : ${jobApplication.qualifications}">
                                 <li th:text="${skill.name}">Skill</li>
                             </ul>
                         </div>
@@ -91,46 +93,42 @@
                     <div class="post-details3  mb-50">
                         <!-- Small Section Tittle -->
                         <div class="small-section-tittle">
-                            <h4>Job Overview</h4>
+                            <h4>Application Overview</h4>
                         </div>
                         <ul>
                             <li>
                                 Location :
-                                <span th:if="${jobAd.location.name != 'Home' and !jobAd.hybrid}"
-                                      th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode}">
+                                <span th:if="${jobApplication.location.name != 'Home' and !jobApplication.hybrid}"
+                                      th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode}">
                                 </span>
-                                <span th:if="${jobAd.location.name != 'Home' and jobAd.hybrid}"
-                                      th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode + ' (Hybrid)'}">
+                                <span th:if="${jobApplication.location.name != 'Home' and jobApplication.hybrid}"
+                                      th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode + ' (Hybrid)'}">
                                 </span>
-                                <span th:if="${jobAd.location.name == 'Home'}" th:text="'Remote'">
+                                <span th:if="${jobApplication.location.name == 'Home'}" th:text="'Remote'">
                                 </span>
                             </li>
-                            <li>Job nature : <span>Full time</span></li>
-                            <li>Salary Proposed: <span
-                                    th:text="${#numbers.formatDecimal(jobAd.minSalary, 0, 0)} + ' - ' + ${#numbers.formatDecimal(jobAd.maxSalary, 0, 0)}">Salary</span>
+                            <li>Application nature : <span>Full time</span></li>
+                            <li>Salary Desired: <span
+                                    th:text="${#numbers.formatDecimal(jobApplication.minSalary, 0, 0)} + ' - '
+                                    + ${#numbers.formatDecimal(jobApplication.maxSalary, 0, 0)}">Salary</span>
                             </li>
                         </ul>
-                        <div class="d-lg-block">
-                            <a href="#" class="btn head-btn1" style="
-                                                        padding-left: 46px;
-                                                        padding-right: 46px;">Update</a>
-                            <a href="#" class="btn head-btn2" style="
-                                                        padding-left: 25px;
-                                                        padding-right: 25px;
-                                                        padding-top: 26px;
-                                                        padding-bottom: 26px;">Find Matches</a>
+                        <div class="apply-btn2">
+                            <a href="#" class="btn">Request Match</a>
                         </div>
                     </div>
                     <div class="post-details4  mb-50">
                         <!-- Small Section Tittle -->
                         <div class="small-section-tittle">
-                            <h4>Company Information</h4>
+                            <h4>Applicant Information</h4>
                         </div>
-                        <span th:text="${jobAd.employer.companyName}">Company Name</span>
-                        <p th:text="${jobAd.employer.description}">Company Description</p>
+                        <span th:text="${jobApplication.professional.firstName} + ' ' +
+                            ${jobApplication.professional.lastName}">Professional Names</span>
+                        <p th:text="${jobApplication.professional.summary}">Company Description</p>
                         <ul>
-                            <li>Name: <span th:text="${jobAd.employer.companyName}">Company Name </span></li>
-                            <li>Email: <span th:text="${jobAd.employer.email}">Company email</span></li>
+                            <li>Name: <span th:text="${jobApplication.professional.firstName} + ' ' +
+                            ${jobApplication.professional.lastName}">Professional Names</span></li>
+                            <li>Email: <span th:text="${jobApplication.professional.email}">Professional email</span></li>
                         </ul>
                     </div>
                 </div>
