@@ -129,26 +129,7 @@ public class AuthenticationRestService {
     }
 
     public AuthResponseDto registerEmployer(@Valid EmployerDtoIn employerDtoIn, HttpServletResponse response) {
-        boolean isUsernameExist = true;
-        boolean isEmailExist = true;
-        try {
-            userService.findByUsername(employerDtoIn.getUsername());
-        } catch (EntityNotFoundException e) {
-            isUsernameExist = false;
-        }
-
-        try {
-            userService.findByEmail(employerDtoIn.getEmail());
-        } catch (EntityNotFoundException e) {
-            isEmailExist = false;
-        }
-
-        if (isUsernameExist) {
-            throw new EntityDuplicateException("This username is already taken");
-        }
-        if (isEmailExist) {
-            throw new EntityDuplicateException("This email is already taken");
-        }
+        checkForUniqueUsernameAndEmail(employerDtoIn.getUsername(), employerDtoIn.getEmail());
 
         UserPrincipal userDetailsEntity = userInfoMapper.convertToEmployerEntity(employerDtoIn);
         Authentication authentication = createAuthenticationObject(userDetailsEntity);
@@ -158,42 +139,11 @@ public class AuthenticationRestService {
 
 
         employersService.createEmployer(employerDtoIn);
-        int employerId = userService.findByUsername(employerDtoIn.getUsername()).getId();
-        userDetailsEntity.setId(employerId);
-        saveUserRefreshToken(userDetailsEntity,refreshToken);
-
-        createRefreshTokenCookie(response,refreshToken);
-
-            log.info("[AuthService:registerUser] User:{} Successfully registered", userDetailsEntity.getUsername());
-            return   AuthResponseDto.builder()
-                    .accessToken(accessToken)
-                    .accessTokenExpiry(5 * 60)
-                    .username(userDetailsEntity.getUsername())
-                    .tokenType(TokenType.Bearer)
-                    .build();
+        return getAuthResponseDto(response, userDetailsEntity, accessToken, refreshToken, employerDtoIn.getUsername());
     }
 
     public AuthResponseDto registerProfessional(@Valid ProfessionalDtoIn professionalDtoIn, HttpServletResponse response) {
-        boolean isUsernameExist = true;
-        boolean isEmailExist = true;
-        try {
-            userService.findByUsername(professionalDtoIn.getUsername());
-        } catch (EntityNotFoundException e) {
-            isUsernameExist = false;
-        }
-
-        try {
-            userService.findByEmail(professionalDtoIn.getEmail());
-        } catch (EntityNotFoundException e) {
-            isEmailExist = false;
-        }
-
-        if (isUsernameExist) {
-            throw new EntityDuplicateException("This username is already taken");
-        }
-        if (isEmailExist) {
-            throw new EntityDuplicateException("This email is already taken");
-        }
+        checkForUniqueUsernameAndEmail(professionalDtoIn.getUsername(), professionalDtoIn.getEmail());
 
         UserPrincipal userDetailsEntity = userInfoMapper.convertToProfessionalEntity(professionalDtoIn);
         Authentication authentication = createAuthenticationObject(userDetailsEntity);
@@ -203,8 +153,12 @@ public class AuthenticationRestService {
 
 
         professionalService.registerProfessional(professionalDtoIn);
-        int id = userService.findByUsername(professionalDtoIn.getUsername()).getId();
-        userDetailsEntity.setId(id);
+        return getAuthResponseDto(response, userDetailsEntity, accessToken, refreshToken, professionalDtoIn.getUsername());
+    }
+
+    private AuthResponseDto getAuthResponseDto(HttpServletResponse response, UserPrincipal userDetailsEntity, String accessToken, String refreshToken, String username) {
+        int userId = userService.findByUsername(username).getId();
+        userDetailsEntity.setId(userId);
         saveUserRefreshToken(userDetailsEntity,refreshToken);
 
         createRefreshTokenCookie(response,refreshToken);
@@ -216,6 +170,29 @@ public class AuthenticationRestService {
                 .username(userDetailsEntity.getUsername())
                 .tokenType(TokenType.Bearer)
                 .build();
+    }
+
+    private void checkForUniqueUsernameAndEmail(String username, String email) {
+        boolean isUsernameExist = true;
+        boolean isEmailExist = true;
+        try {
+            userService.findByUsername(username);
+        } catch (EntityNotFoundException e) {
+            isUsernameExist = false;
+        }
+
+        try {
+            userService.findByEmail(email);
+        } catch (EntityNotFoundException e) {
+            isEmailExist = false;
+        }
+
+        if (isUsernameExist) {
+            throw new EntityDuplicateException("This username is already taken");
+        }
+        if (isEmailExist) {
+            throw new EntityDuplicateException("This email is already taken");
+        }
     }
 
 }

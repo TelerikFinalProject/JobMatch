@@ -44,39 +44,41 @@ public class JwtAccessTokenFilter extends OncePerRequestFilter {
 
             final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-            JwtDecoder jwtDecoder = NimbusJwtDecoder.withPublicKey(rsaKeyRecord.rsaPublicKey()).build();
-
-            if (!authHeader.startsWith(TokenType.Bearer.name())) {
+            if (request.getRequestURI().startsWith("/api/locations")) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            final String token = authHeader.substring(TokenType.Bearer.name().length() + 1);
-            final Jwt jwtToken = jwtDecoder.decode(token);
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                JwtDecoder jwtDecoder = NimbusJwtDecoder.withPublicKey(rsaKeyRecord.rsaPublicKey()).build();
 
-            final String username = jwtTokenUtils.getUsername(jwtToken);
+                final String token = authHeader.substring(TokenType.Bearer.name().length() + 1);
+                final Jwt jwtToken = jwtDecoder.decode(token);
 
-            if (!username.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = jwtTokenUtils.mapToUserDetails(username);
+                final String username = jwtTokenUtils.getUsername(jwtToken);
 
-                if (jwtTokenUtils.isTokenValid(jwtToken, userDetails)) {
-                    SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+                if (!username.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails userDetails = jwtTokenUtils.mapToUserDetails(username);
 
-                    UsernamePasswordAuthenticationToken createdToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities());
+                    if (jwtTokenUtils.isTokenValid(jwtToken, userDetails)) {
+                        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 
-                    createdToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        UsernamePasswordAuthenticationToken createdToken = new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities());
 
-                    securityContext.setAuthentication(createdToken);
-                    SecurityContextHolder.setContext(securityContext);
+                        createdToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                        securityContext.setAuthentication(createdToken);
+                        SecurityContextHolder.setContext(securityContext);
+                    }
                 }
+
+                log.info("[JwtAccessTokenFilter:doFilterInternal] Completed");
+
+                filterChain.doFilter(request, response);
             }
-
-            log.info("[JwtAccessTokenFilter:doFilterInternal] Completed");
-
-            filterChain.doFilter(request, response);
         } catch (JwtValidationException jwtValidationException) {
             log.error("[JwtAccessTokenFilter:doFilterInternal] JWT validation failed: {}", jwtValidationException.getMessage());
             response.setStatus(HttpStatus.NOT_ACCEPTABLE.value());

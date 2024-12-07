@@ -12,6 +12,16 @@ public class PasswordMatchesValidator implements ConstraintValidator<PasswordMat
             return true;
         }
 
-        return userDtoIn.getPassword().equals(userDtoIn.getConfirmPassword());
+        boolean passwordsMatch =  userDtoIn.getPassword().equals(userDtoIn.getConfirmPassword());
+
+        if (!passwordsMatch) {
+            // Link the violation to the "confirmPassword" field
+            constraintValidatorContext.disableDefaultConstraintViolation();
+            constraintValidatorContext.buildConstraintViolationWithTemplate("Passwords do not match")
+                    .addPropertyNode("confirmPassword") // Link to "confirmPassword" field
+                    .addConstraintViolation();
+        }
+
+        return passwordsMatch;
     }
 }

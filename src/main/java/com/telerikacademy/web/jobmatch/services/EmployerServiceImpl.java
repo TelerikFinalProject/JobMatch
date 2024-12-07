@@ -81,6 +81,12 @@ public class EmployerServiceImpl implements EmployersService {
         employerRepository.delete(employer);
     }
 
+    @Override
+    public Employer findByCompanyName(String companyName) {
+        return employerRepository.findByCompanyName(companyName)
+                .orElseThrow(() -> new EntityNotFoundException("Employer", "company name", companyName));
+    }
+
     private void checkForDuplicateEmail(Employer employer) {
         boolean duplicateExists = true;
         try {

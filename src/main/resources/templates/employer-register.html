@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:insert="~{head-fragment.html :: head(Register)}">
+</head>
+<head>
+  <style>
+    .gradient-custom {
+      /* fallback for old browsers */
+
+      background: rgb(1,11,29);
+      background: linear-gradient(0deg, rgba(1,11,29,1) 14%, rgba(9,9,121,0.68) 48%, rgba(255,255,255,1) 100%);
+    }
+
+    .card-registration .select-input.form-control[readonly]:not([disabled]) {
+      font-size: 1rem;
+      line-height: 2.15;
+      padding-left: .75em;
+      padding-right: .75em;
+    }
+    .card-registration .select-arrow {
+      top: 13px;
+    }
+  </style>
+</head>
+<body>
+<header th:replace="~{header-fragment.html :: header}"></header>
+<main>
+  <section class="vh-100 gradient-custom">
+    <div class="container py-5 h-100">
+      <div class="row justify-content-center align-items-center h-100">
+        <div class="col-12 col-lg-9 col-xl-7">
+          <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+            <div class="card-body p-4 p-md-5">
+              <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Register Your Company</h3>
+              <form method="post" th:object="${employer}" th:action="@{/authentication/employer/register/submit}">
+
+                <div class="row">
+                  <div class="col-12 mb-4">
+                    <div data-mdb-input-init class="form-outline">
+                      <input th:field="*{companyName}" type="text" id="companyName" class="form-control form-control-lg" />
+                      <label class="form-label" for="companyName">Company Name</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-12 mb-4">
+                    <div data-mdb-input-init class="form-outline">
+                      <textarea th:field="*{description}" id="companyDescription" class="form-control form-control-lg" rows="5"></textarea>
+                      <label class="form-label" for="companyDescription">Description</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-4 pt-2">
+                  <a style="float: left" th:href="@{/authentication/employer/register}" data-mdb-ripple-init class="btn btn-primary btn-lg">Back</a>
+                  <input style="float: right" data-mdb-ripple-init class="btn btn-primary btn-lg" type="submit" value="Register"/>
+                </div>
+
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer th:replace="~{footer-fragment.html :: footer}"></footer>
+<div th:replace="~{scripts-fragment.html :: scripts}"></div>
+</body>
+</html>

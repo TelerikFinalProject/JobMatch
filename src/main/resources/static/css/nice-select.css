@@ -20,10 +20,10 @@
   text-align: left !important;
   -webkit-transition: all 0.2s ease-in-out;
   transition: all 0.2s ease-in-out;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  -webkit-user-select: auto;
+     -moz-user-select: auto;
+      -ms-user-select: auto;
+          user-select: auto;
   white-space: nowrap;
   width: auto; }
   .nice-select:hover {
@@ -95,7 +95,7 @@
     opacity: 0;
     overflow: hidden;
     padding: 0;
-    pointer-events: none;
+    pointer-events: auto;
     position: absolute;
     top: 100%;
     left: 0;

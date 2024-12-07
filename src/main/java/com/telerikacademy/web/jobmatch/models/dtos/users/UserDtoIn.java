@@ -23,11 +23,11 @@ public class UserDtoIn {
     private String email;
 
     @NotNull(message = "Password" + NULL_FIELD_ERROR)
-    @Size(min = 4)
+    @Size(min = 8, max = 64)
     private String password;
 
     @NotNull(message = "Confirm password" + NULL_FIELD_ERROR)
-    @Size(min = 4)
+    @Size(min = 8, max = 64)
     private String confirmPassword;
 
     @NotNull(message = "Country Iso code" + NULL_FIELD_ERROR)
@@ -35,5 +35,5 @@ public class UserDtoIn {
     private String locCountryIsoCode;
 
     @NotNull(message = "City ID" + NULL_FIELD_ERROR)
-    private int locCityId;
+    private Integer locCityId;
 }

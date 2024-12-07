@@ -7,7 +7,7 @@
           <div class="col-lg-3 col-md-2">
             <!-- Logo -->
             <div class="logo">
-              <a href="index.html"><img src="/img/logo/logo.png" alt=""></a>
+              <a th:href="@{/}"><img src="/img/logo/logo.png" alt=""></a>
             </div>
           </div>
           <div class="col-lg-9 col-md-9">
@@ -33,8 +33,27 @@
               </div>
               <!-- Header-btn -->
               <div class="header-btn d-none f-right d-lg-block">
-                <a href="#" class="btn head-btn1">Register</a>
-                <a href="#" class="btn head-btn2">Login</a>
+                <div class="dropdown">
+                  <!-- btn head-btn1 -->
+                  <button onclick="registerDropdown()" href="#" class="btn head-btn1 dropbtn">Register</button>
+                  <div id="myDropdown" class="dropdown-content">
+                    <a th:href="@{/authentication/employer/register}" href="#">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle mr-2 mb-1" viewBox="0 0 16 16">
+                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                      </svg>
+                      <span>Employer</span>
+                    </a>
+                    <a th:href="@{/authentication/professional/register}" href="#">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-building mr-2 mb-1" viewBox="0 0 16 16">
+                        <path d="M4 2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zM7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zM4.5 8a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
+                        <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1zm11 0H3v14h3v-2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V15h3z"/>
+                      </svg>
+                      <span>Professional</span>
+                    </a>
+                  </div>
+                </div>
+                <a th:href="@{/authentication/login}" href="#" class="btn head-btn2">Login</a>
               </div>
             </div>
           </div>
