@@ -59,6 +59,12 @@ public class JobApplicationSpecification implements Specification<JobApplication
             predicates.add(combinedStatusPredicate);
         });
 
+        filterOptions.getHybrid().ifPresent(hybrid ->
+                predicates.add(
+                        criteriaBuilder.equal(root.get("hybrid"), hybrid)
+                )
+        );
+
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     }
 }

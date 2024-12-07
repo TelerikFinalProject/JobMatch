@@ -8,7 +8,6 @@ import java.util.Optional;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class JobAdFilterOptions {
     private Optional<String> positionTitle;
     private Optional<Double> minSalary;
@@ -16,13 +15,21 @@ public class JobAdFilterOptions {
     private Optional<String> location;
     private Optional<String> creator;
     private Optional<String> status;
+    private Optional<Boolean> hybrid;
 
-    public JobAdFilterOptions(String positionTitle, Double minSalary, Double maxSalary, String location, String creator, String status) {
+    public JobAdFilterOptions(String positionTitle,
+                              Double minSalary,
+                              Double maxSalary,
+                              String location,
+                              String creator,
+                              String status,
+                              Boolean hybrid) {
         this.positionTitle = Optional.ofNullable(positionTitle);
         this.minSalary = Optional.ofNullable(minSalary);
         this.maxSalary = Optional.ofNullable(maxSalary);
         this.location = Optional.ofNullable(location);
         this.creator = Optional.ofNullable(creator);
         this.status = Optional.ofNullable(status);
+        this.hybrid = Optional.ofNullable(hybrid);
     }
 }

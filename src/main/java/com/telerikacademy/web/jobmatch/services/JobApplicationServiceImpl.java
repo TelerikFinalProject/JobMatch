@@ -46,6 +46,19 @@ public class JobApplicationServiceImpl implements JobApplicationService {
 
     @Override
     public void removeJobApplication(int id) {
+        jobApplicationRepository.deleteById(id);
+    }
 
+    @Override
+    public int getNumberOfActiveJobApplications() {
+        return getJobApplications(new JobApplicationFilterOptions(null, null, null,
+                null, "Active", null)).size();
+    }
+
+    @Override
+    public List<JobApplication> getPaginatedJobApplications(List<JobApplication> jobApplications, int page, int size) {
+        int start = page * size;
+        int end = Math.min(start + size, jobApplications.size());
+        return jobApplications.subList(start, end);
     }
 }

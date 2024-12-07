@@ -47,6 +47,12 @@ public class JobAdServiceImpl implements JobAdService {
     }
 
     @Override
+    public int getNumberOfActiveJobAds() {
+        return getJobAds(new JobAdFilterOptions(null, null,
+                null, null, null, "Active", null)).size();
+    }
+
+    @Override
     public List<JobAd> getPaginatedJobAds(List<JobAd> jobAds, int page, int size) {
         int start = page * size;
         int end = Math.min(start + size, jobAds.size());

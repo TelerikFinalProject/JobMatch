@@ -49,6 +49,7 @@ public class JobAdRestController {
                                                        @RequestParam(required = false) String location,
                                                        @RequestParam(required = false) String creator,
                                                        @RequestParam(required = false) String status,
+                                                       @RequestParam(required = false) Boolean hybrid,
                                                        Authentication authentication) {
 
         JobAdFilterOptions filterOptions;
@@ -57,9 +58,9 @@ public class JobAdRestController {
 
         if (isEmployer) {
             Employer employer = employersService.getEmployer(authentication.getName());
-            filterOptions = new JobAdFilterOptions(positionTitle, minSalary, maxSalary, location, employer.getCompanyName(), status);
+            filterOptions = new JobAdFilterOptions(positionTitle, minSalary, maxSalary, location, employer.getCompanyName(), status, hybrid);
         } else {
-            filterOptions = new JobAdFilterOptions(positionTitle, minSalary, maxSalary, location, creator, status);
+            filterOptions = new JobAdFilterOptions(positionTitle, minSalary, maxSalary, location, creator, status, hybrid);
         }
 
         List<JobAd> jobAds = jobAdService.getJobAds(filterOptions);
@@ -210,12 +211,12 @@ public class JobAdRestController {
                         String.format("Job %s with ID:%d is not suitable for your %s!", "application", jobApplicationId, "ad"));
             }
 
-            if (!jobAdToMatchWith.getMatchesSentToJobApplications().add(jobApplication)){
+            if (!jobAdToMatchWith.getMatchesSentToJobApplications().add(jobApplication)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         String.format("A match request for Job %s with ID:%d has already been initiated!", "application", jobApplicationId));
             }
 
-            if (jobAdToMatchWith.getMatchRequestedApplications().contains(jobApplication)){
+            if (jobAdToMatchWith.getMatchRequestedApplications().contains(jobApplication)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         String.format("A match request for Job %s with ID:%d already exists, " +
                                 "please reach out to the Job %s creator!", "application", jobAdId, "application"));

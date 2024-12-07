@@ -47,7 +47,7 @@ public class MatchServiceImpl implements MatchService {
         String status = "Active";
 
         JobAdFilterOptions filterOptions =
-                new JobAdFilterOptions(null, minSalary, maxSalary, location, null, status);
+                new JobAdFilterOptions(null, minSalary, maxSalary, location, null, status, null);
 
         List<JobAd> filteredAds = jobAdService.getJobAds(filterOptions);
 
@@ -86,7 +86,7 @@ public class MatchServiceImpl implements MatchService {
         String status = "Active";
 
         JobApplicationFilterOptions filterOptions =
-                new JobApplicationFilterOptions(minSalary, maxSalary, null, location, status);
+                new JobApplicationFilterOptions(minSalary, maxSalary, null, location, status, null);
         List<JobApplication> filteredApplications = jobApplicationService.getJobApplications(filterOptions);
 
         Set<JobApplication> suitableApplications = new HashSet<>();

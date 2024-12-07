@@ -52,7 +52,7 @@ public class JobApplication {
     private Set<JobAd> matchRequestedAds;
 
     @Column(name = "is_hybrid")
-    private boolean isHybrid;
+    private boolean hybrid;
 
     @ManyToMany
     @JoinTable(

@@ -16,7 +16,7 @@
                 <div class="row">
                     <div class="col-xl-12">
                         <div class="hero-cap text-center">
-                            <h2>Job Ads</h2>
+                            <h2 th:text="${employer.companyName} + ' Job Ads'">Job Ads</h2>
                         </div>
                     </div>
                 </div>
@@ -29,7 +29,7 @@
         <div class="container">
             <div class="row">
                 <!-- Left content -->
-                <form th:replace="~{professionals_view_fragments.html :: professionals-job-ads-filter-bar}"></form>
+                <form th:replace="~{company_view_fragments.html :: company-job-ad-filter-bar}"></form>
                 <!-- Right content -->
                 <div class="col-xl-9 col-lg-9 col-md-8">
                     <!-- Featured_job_start -->
@@ -64,7 +64,7 @@
                                         <a href="#"><img src="/img/icon/job-list1.png" alt=""></a>
                                     </div>
                                     <div class="job-tittle job-tittle2">
-                                        <a href="#" th:href="@{/professionals/job-ads/{id}(id=${jobAd.id})}">
+                                        <a href="#" th:href="@{/employers/dashboard/job-ads/{id}(id=${jobAd.id})}">
                                             <h4 th:text="${jobAd.positionTitle}">Job Title</h4>
                                         </a>
                                         <ul>
@@ -109,11 +109,10 @@
                                 <!-- Previous Button -->
                                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                                     <a class="page-link"
-                                       th:href="@{/professionals/job-ads(page=${currentPage - 1}, size=7,
+                                       th:href="@{/employers/dashboard/job-ads(page=${currentPage - 1}, size=7,
                                        minSalary=${filterOptions.minSalary},
                                        maxSalary=${filterOptions.maxSalary},
                                        location=${filterOptions.location},
-                                       creator=${filterOptions.creator},
                                        hybrid=${filterOptions.hybrid})}"
                                        aria-label="Previous">
                                         <span class="ti-angle-left"></span>
@@ -124,11 +123,10 @@
                                 <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                                     th:classappend="${currentPage == i} ? 'active'">
                                     <a class="page-link"
-                                       th:href="@{/professionals/job-ads(page=${i}, size=7,
+                                       th:href="@{/employers/dashboard/job-ads(page=${i}, size=7,
                                        minSalary=${filterOptions.minSalary},
                                        maxSalary=${filterOptions.maxSalary},
                                        location=${filterOptions.location},
-                                       creator=${filterOptions.creator},
                                        hybrid=${filterOptions.hybrid})}"
                                        th:text="${i + 1}"></a>
                                 </li>
@@ -136,11 +134,10 @@
                                 <!-- Next Button -->
                                 <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
                                     <a class="page-link"
-                                       th:href="@{/professionals/job-ads(page=${currentPage + 1}, size=7,
+                                       th:href="@{/employers/dashboard/job-ads(page=${currentPage + 1}, size=7,
                                        minSalary=${filterOptions.minSalary},
                                        maxSalary=${filterOptions.maxSalary},
                                        location=${filterOptions.location},
-                                       creator=${filterOptions.creator},
                                        hybrid=${filterOptions.hybrid})}"
                                        aria-label="Next">
                                         <span class="ti-angle-right"></span>
