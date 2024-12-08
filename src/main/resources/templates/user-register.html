@@ -41,7 +41,8 @@
                 <div class="col-12 col-lg-9 col-xl-7">
                     <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
                         <div class="card-body p-4 p-md-5">
-                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Register Your Company</h3>
+                            <h3 th:if="${requestURI == '/authentication/employer/register'}" class="mb-4 pb-2 pb-md-0 mb-md-5">Register Your Company</h3>
+                            <h3 th:if="${requestURI == '/authentication/professional/register'}" class="mb-4 pb-2 pb-md-0 mb-md-5">Create Your Profile</h3>
                             <form id="registrationForm" method="post" action="#" th:action="@{${requestURI}}" th:object="${user}">
 
                                 <div class="row">

@@ -4,12 +4,13 @@ import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
 import com.telerikacademy.web.jobmatch.helpers.EmployerMappers;
 import com.telerikacademy.web.jobmatch.helpers.UserMappers;
 import com.telerikacademy.web.jobmatch.models.Employer;
+import com.telerikacademy.web.jobmatch.models.Professional;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
 import com.telerikacademy.web.jobmatch.models.dtos.users.EmployerDtoIn;
+import com.telerikacademy.web.jobmatch.models.dtos.users.LoginDto;
+import com.telerikacademy.web.jobmatch.models.dtos.users.ProfessionalDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.users.UserDtoIn;
-import com.telerikacademy.web.jobmatch.services.contracts.EmployersService;
-import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
-import com.telerikacademy.web.jobmatch.services.contracts.UserService;
+import com.telerikacademy.web.jobmatch.services.contracts.*;
 import com.telerikacademy.web.jobmatch.services.security.JwtTokenGenerator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -36,10 +37,94 @@ public class AuthenticationMvcController {
     private final LocationService locationService;
     private final UserService userService;
     private final EmployersService employersService;
+    private final AuthenticationService authenticationService;
+    private final ProfessionalService professionalService;
 
     @ModelAttribute("requestURI")
     public String requestURI(final HttpServletRequest request) {
         return request.getRequestURI();
+    }
+
+    @GetMapping("/professional/register")
+    public String showProfessionalRegister(Model model,
+                                           HttpSession session) {
+
+        UserDtoIn sessionUser = (UserDtoIn) session.getAttribute("userDtoIn");
+
+        if (sessionUser == null) {
+            sessionUser = new UserDtoIn();
+        }
+
+        model.addAttribute("user", sessionUser);
+        model.addAttribute("countries", locationService.getAllCountries());
+        return "user-register";
+    }
+
+    @PostMapping("/professional/register")
+    public String handleFirstProfessionalRegister(@Valid @ModelAttribute("user") UserDtoIn userDtoIn,
+                                                  BindingResult bindingResult,
+                                                  Model model,
+                                                  HttpSession session) {
+
+        try {
+            userService.findByUsername(userDtoIn.getUsername());
+            bindingResult.rejectValue("username", "username.exists", USERNAME_IS_ALREADY_TAKEN);
+        } catch (EntityNotFoundException ignored) {}
+
+        try {
+            userService.findByEmail(userDtoIn.getEmail());
+            bindingResult.rejectValue("email", "email.exists", EMAIL_IS_ALREADY_TAKEN);
+        } catch (EntityNotFoundException ignored) {}
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("countries", locationService.getAllCountries());
+            return "user-register";
+        }
+
+        ProfessionalDtoIn professionalDtoIn = new ProfessionalDtoIn();
+        professionalDtoIn.setUsername(userDtoIn.getUsername());
+        professionalDtoIn.setEmail(userDtoIn.getEmail());
+        professionalDtoIn.setPassword(userDtoIn.getPassword());
+        professionalDtoIn.setConfirmPassword(userDtoIn.getConfirmPassword());
+        professionalDtoIn.setLocCountryIsoCode(userDtoIn.getLocCountryIsoCode());
+        professionalDtoIn.setLocCityId(userDtoIn.getLocCityId());
+
+        session.setAttribute("professionalFromSession", professionalDtoIn);
+        model.addAttribute("professional", professionalDtoIn);
+        session.setAttribute("userDtoIn", userDtoIn);
+        return "professional-register";
+    }
+
+    @PostMapping("/professional/register/submit")
+    public String handleProfessionalRegister(@ModelAttribute("professional") ProfessionalDtoIn professionalDtoIn,
+                                             BindingResult bindingResult,
+                                             HttpSession session) {
+
+        ProfessionalDtoIn professionalFromSession = (ProfessionalDtoIn) session.getAttribute("professionalFromSession");
+
+        if (professionalFromSession == null) {
+            return "error-view";
+        } else {
+            professionalDtoIn.setUsername(professionalFromSession.getUsername());
+            professionalDtoIn.setPassword(professionalFromSession.getPassword());
+            professionalDtoIn.setConfirmPassword(professionalFromSession.getConfirmPassword());
+            professionalDtoIn.setEmail(professionalFromSession.getEmail());
+            professionalDtoIn.setLocCountryIsoCode(professionalFromSession.getLocCountryIsoCode());
+            professionalDtoIn.setLocCityId(professionalFromSession.getLocCityId());
+        }
+
+        if (bindingResult.hasErrors()) {
+            return "professional-register";
+        }
+
+        professionalService.registerProfessional(professionalDtoIn);
+        Professional professional = professionalService.getProfessionalByUsername(professionalDtoIn.getUsername());
+        session.setAttribute("currentUser", professional);
+        session.setAttribute("userRole", professional.getRoles());
+        session.removeAttribute("professionalFromSession");
+        session.removeAttribute("userDtoIn");
+
+        return "redirect:/professionals/job-ads";
     }
 
     @GetMapping("/employer/register")
@@ -57,7 +142,7 @@ public class AuthenticationMvcController {
     }
 
     @PostMapping("/employer/register")
-    public String showUserRegister(@Valid @ModelAttribute("user") UserDtoIn userDtoIn,
+    public String handleFirstEmployerRegister(@Valid @ModelAttribute("user") UserDtoIn userDtoIn,
                                    BindingResult bindingResult,
                                    Model model,
                                    HttpSession session) {
@@ -65,14 +150,12 @@ public class AuthenticationMvcController {
         try {
             userService.findByUsername(userDtoIn.getUsername());
             bindingResult.rejectValue("username", "username.exists", USERNAME_IS_ALREADY_TAKEN);
-        } catch (EntityNotFoundException ignored) {
-        }
+        } catch (EntityNotFoundException ignored) {}
         // check for existing email
         try {
             userService.findByEmail(userDtoIn.getEmail());
             bindingResult.rejectValue("email", "email.exists", EMAIL_IS_ALREADY_TAKEN);
-        } catch (EntityNotFoundException ignored) {
-        }
+        } catch (EntityNotFoundException ignored) {}
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("countries", locationService.getAllCountries());
@@ -94,7 +177,7 @@ public class AuthenticationMvcController {
     }
 
     @PostMapping("/employer/register/submit")
-    public String showEmployerRegister(@ModelAttribute("employer") EmployerDtoIn employerDtoIn,
+    public String handleEmployerRegister(@ModelAttribute("employer") EmployerDtoIn employerDtoIn,
                                        BindingResult bindingResult,
                                        HttpSession session) {
 
@@ -122,18 +205,50 @@ public class AuthenticationMvcController {
         }
 
         employersService.createEmployer(employerDtoIn);
-        session.setAttribute("currentUser", employersService.getEmployer(employerDtoIn.getUsername()));
+        Employer employer = employersService.getEmployer(employerDtoIn.getUsername());
+        session.setAttribute("currentUser", employer);
+        session.setAttribute("userRole", employer.getRoles());
+        session.removeAttribute("employerFromSession");
+        session.removeAttribute("userDtoIn");
 
-        return "redirect:/";
+        return "redirect:/employers/job-applications";
     }
 
-    @RequestMapping("/professional/register")
-    public String showProfessionalRegister() {
-        return "user-register";
-    }
-
-    @RequestMapping("/login")
-    public String showLogin() {
+    @GetMapping("/login")
+    public String showLogin(Model model) {
+        model.addAttribute("loginDto", new LoginDto());
         return "login";
+    }
+
+    @PostMapping("/login")
+    public String handleLogin(@Valid @ModelAttribute("loginDto") LoginDto loginDto,
+                              BindingResult bindingResult,
+                              HttpSession session) {
+
+        if (bindingResult.hasErrors()) {
+            return "login";
+        }
+
+        try {
+            UserPrincipal userPrincipal = authenticationService.login(loginDto.getUsername(), loginDto.getPassword());
+
+            if (userPrincipal.getRoles().equals("EMPLOYER")) {
+                Employer employer = employersService.getEmployer(userPrincipal.getId());
+                session.setAttribute("currentUser", employer);
+                session.setAttribute("userRole", employer.getRoles());
+            } else if (userPrincipal.getRoles().equals("PROFESSIONAL")) {
+                Professional professional = professionalService.getProfessional(userPrincipal.getId());
+                session.setAttribute("currentUser", professional);
+                session.setAttribute("userRole", professional.getRoles());
+            } else {
+                session.setAttribute("currentUser", userPrincipal);
+                session.setAttribute("userRole", userPrincipal.getRoles());
+            }
+
+            return "redirect:/";
+
+        } catch (EntityNotFoundException e) {
+            return "error-view";
+        }
     }
 }
