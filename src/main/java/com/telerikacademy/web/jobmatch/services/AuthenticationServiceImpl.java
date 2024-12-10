@@ -1,7 +1,5 @@
 package com.telerikacademy.web.jobmatch.services;
 
-
-import com.telerikacademy.web.jobmatch.exceptions.AuthorizationException;
 import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
 import com.telerikacademy.web.jobmatch.repositories.contracts.UserRepository;

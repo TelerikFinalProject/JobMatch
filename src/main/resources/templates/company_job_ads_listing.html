@@ -86,8 +86,15 @@
                                     </div>
                                 </div>
                                 <div class="f-right">
-                                    <a th:text="${#numbers.formatDecimal(jobAd.minSalary, 0, 0)} + ' - ' + ${#numbers.formatDecimal(jobAd.maxSalary, 0, 0)}"></a>
-                                    <span></span>
+                                    <a style="margin-left: 11px;"
+                                       th:text="${#numbers.formatDecimal(jobAd.minSalary, 0, 0)} + ' - '
+                                       + ${#numbers.formatDecimal(jobAd.maxSalary, 0, 0)}"></a>
+
+                                    <div class="items-link items-link2">
+                                        <a style="
+                                        margin-top: 15px; margin-bottom: 15px;" href=""
+                                           onclick="return confirm('Are you sure you want to delete this item?');">Delete</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
