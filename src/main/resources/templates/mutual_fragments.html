@@ -1,0 +1,160 @@
+<div class="single-job-items mb-30"
+     th:each="jobApplication : ${jobApplications}" th:fragment="applications-lising">
+    <div class="job-items">
+        <div class="company-img">
+            <a href="#"><img src="/img/icon/job-list1.png" alt=""></a>
+        </div>
+        <div class="job-tittle job-tittle2">
+            <a href="#"
+               th:href="@{/employers/dashboard/job-applications/{id}(id=${jobApplication.id})}">
+                <h4 th:text="${jobApplication.professional.firstName} + ' '
+                                                + ${jobApplication.professional.lastName}">Professional Name</h4>
+            </a>
+            <ul>
+                <li th:unless="${jobApplication.qualifications.isEmpty()}">
+                                                <span th:each="qualification, iterStat : ${jobApplication.qualifications}">
+                                                <span th:if="${iterStat.index < 3}"
+                                                      th:text="${qualification.name}"></span>
+                                                    <span th:if="${iterStat.index < 2 && iterStat.index < (jobApplication.qualifications.size() - 1)}">, </span>
+                                                    </span>
+
+                </li>
+
+                <li>
+                    <i class="fas fa-map-marker-alt"></i>
+                    <!-- Case 1: Not 'Home' and not Hybrid -->
+                    <a th:if="${jobApplication.location.name != 'Home' and !jobApplication.hybrid}"
+                       th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode}"></a>
+
+                    <!-- Case 2: Not 'Home' and Hybrid -->
+                    <a th:if="${jobApplication.location.name != 'Home' and jobApplication.hybrid}"
+                       th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode + ' (Hybrid)'}"></a>
+
+                    <!-- Case 3: Location is 'Home' -->
+                    <a th:if="${jobApplication.location.name == 'Home'}">Remote</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="f-right">
+        <a th:text="${#numbers.formatDecimal(jobApplication.minSalary, 0, 0)} + ' - ' + ${#numbers.formatDecimal(jobApplication.maxSalary, 0, 0)}"></a>
+        <span></span>
+    </div>
+</div>
+
+
+<ul th:fragment="application-details-right">
+    <li>
+        Location :
+        <span th:if="${jobApplication.location.name != 'Home' and !jobApplication.hybrid}"
+              th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode}">
+                                </span>
+        <span th:if="${jobApplication.location.name != 'Home' and jobApplication.hybrid}"
+              th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode + ' (Hybrid)'}">
+                                </span>
+        <span th:if="${jobApplication.location.name == 'Home'}" th:text="'Remote'">
+                                </span>
+    </li>
+    <li>Application nature : <span>Full time</span></li>
+    <li>Salary Desired: <span
+            th:text="${#numbers.formatDecimal(jobApplication.minSalary, 0, 0)} + ' - '
+                                    + ${#numbers.formatDecimal(jobApplication.maxSalary, 0, 0)}">Salary</span>
+    </li>
+</ul>
+
+<div class="single-job-items mb-50" th:fragment="application-details-left">
+    <div class="job-items">
+        <div class="company-img company-img-details">
+            <a href="#"><img src="/img/icon/job-list1.png" alt=""></a>
+        </div>
+        <div class="job-tittle">
+
+            <h4 th:text="${jobApplication.professional.firstName} + ' ' +
+                            ${jobApplication.professional.lastName}">Professional Names</h4>
+
+            <ul>
+                <li>
+                    <i class="fas fa-map-marker-alt"></i>
+                    <!-- Case 1: Not 'Home' and not Hybrid -->
+                    <a th:if="${jobApplication.location.name != 'Home' and !jobApplication.hybrid}"
+                       th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode}"></a>
+
+                    <!-- Case 2: Not 'Home' and Hybrid -->
+                    <a th:if="${jobApplication.location.name != 'Home' and jobApplication.hybrid}"
+                       th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode + ' (Hybrid)'}"></a>
+
+                    <!-- Case 3: Location is 'Home' -->
+                    <a th:if="${jobApplication.location.name == 'Home'}">Remote</a>
+                </li>
+                <li th:text="${#numbers.formatDecimal(jobApplication.minSalary, 0, 0)} + ' - '
+                                    + ${#numbers.formatDecimal(jobApplication.maxSalary, 0, 0)}">
+                    Salary range
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="post-details4  mb-50" th:fragment="application-details-professional-right-details">
+    <!-- Small Section Tittle -->
+    <div class="small-section-tittle">
+        <h4>Applicant Information</h4>
+    </div>
+    <span th:text="${jobApplication.professional.firstName} + ' ' +
+                            ${jobApplication.professional.lastName}">Professional Names</span>
+    <p th:text="${jobApplication.professional.summary}">Professional Description</p>
+    <ul>
+        <li>Name: <span th:text="${jobApplication.professional.firstName} + ' ' +
+                            ${jobApplication.professional.lastName}">Professional Names</span></li>
+        <li>Email: <span th:text="${jobApplication.professional.email}">Professional email</span></li>
+    </ul>
+</div>
+
+
+<div class="job-tittle job-tittle2" th:fragment="ads-listing">
+    <a href="#" th:href="@{/employers/dashboard/job-ads/{id}(id=${jobAd.id})}">
+        <h4 th:text="${jobAd.positionTitle}">Job Title</h4>
+    </a>
+    <ul>
+        <li th:text="${jobAd.employer.getCompanyName()}">Company Name</li>
+        <li>
+            <i class="fas fa-map-marker-alt"></i>
+            <!-- Case 1: Not 'Home' and not Hybrid -->
+            <a th:if="${jobAd.location.name != 'Home' and !jobAd.hybrid}"
+               th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode}"></a>
+
+            <!-- Case 2: Not 'Home' and Hybrid -->
+            <a th:if="${jobAd.location.name != 'Home' and jobAd.hybrid}"
+               th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode + ' (Hybrid)'}"></a>
+
+            <!-- Case 3: Location is 'Home' -->
+            <a th:if="${jobAd.location.name == 'Home'}">Remote</a>
+        </li>
+    </ul>
+</div>
+
+<div class="select-job-items" th:fragment="sort">
+    <span>Sort by</span>
+    <label>
+        <select name="select">
+            <option value="">None</option>
+            <option value="">job list</option>
+            <option value="">job list</option>
+            <option value="">job list</option>
+        </select>
+    </label>
+</div>
+
+<li th:fragment="application-location">
+    <i class="fas fa-map-marker-alt"></i>
+    <!-- Case 1: Not 'Home' and not Hybrid -->
+    <a th:if="${jobApplication.location.name != 'Home' and !jobApplication.hybrid}"
+       th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode}"></a>
+
+    <!-- Case 2: Not 'Home' and Hybrid -->
+    <a th:if="${jobApplication.location.name != 'Home' and jobApplication.hybrid}"
+       th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode + ' (Hybrid)'}"></a>
+
+    <!-- Case 3: Location is 'Home' -->
+    <a th:if="${jobApplication.location.name == 'Home'}">Remote</a>
+</li>

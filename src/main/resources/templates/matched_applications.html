@@ -8,167 +8,156 @@
 <form th:replace="~{header-fragment.html :: header}"></form>
 
 <main>
-  <!-- Hero Area Start-->
-  <div class="slider-area ">
-    <div class="single-slider section-overly slider-height2 d-flex align-items-center"
-         data-background="/assets/img/hero/about.jpg">
-      <div class="container">
-        <div class="row">
-          <div class="col-xl-12">
-            <div class="hero-cap text-center">
-              <h2 th:text="${jobAd.positionTitle} + ' Matches'">Job Applications</h2>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Hero Area End -->
-  <!-- Job List Area Start -->
-  <div class="job-listing-area pt-120 pb-120">
-    <div class="container">
-      <div class="row">
-        <!-- Left content -->
-        <div class="col-xl-3 col-lg-3 col-md-4">
-          <div class="row">
-            <div class="col-12">
-              <div class="small-section-tittle2 mb-45">
-                <div class="ion">
-                  <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="20px" height="12px">
-                    <path fill-rule="evenodd" fill="rgb(27, 207, 107)"
-                          d="M7.778,12.000 L12.222,12.000 L12.222,10.000 L7.778,10.000 L7.778,12.000 ZM-0.000,-0.000 L-0.000,2.000 L20.000,2.000 L20.000,-0.000 L-0.000,-0.000 ZM3.333,7.000 L16.667,7.000 L16.667,5.000 L3.333,5.000 L3.333,7.000 Z"/>
-                  </svg>
-                </div>
-                <h4>Filter Applications</h4>
-              </div>
-            </div>
-          </div>
-          <!-- Job Category Listing start -->
-          <!-- Job Category Listing End -->
-        </div>
-        <!-- Right content -->
-        <div class=" col-xl-9 col-lg-9 col-md-8">
-          <!-- Featured_job_start -->
-          <section class="featured-job-area">
+    <!-- Hero Area Start-->
+    <div class="slider-area ">
+        <div class="single-slider section-overly slider-height2 d-flex align-items-center"
+             data-background="/assets/img/hero/about.jpg">
             <div class="container">
-              <!-- Count of Job list Start -->
-              <div class="row">
-                <div class="col-lg-12">
-                  <div class="count-job mb-35">
-                    <span th:text="${applicationsSize} + ' Applications found'">Applications found</span>
-                    <!-- Select job items start -->
-                    <div class="select-job-items">
-                      <span>Sort by</span>
-                      <label>
-                        <select name="select">
-                          <option value="">None</option>
-                          <option value="">job list</option>
-                          <option value="">job list</option>
-                          <option value="">job list</option>
-                        </select>
-                      </label>
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="hero-cap text-center">
+                            <h2 th:text="${jobAd.positionTitle} + ' Matches'">Job Applications</h2>
+                        </div>
                     </div>
-                    <!--  Select job items End-->
-                  </div>
                 </div>
-              </div>
-              <!-- Count of Job list End -->
-              <!-- single-job-content -->
-              <div class="single-job-items mb-30"
-                   th:each="jobApplication : ${jobApplications}">
-                <div class="job-items">
-                  <div class="company-img">
-                    <a href="#"><img src="/img/icon/job-list1.png" alt=""></a>
-                  </div>
-                  <div class="job-tittle job-tittle2">
-                    <a href="#"
-                       th:href="@{/employers/dashboard/job-ads/{jobAdId}/find-matches/job-applications/{jobApplicationId}(jobAdId = ${jobAd.id}, jobApplicationId=${jobApplication.id})}">
-                      <h4 th:text="${jobApplication.professional.firstName} + ' '
+            </div>
+        </div>
+    </div>
+    <!-- Hero Area End -->
+    <!-- Job List Area Start -->
+    <div class="job-listing-area pt-120 pb-120">
+        <div class="container">
+            <div class="row">
+                <!-- Left content -->
+                <div class="col-xl-3 col-lg-3 col-md-4">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="small-section-tittle2 mb-45">
+                                <div class="ion">
+                                    <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="20px" height="12px">
+                                        <path fill-rule="evenodd" fill="rgb(27, 207, 107)"
+                                              d="M7.778,12.000 L12.222,12.000 L12.222,10.000 L7.778,10.000 L7.778,12.000 ZM-0.000,-0.000 L-0.000,2.000 L20.000,2.000 L20.000,-0.000 L-0.000,-0.000 ZM3.333,7.000 L16.667,7.000 L16.667,5.000 L3.333,5.000 L3.333,7.000 Z"/>
+                                    </svg>
+                                </div>
+                                <h4>Filter Applications</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Job Category Listing start -->
+                    <!-- Job Category Listing End -->
+                </div>
+                <!-- Right content -->
+                <div class=" col-xl-9 col-lg-9 col-md-8">
+                    <!-- Featured_job_start -->
+                    <section class="featured-job-area">
+                        <div class="container">
+                            <!-- Count of Job list Start -->
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="count-job mb-35">
+                                        <span th:text="${applicationsSize} + ' Applications found'">Applications found</span>
+                                        <!-- Select job items start -->
+                                        <!--  Select job items End-->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Count of Job list End -->
+                            <!-- single-job-content -->
+                            <div class="single-job-items mb-30"
+                                 th:each="jobApplication : ${jobApplications}">
+                                <div class="job-items">
+                                    <div class="company-img">
+                                        <a href="#"><img src="/img/icon/job-list1.png" alt=""></a>
+                                    </div>
+                                    <div class="job-tittle job-tittle2">
+                                        <a href="#"
+                                           th:href="@{/employers/dashboard/job-ads/{jobAdId}/find-matches/job-applications/{jobApplicationId}(jobAdId = ${jobAd.id}, jobApplicationId=${jobApplication.id})}">
+                                            <h4 th:text="${jobApplication.professional.firstName} + ' '
                                                 + ${jobApplication.professional.lastName}">Professional Name</h4>
-                    </a>
-                    <ul>
-                      <li th:unless="${jobApplication.qualifications.isEmpty()}">
+                                        </a>
+                                        <ul>
+                                            <li th:unless="${jobApplication.qualifications.isEmpty()}">
                                                 <span th:each="qualification, iterStat : ${jobApplication.qualifications}">
                                                 <span th:if="${iterStat.index < 3}"
                                                       th:text="${qualification.name}"></span>
                                                     <span th:if="${iterStat.index < 2 && iterStat.index < (jobApplication.qualifications.size() - 1)}">, </span>
                                                     </span>
 
-                      </li>
+                                            </li>
 
-                      <li>
-                        <i class="fas fa-map-marker-alt"></i>
-                        <!-- Case 1: Not 'Home' and not Hybrid -->
-                        <a th:if="${jobApplication.location.name != 'Home' and !jobApplication.hybrid}"
-                           th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode}"></a>
+                                            <li>
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                <!-- Case 1: Not 'Home' and not Hybrid -->
+                                                <a th:if="${jobApplication.location.name != 'Home' and !jobApplication.hybrid}"
+                                                   th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode}"></a>
 
-                        <!-- Case 2: Not 'Home' and Hybrid -->
-                        <a th:if="${jobApplication.location.name != 'Home' and jobApplication.hybrid}"
-                           th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode + ' (Hybrid)'}"></a>
+                                                <!-- Case 2: Not 'Home' and Hybrid -->
+                                                <a th:if="${jobApplication.location.name != 'Home' and jobApplication.hybrid}"
+                                                   th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode + ' (Hybrid)'}"></a>
 
-                        <!-- Case 3: Location is 'Home' -->
-                        <a th:if="${jobApplication.location.name == 'Home'}">Remote</a>
-                      </li>
-                    </ul>
-                  </div>
+                                                <!-- Case 3: Location is 'Home' -->
+                                                <a th:if="${jobApplication.location.name == 'Home'}">Remote</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="f-right">
+                                    <a th:text="${#numbers.formatDecimal(jobApplication.minSalary, 0, 0)} + ' - ' + ${#numbers.formatDecimal(jobApplication.maxSalary, 0, 0)}"></a>
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <!-- Featured_job_end -->
                 </div>
-                <div class="f-right">
-                  <a th:text="${#numbers.formatDecimal(jobApplication.minSalary, 0, 0)} + ' - ' + ${#numbers.formatDecimal(jobApplication.maxSalary, 0, 0)}"></a>
-                  <span></span>
-                </div>
-              </div>
             </div>
-          </section>
-          <!-- Featured_job_end -->
         </div>
-      </div>
     </div>
-  </div>
-  <!-- Job List Area End -->
-  <!--Pagination Start  -->
-  <div class="pagination-area pb-115 text-center">
-    <div class="container">
-      <div class="row">
-        <div class="col-xl-12">
-          <div class="single-wrap d-flex justify-content-center">
-            <nav aria-label="Page navigation example">
-              <ul class="pagination justify-content-start">
-                <!-- Previous Button -->
-                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                  <a class="page-link"
-                     th:href="@{/employers/dashboard/job-ads/{id}/find-matches(id=${jobAd.id}, page=${currentPage - 1}, size=7)}"
-                     aria-label="Previous">
-                    <span class="ti-angle-left"></span>
-                  </a>
-                </li>
+    <!-- Job List Area End -->
+    <!--Pagination Start  -->
+    <div class="pagination-area pb-115 text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="single-wrap d-flex justify-content-center">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-start">
+                                <!-- Previous Button -->
+                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                    <a class="page-link"
+                                       th:href="@{/employers/dashboard/job-ads/{id}/find-matches(id=${jobAd.id}, page=${currentPage - 1}, size=7)}"
+                                       aria-label="Previous">
+                                        <span class="ti-angle-left"></span>
+                                    </a>
+                                </li>
 
-                <!-- Page Numbers -->
-                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                    th:classappend="${currentPage == i} ? 'active'">
-                  <a class="page-link"
-                     th:href="@{/employers/dashboard/job-ads/{id}/find-matches(id=${jobAd.id}, page=${i}, size=7)}"
-                     th:text="${i + 1}"></a>
-                </li>
+                                <!-- Page Numbers -->
+                                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                    th:classappend="${currentPage == i} ? 'active'">
+                                    <a class="page-link"
+                                       th:href="@{/employers/dashboard/job-ads/{id}/find-matches(id=${jobAd.id}, page=${i}, size=7)}"
+                                       th:text="${i + 1}"></a>
+                                </li>
 
-                <!-- Next Button -->
-                <li class="page-item"
-                    th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                  <a class="page-link"
-                     th:href="@{/employers/dashboard/job-ads/{id}/find-matches(id=${jobAd.id}, page=${currentPage + 1}, size=7)}"
-                     aria-label="Next">
-                    <span class="ti-angle-right"></span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-          </div>
+                                <!-- Next Button -->
+                                <li class="page-item"
+                                    th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                    <a class="page-link"
+                                       th:href="@{/employers/dashboard/job-ads/{id}/find-matches(id=${jobAd.id}, page=${currentPage + 1}, size=7)}"
+                                       aria-label="Next">
+                                        <span class="ti-angle-right"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-  <!--Pagination End  -->
+    <!--Pagination End  -->
 
 </main>
 

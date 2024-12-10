@@ -47,10 +47,10 @@ public class EmployersMvcController {
         this.mailService = mailService;
     }
 
-    @ModelAttribute("userRole")
-    public String populateIsAuthenticated(HttpSession session) {
-        return session.getAttribute("userRole").toString();
-    }
+//    @ModelAttribute("userRole")
+//    public String populateIsAuthenticated(HttpSession session) {
+//        return session.getAttribute("userRole").toString();
+//    }
 
     @GetMapping("/dashboard")
     public String getDashboard(Model model,
@@ -213,6 +213,31 @@ public class EmployersMvcController {
         }
     }
 
+    @PostMapping("/dashboard/job-ads/{id}")
+    public String deleteJobAdById(Model model,
+                                  @PathVariable int id,
+                                  HttpSession session) {
+        try {
+            rolesChecker(session);
+
+            JobAd jobAd = jobAdService.getJobAd(id);
+
+            checkAdCreator(session, jobAd);
+
+            jobAdService.removeJobAd(id);
+
+            return "redirect:/employers/dashboard/job-ads";
+        } catch (EntityNotFoundException e) {
+            model.addAttribute("statusCode", HttpStatus.NOT_FOUND.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        } catch (AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
+    }
+
     @GetMapping("/dashboard/job-ads/{id}/find-matches")
     public String getAllMatchedJobApplicationsByJobAd(@RequestParam(defaultValue = "0") int page,
                                                       @RequestParam(defaultValue = "7") int size,
@@ -318,7 +343,7 @@ public class EmployersMvcController {
 
             mailService.sendNotificationViaEmailToApplicant(jobApplication, jobAdToMatchWith);
             jobAdService.updateJobAd(jobAdToMatchWith);
-            return String.format("redirect:/employers/dashboard/job-ads/%d/find-matches/%d",
+            return String.format("redirect:/employers/dashboard/job-ads/%d/find-matches/job-applications/%d",
                     jobAdId, jobApplicationId);
 
         } catch (EntityNotFoundException e) {
@@ -345,7 +370,7 @@ public class EmployersMvcController {
 
     private static void checkAdCreator(HttpSession session, JobAd jobAd) {
         String user = session.getAttribute("currentUser").toString();
-        if (!jobAd.getEmployer().getUsername().equals(user)){
+        if (!jobAd.getEmployer().getUsername().equals(user)) {
             throw new AuthorizationException("access", "job ad");
         }
     }

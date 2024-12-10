@@ -32,38 +32,7 @@
         <!-- Left Content -->
         <div class="col-xl-7 col-lg-8">
           <!-- job single -->
-          <div class="single-job-items mb-50">
-            <div class="job-items">
-              <div class="company-img company-img-details">
-                <a href="#"><img src="/img/icon/job-list1.png" alt=""></a>
-              </div>
-              <div class="job-tittle">
-
-                <h4 th:text="${jobApplication.professional.firstName} + ' ' +
-                            ${jobApplication.professional.lastName}">Professional Names</h4>
-
-                <ul>
-                  <li>
-                    <i class="fas fa-map-marker-alt"></i>
-                    <!-- Case 1: Not 'Home' and not Hybrid -->
-                    <a th:if="${jobApplication.location.name != 'Home' and !jobApplication.hybrid}"
-                       th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode}"></a>
-
-                    <!-- Case 2: Not 'Home' and Hybrid -->
-                    <a th:if="${jobApplication.location.name != 'Home' and jobApplication.hybrid}"
-                       th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode + ' (Hybrid)'}"></a>
-
-                    <!-- Case 3: Location is 'Home' -->
-                    <a th:if="${jobApplication.location.name == 'Home'}">Remote</a>
-                  </li>
-                  <li th:text="${#numbers.formatDecimal(jobApplication.minSalary, 0, 0)} + ' - '
-                                    + ${#numbers.formatDecimal(jobApplication.maxSalary, 0, 0)}">
-                    Salary range
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
+          <form th:replace="~{mutual_fragments.html :: application-details-left}"></form>
           <!-- job single End -->
 
           <div class="job-post-details">
@@ -95,24 +64,7 @@
             <div class="small-section-tittle">
               <h4>Application Overview</h4>
             </div>
-            <ul>
-              <li>
-                Location :
-                <span th:if="${jobApplication.location.name != 'Home' and !jobApplication.hybrid}"
-                      th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode}">
-                                </span>
-                <span th:if="${jobApplication.location.name != 'Home' and jobApplication.hybrid}"
-                      th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode + ' (Hybrid)'}">
-                                </span>
-                <span th:if="${jobApplication.location.name == 'Home'}" th:text="'Remote'">
-                                </span>
-              </li>
-              <li>Application nature : <span>Full time</span></li>
-              <li>Salary Desired: <span
-                      th:text="${#numbers.formatDecimal(jobApplication.minSalary, 0, 0)} + ' - '
-                                    + ${#numbers.formatDecimal(jobApplication.maxSalary, 0, 0)}">Salary</span>
-              </li>
-            </ul>
+            <form th:replace="~{mutual_fragments.html :: application-details-right}"></form>
             <div class="apply-btn2" th:if="${isApplicationSuitable}"
                  th:unless="${isAlreadyRequestedByAd || isAlreadyRequestedByApplication}">
               <form th:action="@{/employers/dashboard/job-ads/{jobAdId}/find-matches/job-applications/{jobApplicationId}/request-match(jobAdId=${jobAdId}, jobApplicationId=${jobApplicationId})}" method="post" style="display: inline;">
@@ -120,12 +72,12 @@
               </form>
             </div>
             <div class="d-lg-block" th:if="${isApplicationSuitable && isAlreadyRequestedByApplication}">
-              <a href="#" class="btn head-btn1" style="
+              <a href="" class="btn head-btn1" style="
                                                         padding-left: 46px;
                                                         padding-right: 46px;">Approve</a>
-              <a href="#" th:href="" class="btn head-btn2" style="
-                                                        padding-left: 25px;
-                                                        padding-right: 25px;
+              <a href="" class="btn head-btn2" style="
+                                                        padding-left: 43px;
+                                                        padding-right: 43px;
                                                         padding-top: 26px;
                                                         padding-bottom: 26px;">Decline</a>
             </div>
@@ -133,20 +85,7 @@
               Waiting for action from other side
             </div>
           </div>
-          <div class="post-details4  mb-50">
-            <!-- Small Section Tittle -->
-            <div class="small-section-tittle">
-              <h4>Applicant Information</h4>
-            </div>
-            <span th:text="${jobApplication.professional.firstName} + ' ' +
-                            ${jobApplication.professional.lastName}">Professional Names</span>
-            <p th:text="${jobApplication.professional.summary}">Company Description</p>
-            <ul>
-              <li>Name: <span th:text="${jobApplication.professional.firstName} + ' ' +
-                            ${jobApplication.professional.lastName}">Professional Names</span></li>
-              <li>Email: <span th:text="${jobApplication.professional.email}">Professional email</span></li>
-            </ul>
-          </div>
+          <form th:replace="~{mutual_fragments.html :: application-details-professional-right-details}"></form>
         </div>
       </div>
     </div>
