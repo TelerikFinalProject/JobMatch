@@ -251,4 +251,11 @@ public class AuthenticationMvcController {
             return "error-view";
         }
     }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.removeAttribute("currentUser");
+        session.removeAttribute("userRole");
+        return "redirect:/";
+    }
 }
