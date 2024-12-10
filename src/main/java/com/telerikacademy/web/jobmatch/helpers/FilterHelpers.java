@@ -8,6 +8,7 @@ public class FilterHelpers {
         filter.setCreator(checkForEmptyStrings(filter.getCreator()));
         filter.setLocation(checkForEmptyStrings(filter.getLocation()));
         filter.setHybrid(hybridChecker(filter.getHybrid()));
+        filter.setStatus(checkStatus(filter.getStatus()));
     }
 
     public static void jobApplicationMvcFilterHelper(JobApplicationFilterDto filter) {
@@ -16,10 +17,17 @@ public class FilterHelpers {
     }
 
     private static Boolean hybridChecker(Boolean isHybrid) {
-        if (isHybrid != null && !isHybrid) {
-            return null;
+        if (isHybrid == null) {
+            return Boolean.FALSE;
         }
         return isHybrid;
+    }
+
+    private static String checkStatus(String status) {
+        if (status == null || status.isEmpty()){
+            return "Active";
+        }
+        return status;
     }
 
     private static String checkForEmptyStrings(String string){

@@ -60,7 +60,7 @@
                                        + ${#numbers.formatDecimal(jobAd.maxSalary, 0, 0)}"></a>
 
                                     <div class="items-link items-link2" th:unless="${jobAd.status.status.equals('Archieved')}">
-                                        <form th:action="@{/employers/dashboard/job-ads/{id}(id=${jobAd.id})}" method="Post" style="
+                                        <form th:action="@{/employers/dashboard/job-ads/{id}/delete(id=${jobAd.id})}" method="Post" style="
                                         margin-top: 15px; margin-bottom: 15px;" href=""
                                               onclick="return confirm('Are you sure you want to delete this item?');">
                                             <button type="submit" class="btn">Delete</button>
