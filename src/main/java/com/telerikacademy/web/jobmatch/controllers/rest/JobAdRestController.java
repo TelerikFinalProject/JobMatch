@@ -211,15 +211,15 @@ public class JobAdRestController {
                         String.format("Job %s with ID:%d is not suitable for your %s!", "application", jobApplicationId, "ad"));
             }
 
-            if (!jobAdToMatchWith.getMatchesSentToJobApplications().add(jobApplication)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT,
-                        String.format("A match request for Job %s with ID:%d has already been initiated!", "application", jobApplicationId));
-            }
-
             if (jobAdToMatchWith.getMatchRequestedApplications().contains(jobApplication)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         String.format("A match request for Job %s with ID:%d already exists, " +
                                 "please reach out to the Job %s creator!", "application", jobAdId, "application"));
+            }
+
+            if (!jobAdToMatchWith.getMatchesSentToJobApplications().add(jobApplication)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        String.format("A match request for Job %s with ID:%d has already been initiated!", "application", jobApplicationId));
             }
 
             mailService.sendNotificationViaEmailToApplicant(jobApplication, jobAdToMatchWith);

@@ -119,7 +119,7 @@ public class AuthenticationMvcController {
 
         professionalService.registerProfessional(professionalDtoIn);
         Professional professional = professionalService.getProfessionalByUsername(professionalDtoIn.getUsername());
-        session.setAttribute("currentUser", professional);
+        session.setAttribute("currentUser", professional.getUsername());
         session.setAttribute("userRole", professional.getRoles());
         session.removeAttribute("professionalFromSession");
         session.removeAttribute("userDtoIn");
@@ -206,7 +206,7 @@ public class AuthenticationMvcController {
 
         employersService.createEmployer(employerDtoIn);
         Employer employer = employersService.getEmployer(employerDtoIn.getUsername());
-        session.setAttribute("currentUser", employer);
+        session.setAttribute("currentUser", employer.getUsername());
         session.setAttribute("userRole", employer.getRoles());
         session.removeAttribute("employerFromSession");
         session.removeAttribute("userDtoIn");
@@ -230,16 +230,16 @@ public class AuthenticationMvcController {
 
             if (userPrincipal.getRoles().equals("EMPLOYER")) {
                 Employer employer = employersService.getEmployer(userPrincipal.getId());
-                session.setAttribute("currentUser", employer);
+                session.setAttribute("currentUser", employer.getUsername());
                 session.setAttribute("userRole", employer.getRoles());
                 return "redirect:/employers/dashboard";
             } else if (userPrincipal.getRoles().equals("PROFESSIONAL")) {
                 Professional professional = professionalService.getProfessional(userPrincipal.getId());
-                session.setAttribute("currentUser", professional);
+                session.setAttribute("currentUser", professional.getUsername());
                 session.setAttribute("userRole", professional.getRoles());
                 return "redirect:/professionals/dashboard";
             } else {
-                session.setAttribute("currentUser", userPrincipal);
+                session.setAttribute("currentUser", userPrincipal.getUsername());
                 session.setAttribute("userRole", userPrincipal.getRoles());
                 return "redirect:/";
             }

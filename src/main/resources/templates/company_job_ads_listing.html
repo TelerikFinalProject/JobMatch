@@ -41,17 +41,6 @@
                                     <div class="count-job mb-35">
                                         <span th:text="${jobsSize} + ' Jobs found'">Jobs found</span>
                                         <!-- Select job items start -->
-                                        <div class="select-job-items">
-                                            <span>Sort by</span>
-                                            <label>
-                                                <select name="select">
-                                                    <option value="">None</option>
-                                                    <option value="">job list</option>
-                                                    <option value="">job list</option>
-                                                    <option value="">job list</option>
-                                                </select>
-                                            </label>
-                                        </div>
                                         <!--  Select job items End-->
                                     </div>
                                 </div>
@@ -63,31 +52,20 @@
                                     <div class="company-img">
                                         <a href="#"><img src="/img/icon/job-list1.png" alt=""></a>
                                     </div>
-                                    <div class="job-tittle job-tittle2">
-                                        <a href="#" th:href="@{/employers/dashboard/job-ads/{id}(id=${jobAd.id})}">
-                                            <h4 th:text="${jobAd.positionTitle}">Job Title</h4>
-                                        </a>
-                                        <ul>
-                                            <li th:text="${jobAd.employer.getCompanyName()}">Company Name</li>
-                                            <li>
-                                                <i class="fas fa-map-marker-alt"></i>
-                                                <!-- Case 1: Not 'Home' and not Hybrid -->
-                                                <a th:if="${jobAd.location.name != 'Home' and !jobAd.hybrid}"
-                                                   th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode}"></a>
-
-                                                <!-- Case 2: Not 'Home' and Hybrid -->
-                                                <a th:if="${jobAd.location.name != 'Home' and jobAd.hybrid}"
-                                                   th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode + ' (Hybrid)'}"></a>
-
-                                                <!-- Case 3: Location is 'Home' -->
-                                                <a th:if="${jobAd.location.name == 'Home'}">Remote</a>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                    <form th:replace="~{mutual_fragments.html :: ads-listing}"></form>
                                 </div>
                                 <div class="f-right">
-                                    <a th:text="${#numbers.formatDecimal(jobAd.minSalary, 0, 0)} + ' - ' + ${#numbers.formatDecimal(jobAd.maxSalary, 0, 0)}"></a>
-                                    <span></span>
+                                    <a style="margin-left: 20px;"
+                                       th:text="${#numbers.formatDecimal(jobAd.minSalary, 0, 0)} + ' - '
+                                       + ${#numbers.formatDecimal(jobAd.maxSalary, 0, 0)}"></a>
+
+                                    <div class="items-link items-link2" th:unless="${jobAd.status.status.equals('Archieved')}">
+                                        <form th:action="@{/employers/dashboard/job-ads/{id}/delete(id=${jobAd.id})}" method="Post" style="
+                                        margin-top: 15px; margin-bottom: 15px;" href=""
+                                              onclick="return confirm('Are you sure you want to delete this item?');">
+                                            <button type="submit" class="btn">Delete</button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>

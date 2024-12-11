@@ -109,12 +109,16 @@
                             <li>Salary Proposed: <span
                                     th:text="${#numbers.formatDecimal(jobAd.minSalary, 0, 0)} + ' - ' + ${#numbers.formatDecimal(jobAd.maxSalary, 0, 0)}">Salary</span>
                             </li>
+                            <li th:if="${jobAd.status.status.equals('Archived')}">Status :
+                            <span>ARCHIVED</span></li>
                         </ul>
                         <div class="d-lg-block">
                             <a href="#" class="btn head-btn1" style="
                                                         padding-left: 46px;
                                                         padding-right: 46px;">Update</a>
-                            <a href="#" class="btn head-btn2" style="
+                            <a href="#" th:unless="${jobAd.status.status.equals('Archived')}"
+                               th:href="@{/employers/dashboard/job-ads/{id}/find-matches(id=${jobAd.id})}"
+                               class="btn head-btn2" style="
                                                         padding-left: 25px;
                                                         padding-right: 25px;
                                                         padding-top: 26px;
@@ -133,6 +137,66 @@
                             <li>Email: <span th:text="${jobAd.employer.email}">Company email</span></li>
                         </ul>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="container" th:unless="${jobAd.getMatchRequestedApplications().isEmpty()}">
+            <!-- Section Tittle -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-tittle text-center">
+                        <span>Waiting for action</span>
+                        <h2>Match Requests</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-xl-10">
+                    <!-- single-job-content -->
+                    <div class="single-job-items mb-30" th:each="jobApplication : ${jobAd.getMatchRequestedApplications()}">
+                        <div class="job-items">
+                            <div class="company-img">
+                                <a href="job_details.html"><img src="/img/icon/job-list1.png" alt=""></a>
+                            </div>
+                            <div class="job-tittle">
+
+                                <a href="#"
+                                   th:href="@{/employers/dashboard/job-ads/{jobAdId}/find-matches/job-applications/{jobApplicationId}(jobAdId = ${jobAd.id}, jobApplicationId=${jobApplication.id})}">
+                                    <h4 th:text="${jobApplication.professional.firstName} + ' '
+                                                + ${jobApplication.professional.lastName}">Professional Name</h4>
+                                </a>
+                                <ul>
+                                    <li th:unless="${jobApplication.qualifications.isEmpty()}">
+                                                <span th:each="qualification, iterStat : ${jobApplication.qualifications}">
+                                                <span th:if="${iterStat.index < 3}"
+                                                      th:text="${qualification.name}"></span>
+                                                    <span th:if="${iterStat.index < 2 && iterStat.index < (jobApplication.qualifications.size() - 1)}">, </span>
+                                                    </span>
+
+                                    </li>
+
+                                    <li>
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <!-- Case 1: Not 'Home' and not Hybrid -->
+                                        <a th:if="${jobApplication.location.name != 'Home' and !jobApplication.hybrid}"
+                                           th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode}"></a>
+
+                                        <!-- Case 2: Not 'Home' and Hybrid -->
+                                        <a th:if="${jobApplication.location.name != 'Home' and jobApplication.hybrid}"
+                                           th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode + ' (Hybrid)'}"></a>
+
+                                        <!-- Case 3: Location is 'Home' -->
+                                        <a th:if="${jobApplication.location.name == 'Home'}">Remote</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="f-right">
+                            <a th:text="${#numbers.formatDecimal(jobApplication.minSalary, 0, 0)} + ' - ' + ${#numbers.formatDecimal(jobApplication.maxSalary, 0, 0)}"></a>
+                            <span></span>
+                        </div>
+                    </div>
+                    <!-- single-job-content -->
                 </div>
             </div>
         </div>

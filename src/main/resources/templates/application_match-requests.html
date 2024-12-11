@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zxx" class="no-js" xmlns:th="http://www.thymeleaf.org">
+<form th:replace="~{head-fragment.html :: head('Job Application')}"></form>
+<body style="overflow: visible">
+
+<form th:replace="~{preloader-fragment.html :: preloader}"></form>
+
+<form th:replace="~{header-fragment.html :: header}"></form>
+<main>
+
+  <!-- Hero Area Start-->
+  <div class="slider-area ">
+    <div class="single-slider section-overly slider-height2 d-flex align-items-center"
+         data-background="assets/img/hero/about.jpg">
+      <div class="container">
+        <div class="row">
+          <div class="col-xl-12">
+            <div class="hero-cap text-center">
+              <h2 th:text="${jobApplication.professional.firstName} + ' ' +
+                            ${jobApplication.professional.lastName}">Professional Names</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Hero Area End -->
+  <!-- job post company Start -->
+  <div class="job-post-company pt-120 pb-120">
+    <div class="container">
+      <div class="row justify-content-between">
+        <!-- Left Content -->
+        <div class="col-xl-7 col-lg-8">
+          <!-- job single -->
+          <form th:replace="~{mutual_fragments.html :: application-details-left}"></form>
+          <!-- job single End -->
+
+          <div class="job-post-details">
+            <div class="post-details1 mb-50">
+              <!-- Small Section Tittle -->
+              <div class="small-section-tittle">
+                <h4>Application Description</h4>
+              </div>
+              <p th:text="${jobApplication.description}">Description</p>
+            </div>
+            <div class="post-details2  mb-50" th:unless="${jobApplication.qualifications.isEmpty()}">
+              <!-- Small Section Tittle -->
+              <div class="small-section-tittle">
+                <h4>Knowledge, Skills, and Abilities</h4>
+              </div>
+              <ul th:each="skill : ${jobApplication.qualifications}">
+                <li th:text="${skill.name}">Skill</li>
+              </ul>
+            </div>
+            <div class="post-details2  mb-50">
+            </div>
+          </div>
+
+        </div>
+        <!-- Right Content -->
+        <div class="col-xl-4 col-lg-4">
+          <div class="post-details3  mb-50">
+            <!-- Small Section Tittle -->
+            <div class="small-section-tittle">
+              <h4>Application Overview</h4>
+            </div>
+            <form th:replace="~{mutual_fragments.html :: application-details-right}"></form>
+            <div class="apply-btn2" th:if="${isApplicationSuitable}"
+                 th:unless="${isAlreadyRequestedByAd || isAlreadyRequestedByApplication}">
+              <form th:action="@{/employers/dashboard/job-ads/{jobAdId}/find-matches/job-applications/{jobApplicationId}/request-match(jobAdId=${jobAdId}, jobApplicationId=${jobApplicationId})}" method="post" style="display: inline;">
+                <button type="submit" class="btn">Request Match</button>
+              </form>
+            </div>
+            <div class="d-lg-block" th:if="${isApplicationSuitable && isAlreadyRequestedByApplication}">
+              <form th:action="@{/employers/dashboard/job-ads/{jobAdId}/find-matches/job-applications/{jobApplicationId}/approve-match(jobAdId=${jobAdId}, jobApplicationId=${jobApplicationId})}"
+                    method="post"
+                    style="display: inline;">
+                <button type="submit" class="btn head-btn1" style="padding-left: 46px; padding-right: 46px;">Approve</button>
+              </form>
+
+              <form th:action="@{/employers/dashboard/job-ads/{jobAdId}/find-matches/job-applications/{jobApplicationId}/decline-match(jobAdId=${jobAdId}, jobApplicationId=${jobApplicationId})}"
+                    method="post"
+                    style="display: inline;">
+                <button type="submit" class="btn head-btn2"
+                        style="padding-left: 43px; padding-right: 43px; padding-top: 26px; padding-bottom: 26px;">
+                  Decline
+                </button>
+              </form>
+            </div>
+            <div th:if="${isApplicationSuitable && isAlreadyRequestedByAd}">
+              Waiting for action from other side
+            </div>
+          </div>
+          <form th:replace="~{mutual_fragments.html :: application-details-professional-right-details}"></form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- job post company End -->
+
+</main>
+
+<form th:replace="~{footer-fragment.html ::footer}"></form>
+
+<!-- JS here -->
+
+<form th:replace="~{scripts-fragment.html :: scripts}"></form>
+
+</body>
+</html>
