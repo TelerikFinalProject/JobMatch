@@ -2,6 +2,7 @@ package com.telerikacademy.web.jobmatch.services;
 
 import com.telerikacademy.web.jobmatch.exceptions.EntityDuplicateException;
 import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
+import com.telerikacademy.web.jobmatch.helpers.Constants;
 import com.telerikacademy.web.jobmatch.helpers.EmployerMappers;
 import com.telerikacademy.web.jobmatch.models.Employer;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
@@ -9,6 +10,7 @@ import com.telerikacademy.web.jobmatch.models.dtos.users.EmployerDtoIn;
 import com.telerikacademy.web.jobmatch.repositories.contracts.EmployerRepository;
 import com.telerikacademy.web.jobmatch.services.contracts.EmployersService;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
+import com.telerikacademy.web.jobmatch.services.contracts.UploadService;
 import com.telerikacademy.web.jobmatch.services.contracts.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -62,6 +64,7 @@ public class EmployerServiceImpl implements EmployersService {
         checkForDuplicateUsername(employerToCreate);
         checkForDuplicateCompanyName(employerToCreate);
 
+        employerToCreate.setProfilePictureUrl(Constants.DEFAULT_PROFILE_PICTURE_URL);
         employerRepository.save(employerToCreate);
     }
 

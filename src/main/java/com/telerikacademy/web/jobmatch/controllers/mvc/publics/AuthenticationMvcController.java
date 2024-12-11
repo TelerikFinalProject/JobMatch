@@ -225,10 +225,6 @@ public class AuthenticationMvcController {
                               BindingResult bindingResult,
                               HttpSession session) {
 
-        if (bindingResult.hasErrors()) {
-            return "login";
-        }
-
         try {
             UserPrincipal userPrincipal = authenticationService.login(loginDto.getUsername(), loginDto.getPassword());
 
@@ -236,19 +232,21 @@ public class AuthenticationMvcController {
                 Employer employer = employersService.getEmployer(userPrincipal.getId());
                 session.setAttribute("currentUser", employer);
                 session.setAttribute("userRole", employer.getRoles());
+                return "redirect:/employers/dashboard";
             } else if (userPrincipal.getRoles().equals("PROFESSIONAL")) {
                 Professional professional = professionalService.getProfessional(userPrincipal.getId());
                 session.setAttribute("currentUser", professional);
                 session.setAttribute("userRole", professional.getRoles());
+                return "redirect:/professionals/dashboard";
             } else {
                 session.setAttribute("currentUser", userPrincipal);
                 session.setAttribute("userRole", userPrincipal.getRoles());
+                return "redirect:/";
             }
 
-            return "redirect:/";
-
         } catch (EntityNotFoundException e) {
-            return "error-view";
+            bindingResult.rejectValue("username", "not.found", e.getMessage());
+            return "login";
         }
     }
 
