@@ -14,13 +14,14 @@ public class FilterHelpers {
     public static void jobApplicationMvcFilterHelper(JobApplicationFilterDto filter) {
         filter.setLocation(checkForEmptyStrings(filter.getLocation()));
         filter.setHybrid(hybridChecker(filter.getHybrid()));
+        filter.setStatus(checkStatus(filter.getStatus()));
     }
 
     private static Boolean hybridChecker(Boolean isHybrid) {
-        if (isHybrid == null) {
-            return Boolean.FALSE;
+        if (isHybrid == null || !isHybrid) {
+            return null;
         }
-        return isHybrid;
+        return Boolean.TRUE;
     }
 
     private static String checkStatus(String status) {

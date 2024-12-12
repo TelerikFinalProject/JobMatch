@@ -64,9 +64,100 @@
                         <div class="small-section-tittle">
                             <h4>Application Overview</h4>
                         </div>
-                        <form th:replace="~{mutual_fragments.html :: application-details-right}"></form>
+                        <ul th:fragment="application-details-right">
+                            <li>
+                                Location:
+                                <span th:if="${jobApplication.location.name != 'Home' and !jobApplication.hybrid}"
+                                      th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode}">
+                                </span>
+                                <span th:if="${jobApplication.location.name != 'Home' and jobApplication.hybrid}"
+                                      th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode + ' (Hybrid)'}">
+                                </span>
+                                <span th:if="${jobApplication.location.name == 'Home'}" th:text="'Remote'">
+                                </span>
+                            </li>
+                            <li>Application nature: <span>Full time</span></li>
+                            <li>Salary Desired: <span
+                                    th:text="${#numbers.formatDecimal(jobApplication.minSalary, 0, 0)} + ' - '
+                                    + ${#numbers.formatDecimal(jobApplication.maxSalary, 0, 0)}">Salary</span>
+                            </li>
+                            <li th:unless="${jobApplication.status.status.equals('Active')}">Status:
+                                <span th:text="${jobApplication.status.status}">Status</span></li>
+                        </ul>
+                        <div class="d-lg-block" th:if="${userRole.equals('ADMIN') || currentUser.equals(jobApplication.professional.username)}">
+                            <a href="#" class="btn head-btn1" style="
+                                                        padding-left: 46px;
+                                                        padding-right: 46px;">Update</a>
+                            <a href="#" th:if="${jobApplication.status.status.equals('Active')}"
+                               th:href="@{/professionals/dashboard/job-applications/{id}/find-matches(id=${jobApplication.id})}"
+                               class="btn head-btn2" style="
+                                                        padding-left: 25px;
+                                                        padding-right: 25px;
+                                                        padding-top: 26px;
+                                                        padding-bottom: 26px;">Find Matches</a>
+                        </div>
                     </div>
                     <form th:replace="~{mutual_fragments.html :: application-details-professional-right-details}"></form>
+                </div>
+            </div>
+        </div>
+        <div class="container" th:if="${userRole.equals('ADMIN') || currentUser.equals(jobApplication.professional.username)}"
+             th:unless="${jobApplication.getMatchRequestedAds().isEmpty()}">
+            <!-- Section Tittle -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-tittle text-center">
+                        <span>Waiting for action</span>
+                        <h2>Match Requests</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-xl-10">
+                    <!-- single-job-content -->
+                    <div class="single-job-items mb-30" th:each="jobAd : ${jobApplication.getMatchRequestedAds()}">
+                        <div class="job-items">
+                            <div class="company-img">
+                                <a href="job_details.html"><img src="/img/icon/job-list1.png" alt=""></a>
+                            </div>
+                            <div class="job-tittle">
+
+                                <a href="#"
+                                   th:href="@{/professionals/dashboard/job-applications/{jobApplicationId}/find-matches/job-ads/{jobAdId}(jobAdId = ${jobAd.id}, jobApplicationId=${jobApplication.id})}">
+                                    <h4 th:text="${jobAd.positionTitle}">Position Title</h4>
+                                </a>
+                                <ul>
+                                    <li th:unless="${jobAd.skills.isEmpty()}">
+                                                <span th:each="skill, iterStat : ${jobAd.skills}">
+                                                <span th:if="${iterStat.index < 3}"
+                                                      th:text="${skill.name}"></span>
+                                                    <span th:if="${iterStat.index < 2 && iterStat.index < (jobAd.skills.size() - 1)}">, </span>
+                                                    </span>
+
+                                    </li>
+
+                                    <li>
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <!-- Case 1: Not 'Home' and not Hybrid -->
+                                        <a th:if="${jobAd.location.name != 'Home' and !jobAd.hybrid}"
+                                           th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode}"></a>
+
+                                        <!-- Case 2: Not 'Home' and Hybrid -->
+                                        <a th:if="${jobAd.location.name != 'Home' and jobAd.hybrid}"
+                                           th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode + ' (Hybrid)'}"></a>
+
+                                        <!-- Case 3: Location is 'Home' -->
+                                        <a th:if="${jobAd.location.name == 'Home'}">Remote</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="f-right">
+                            <a th:text="${#numbers.formatDecimal(jobAd.minSalary, 0, 0)} + ' - ' + ${#numbers.formatDecimal(jobAd.maxSalary, 0, 0)}"></a>
+                            <span></span>
+                        </div>
+                    </div>
+                    <!-- single-job-content -->
                 </div>
             </div>
         </div>
