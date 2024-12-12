@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Picture</title>
+</head>
+<body>
+<h1>Upload Picture</h1>
+<form method="post" th:action="@{/upload/profile-picture}" enctype="multipart/form-data">
+    <input type="file" name="profilePicture" required>
+    <input class="button" type="submit" value="Upload">
+</form>
+</body>
+</html>

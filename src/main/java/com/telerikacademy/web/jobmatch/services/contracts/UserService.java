@@ -8,4 +8,6 @@ public interface UserService {
     UserPrincipal findByEmail(String email);
 
     UserPrincipal findById(int id);
+
+    void uploadImageUrl(int id, String url);
 }

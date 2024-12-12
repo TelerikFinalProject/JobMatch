@@ -34,4 +34,13 @@ public class UserServiceImpl implements UserService {
     public UserPrincipal findById(int id) {
         return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User", id));
     }
+
+    @Override
+    public void uploadImageUrl(int id, String url) {
+        UserPrincipal user = findById(id);
+
+        user.setProfilePictureUrl(url);
+
+        userRepository.save(user);
+    }
 }

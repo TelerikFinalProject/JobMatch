@@ -41,4 +41,8 @@ public class UserPrincipal {
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RefreshTokenEntity> refreshTokens;
+
+    @JsonIgnore
+    @Column(name = "profile_picture_url")
+    private String profilePictureUrl;
 }

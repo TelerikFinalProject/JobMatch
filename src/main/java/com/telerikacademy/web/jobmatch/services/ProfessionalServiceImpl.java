@@ -2,6 +2,7 @@ package com.telerikacademy.web.jobmatch.services;
 
 import com.telerikacademy.web.jobmatch.exceptions.EntityDuplicateException;
 import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
+import com.telerikacademy.web.jobmatch.helpers.Constants;
 import com.telerikacademy.web.jobmatch.helpers.ProfessionalMappers;
 import com.telerikacademy.web.jobmatch.models.Professional;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
@@ -67,6 +68,7 @@ public class ProfessionalServiceImpl implements ProfessionalService {
         checkForDuplicateUsername(professionalToCreate);
 
         professionalToCreate.setPassword(passwordEncoder.encode(professionalToCreate.getPassword()));
+        professionalToCreate.setProfilePictureUrl(Constants.DEFAULT_PROFILE_PICTURE_URL);
         professionalRepository.save(professionalToCreate);
     }
 
