@@ -37,3 +37,12 @@
 svg {
     vertical-align: middle;
 }
+
+.company-img {
+    text-align: center;
+}
+.profile-picture {
+    width: 85px;
+    display: inline-block;
+    border: 1px solid #a8ade5
+}

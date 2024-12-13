@@ -4,18 +4,25 @@ import com.telerikacademy.web.jobmatch.exceptions.AuthenticationException;
 import com.telerikacademy.web.jobmatch.exceptions.AuthorizationException;
 import com.telerikacademy.web.jobmatch.exceptions.EntityDuplicateException;
 import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
+import com.telerikacademy.web.jobmatch.helpers.EmployerMappers;
 import com.telerikacademy.web.jobmatch.models.Employer;
 import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.models.JobApplication;
+import com.telerikacademy.web.jobmatch.models.UserPrincipal;
 import com.telerikacademy.web.jobmatch.models.dtos.filters.JobAdFilterDto;
 import com.telerikacademy.web.jobmatch.models.dtos.filters.JobApplicationFilterDto;
+import com.telerikacademy.web.jobmatch.models.dtos.users.mvc.EmployerDetailsDto;
+import com.telerikacademy.web.jobmatch.models.dtos.users.mvc.PasswordChangeDto;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobAdFilterOptions;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobApplicationFilterOptions;
 import com.telerikacademy.web.jobmatch.services.contracts.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,25 +40,33 @@ public class EmployersMvcController {
     private final JobAdService jobAdService;
     private final MatchService matchService;
     private final MailService mailService;
+    private final UserService userService;
 
     public EmployersMvcController(LocationService locationService,
                                   JobApplicationService jobApplicationService,
                                   EmployersService employersService,
                                   JobAdService jobAdService,
                                   MatchService matchService,
-                                  MailService mailService) {
+                                  MailService mailService,
+                                  UserService userService) {
         this.locationService = locationService;
         this.jobApplicationService = jobApplicationService;
         this.employersService = employersService;
         this.jobAdService = jobAdService;
         this.matchService = matchService;
         this.mailService = mailService;
+        this.userService = userService;
     }
 
 //    @ModelAttribute("userRole")
 //    public String populateIsAuthenticated(HttpSession session) {
 //        return session.getAttribute("userRole").toString();
 //    }
+
+    @ModelAttribute("requestURI")
+    public String requestURI(final HttpServletRequest request) {
+        return request.getRequestURI();
+    }
 
     @GetMapping("/dashboard")
     public String getDashboard(Model model,
@@ -79,6 +94,138 @@ public class EmployersMvcController {
             return "error-view";
         } catch (AuthenticationException e){
             return "redirect:/authentication/login";
+        }
+    }
+
+    @GetMapping("/dashboard/company-details/{id}")
+    public String getEmployerDetails(@PathVariable int id,
+                                    Model model,
+                                    HttpSession session) {
+
+        try {
+            checkIfAuthenticated(session);
+            Employer employer = employersService.getEmployer(id);
+
+            if (session.getAttribute("userRole").equals("EMPLOYER")) {
+                checkIfLoggedUserIsOwner(session, employer);
+            }
+
+            List<JobAd> jobAds = jobAdService.getJobAds(new JobAdFilterOptions(null, null, null, null, employer.getCompanyName(), null, null));
+            model.addAttribute("jobAds", jobAds);
+            model.addAttribute("employer", employer);
+            return "company-details";
+
+        } catch (AuthenticationException | AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
+    }
+
+    @GetMapping("/dashboard/company-details/{id}/change-password")
+    public String getUpdateEmployerPassword(@PathVariable int id,
+                                            Model model,
+                                            HttpSession session) {
+
+        try {
+            rolesChecker(session);
+            Employer employer = employersService.getEmployer(session.getAttribute("currentUser").toString());
+
+            checkIfLoggedUserIsOwner(session, employer);
+
+            model.addAttribute("passwordChangeDto", new PasswordChangeDto());
+            return "change-password";
+        } catch (AuthenticationException | AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
+    }
+
+    @PostMapping("/dashboard/company-details/{id}/change-password")
+    public String handleUpdateEmployerPassword(@PathVariable int id,
+                                               @Valid @ModelAttribute("passwordChangeDto") PasswordChangeDto passwordChangeDto,
+                                               BindingResult bindingResult,
+                                               HttpSession session,
+                                               Model model) {
+
+        try {
+            rolesChecker(session);
+            UserPrincipal employer = employersService.getEmployer(session.getAttribute("currentUser").toString());
+
+            checkIfLoggedUserIsOwner(session, employer);
+
+            if (bindingResult.hasErrors()) {
+                return "change-password";
+            }
+
+            userService.changePassword(employer, passwordChangeDto);
+
+            return "redirect:/employers/dashboard/company-details/" + id;
+        } catch (AuthenticationException | AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
+    }
+
+    @GetMapping("/dashboard/company-details/{id}/change-details")
+    public String getUpdateEmployerDetails(@PathVariable int id,
+                                          Model model,
+                                          HttpSession session) {
+        try {
+            rolesChecker(session);
+            Employer employer = employersService.getEmployer(session.getAttribute("currentUser").toString());
+
+            checkIfLoggedUserIsOwner(session, employer);
+
+            EmployerDetailsDto employerDetailsDto = EmployerMappers.INSTANCE.toEmployerDetailsDto(employer);
+            List<JobAd> jobAds = jobAdService.getJobAds(new JobAdFilterOptions(null, null, null, null, employer.getCompanyName(), null, null));
+
+            model.addAttribute("jobAds", jobAds);
+            model.addAttribute("employer", employer);
+            model.addAttribute("employerDetails", employerDetailsDto);
+            model.addAttribute("countries", locationService.getAllCountries());
+            model.addAttribute("currentCountry", locationService.getCountryByIsoCode(employer.getLocation().getIsoCode()).getName());
+            return "company-details-update";
+        } catch (AuthenticationException | AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
+    }
+
+    @PostMapping("/dashboard/company-details/{id}/change-details")
+    public String handleUpdateEmployerDetails(@PathVariable int id,
+                                              @Valid @ModelAttribute("employerDetails") EmployerDetailsDto employerDetailsDto,
+                                              BindingResult bindingResult,
+                                              Model model,
+                                              HttpSession session) {
+
+        try {
+            rolesChecker(session);
+            Employer employer = employersService.getEmployer(session.getAttribute("currentUser").toString());
+            List<JobAd> jobAds = jobAdService.getJobAds(new JobAdFilterOptions(null, null, null, null, employer.getCompanyName(), null, null));
+
+            if (employer.getId() != id) {
+                return "error-view";
+            }
+
+            if (bindingResult.hasErrors()) {
+                model.addAttribute("jobAds", jobAds);
+                model.addAttribute("employer", employer);
+                return "company-details-update";
+            }
+
+            Employer updatedEmployer = EmployerMappers.INSTANCE.fromEmployerDetailsDto(employerDetailsDto, employer, locationService);
+
+            employersService.updateEmployer(updatedEmployer);
+
+            return "redirect:/employers/dashboard/company-details/" + id;
+        } catch (AuthenticationException | AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
         }
     }
 
@@ -472,6 +619,25 @@ public class EmployersMvcController {
         }
     }
 
+    private static boolean isAuthenticated(HttpSession session) {
+        return session.getAttribute("userRole") != null;
+    }
+
+
+    private static boolean isProfessionalOrAdmin(HttpSession session) {
+        if (!isAuthenticated(session)) {
+            return false;
+        }
+
+        String role = session.getAttribute("userRole").toString();
+
+        if (!role.equals("ADMIN") && !role.equals("Professional")) {
+            throw new AuthorizationException("access", "resource");
+        }
+
+        return true;
+    }
+
     private static void checkAdCreator(HttpSession session, JobAd jobAd) {
         if (session.getAttribute("currentUser") == null){
             throw new AuthenticationException("Not authenticated");
@@ -481,6 +647,18 @@ public class EmployersMvcController {
 
         if (!jobAd.getEmployer().getUsername().equals(user)) {
             throw new AuthorizationException("access", "job ad");
+        }
+    }
+
+    private void checkIfAuthenticated(HttpSession session) {
+        if (!isAuthenticated(session)) {
+            throw new AuthenticationException("Not authenticated");
+        }
+    }
+
+    private void checkIfLoggedUserIsOwner(HttpSession session, UserPrincipal user) {
+        if (!session.getAttribute("currentUser").equals(user.getUsername())){
+            throw new AuthorizationException("access", "dashboard");
         }
     }
 }

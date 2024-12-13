@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zxx" class="no-js" xmlns:th="http://www.thymeleaf.org">
+<form th:replace="~{head-fragment.html :: head('Details')}"></form>
+<body style="overflow: visible">
+
+<form th:replace="~{preloader-fragment.html :: preloader}"></form>
+
+<form th:replace="~{header-fragment.html :: header}"></form>
+<main>
+  <section style="background-color: #eee;">
+    <div class="container py-5">
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="card mb-4">
+            <div class="card-body text-center">
+
+              <img th:unless="${session.userId == employer.id}" th:src="${employer.profilePictureUrl}" alt="avatar"
+                   class="profile-picture img-fluid" style="width: 150px;">
+
+              <div th:if="${session.userId == employer.id}">
+                <form th:action="@{'/upload/profile-picture/' + ${session.userId}}" method="post" enctype="multipart/form-data">
+                  <input type="file" id="fileInput" name="profilePicture" style="display: none;" onchange="this.form.submit()">
+                  <button style="all: unset; cursor: pointer;" type="button" onclick="document.getElementById('fileInput').click()">
+                    <img th:src="${employer.profilePictureUrl}" alt="avatar"
+                         class="profile-picture img-fluid" style="width: 150px;">
+                  </button>
+                </form>
+              </div>
+              <h5 th:text="${employer.companyName}" class="my-3">Company Name</h5>
+              <p th:text="${employer.location.name + ', ' + employer.location.isoCode}" class="text-muted mb-2">Location</p>
+              <div th:if="${session.currentUser.equals(employer.username)}" class="d-flex justify-content-center mb-2">
+                <a th:href="@{${requestURI} + '/change-details'}"><button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary">Edit Profile</button></a>
+              </div>
+            </div>
+          </div>
+          <div class="card mb-4 mb-lg-0">
+            <div class="card-body p-0">
+              <ul class="list-group list-group-flush rounded-3">
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                  <i class="fas fa-globe fa-lg text-warning"></i>
+                  <p class="mb-0">https://mdbootstrap.com</p>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                  <i class="fab fa-github fa-lg text-body"></i>
+                  <p class="mb-0">mdbootstrap</p>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                  <i class="fab fa-twitter fa-lg" style="color: #55acee;"></i>
+                  <p class="mb-0">@mdbootstrap</p>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                  <i class="fab fa-instagram fa-lg" style="color: #ac2bac;"></i>
+                  <p class="mb-0">mdbootstrap</p>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                  <i class="fab fa-facebook-f fa-lg" style="color: #3b5998;"></i>
+                  <p class="mb-0">mdbootstrap</p>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <div class="card mb-4 mb-md-0">
+                <div class="card-body">
+                  <p class="mb-4 text-heading"> Company Description</p>
+                  <p th:text="${employer.description}" class="mb-1" style="max-height: 300px; font-size: 1rem;">>Company Description</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="card mb-4 mb-md-0">
+                <div class="card-body">
+                  <p class="mb-4 text-heading"> Statistics</p>
+                  <hr>
+                  <div style="height:30px;" class="row">
+                    <div class="col-sm-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-plus-fill" viewBox="0 0 16 16">
+                        <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M8.5 7v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 1 0"/>
+                      </svg>
+                    </div>
+                    <div class="col-sm-6">
+                      <p style="margin-bottom: 0">Ads Posted:</p>
+                    </div>
+                    <div class="col-sm-1">
+                      <p th:text="${jobAds.size()}">Ad size</p>
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-award-fill" viewBox="0 0 16 16">
+                        <path d="m8 0 1.669.864 1.858.282.842 1.68 1.337 1.32L13.4 6l.306 1.854-1.337 1.32-.842 1.68-1.858.282L8 12l-1.669-.864-1.858-.282-.842-1.68-1.337-1.32L2.6 6l-.306-1.854 1.337-1.32.842-1.68L6.331.864z"/>
+                        <path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1z"/>
+                      </svg>
+                    </div>
+                    <div class="col-sm-6">
+                      <p class="mb-0">Successful Matches</p>
+                    </div>
+                    <div class="col-sm-1">
+                      <p th:text="${employer.successfulProfessionalsMatched.size()}" class="text-muted mb-0">Matches</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-sm-8">
+                  <p class="mb-4 text-heading"> Details</p>
+                </div>
+                <div class="col-sm-3">
+                  <div th:if="${session.currentUser.equals(employer.username)}">
+                    <a th:href="@{${requestURI} + '/change-password'}"><button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-sm">Change Password</button></a>
+                  </div>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Company Name</p>
+                </div>
+                <div class="col-sm-9">
+                  <p th:text="${employer.companyName}" class="text-muted mb-0">Company Name</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row" th:if="${session.userId == employer.id}">
+                <div class="col-sm-3">
+                  <p class="mb-0">Username</p>
+                </div>
+                <div class="col-sm-9">
+                  <p th:text="${employer.username}" class="text-muted mb-0">Username</p>
+                </div>
+              </div>
+              <hr th:if="${session.userId == employer.id}">
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Email</p>
+                </div>
+                <div class="col-sm-9">
+                  <p th:text="${employer.email}" class="text-muted mb-0">Email</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Location</p>
+                </div>
+                <div class="col-sm-9">
+                  <p th:text="${employer.location.name + ', ' + employer.location.isoCode}" class="text-muted mb-0">Location</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<form th:replace="~{footer-fragment.html ::footer}"></form>
+
+<!-- JS here -->
+
+<form th:replace="~{scripts-fragment.html :: scripts}"></form>
+
+</body>
+</html>
