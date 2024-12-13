@@ -4,8 +4,11 @@ import com.telerikacademy.web.jobmatch.models.*;
 import com.telerikacademy.web.jobmatch.models.dtos.users.ProfessionalDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.users.ProfessionalOutDto;
 import com.telerikacademy.web.jobmatch.models.dtos.users.ProfessionalUpdateDto;
+import com.telerikacademy.web.jobmatch.models.dtos.users.mvc.EmployerDetailsDto;
+import com.telerikacademy.web.jobmatch.models.dtos.users.mvc.ProfessionalDetailsDto;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import com.telerikacademy.web.jobmatch.services.contracts.StatusService;
+import jakarta.validation.Valid;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -67,6 +70,28 @@ public interface ProfessionalMappers {
     UserPrincipal toUserPrinciple(ProfessionalDtoIn professionalDtoIn,
                                   @Context LocationService locationService);
 
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "firstName", target = "firstName")
+    @Mapping(source = "lastName", target = "lastName")
+    @Mapping(source = "email", target = "email")
+    @Mapping(source = "location.isoCode", target = "locCountryIsoCode")
+    @Mapping(source = "location.id", target = "locCityId")
+    @Mapping(source = "summary", target = "summary")
+    ProfessionalDetailsDto toProfessionalDetailsDto(Professional professional);
+
+    @Mapping(target = "id", source = "professional.id")
+    @Mapping(target = "roles", source = "professional.roles")
+    @Mapping(target = "username", source = "professionalDetailsDto.username")
+    @Mapping(target = "email", source = "professionalDetailsDto.email")
+    @Mapping(target = "summary", source = "professionalDetailsDto.summary")
+    @Mapping(target = "firstName", source = "professionalDetailsDto.firstName")
+    @Mapping(target = "lastName", source = "professionalDetailsDto.lastName")
+    @Mapping(target = "password", source = "professional.password")
+    @Mapping(target = "location", source = "professionalDetailsDto", qualifiedByName = "mapLocationFromDetailsDto")
+    @Mapping(target = "successfulMatches", source = "professional.successfulMatches")
+    Professional fromProfessionalDetailsDto(@Valid ProfessionalDetailsDto professionalDetailsDto, Professional professional, @Context LocationService locationService);
+
+
     List<ProfessionalOutDto> toDtoOutList(List<Professional> professionals);
 
     @Named("mapLocation")
@@ -101,5 +126,11 @@ public interface ProfessionalMappers {
             return String.join(", ", companyNames);
         }
         return "No successful matches.";
+    }
+
+    @Named("mapLocationFromDetailsDto")
+    default Location mapLocationFromDetailsDto(ProfessionalDetailsDto professionalDetailsDto, @Context LocationService locationService) {
+        return locationService.returnIfExistOrCreate(professionalDetailsDto.getLocCountryIsoCode(),
+                professionalDetailsDto.getLocCityId());
     }
 }

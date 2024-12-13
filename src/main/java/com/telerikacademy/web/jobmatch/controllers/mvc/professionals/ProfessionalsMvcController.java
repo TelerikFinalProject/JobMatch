@@ -4,20 +4,26 @@ import com.telerikacademy.web.jobmatch.exceptions.AuthenticationException;
 import com.telerikacademy.web.jobmatch.exceptions.AuthorizationException;
 import com.telerikacademy.web.jobmatch.exceptions.EntityDuplicateException;
 import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
-import com.telerikacademy.web.jobmatch.models.Employer;
-import com.telerikacademy.web.jobmatch.models.JobAd;
-import com.telerikacademy.web.jobmatch.models.JobApplication;
-import com.telerikacademy.web.jobmatch.models.Professional;
+import com.telerikacademy.web.jobmatch.helpers.EmployerMappers;
+import com.telerikacademy.web.jobmatch.helpers.ProfessionalMappers;
+import com.telerikacademy.web.jobmatch.models.*;
 import com.telerikacademy.web.jobmatch.models.dtos.filters.JobAdFilterDto;
 import com.telerikacademy.web.jobmatch.models.dtos.filters.JobApplicationFilterDto;
+import com.telerikacademy.web.jobmatch.models.dtos.users.mvc.EmployerDetailsDto;
+import com.telerikacademy.web.jobmatch.models.dtos.users.mvc.PasswordChangeDto;
+import com.telerikacademy.web.jobmatch.models.dtos.users.mvc.ProfessionalDetailsDto;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobAdFilterOptions;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobApplicationFilterOptions;
 import com.telerikacademy.web.jobmatch.services.contracts.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,6 +42,8 @@ public class ProfessionalsMvcController {
     private final ProfessionalService professionalService;
     private final MatchService matchService;
     private final MailService mailService;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public ProfessionalsMvcController(JobAdService jobAdService,
@@ -44,7 +52,7 @@ public class ProfessionalsMvcController {
                                       ProfessionalService professionalService,
                                       JobApplicationService jobApplicationService,
                                       MatchService matchService,
-                                      MailService mailService) {
+                                      MailService mailService, UserService userService, PasswordEncoder passwordEncoder) {
         this.jobAdService = jobAdService;
         this.locationService = locationService;
         this.employersService = employersService;
@@ -52,6 +60,8 @@ public class ProfessionalsMvcController {
         this.jobApplicationService = jobApplicationService;
         this.matchService = matchService;
         this.mailService = mailService;
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @ModelAttribute("userRole")
@@ -60,6 +70,11 @@ public class ProfessionalsMvcController {
             return "Unauthenticated";
         }
         return session.getAttribute("userRole").toString();
+    }
+
+    @ModelAttribute("requestURI")
+    public String requestURI(final HttpServletRequest request) {
+        return request.getRequestURI();
     }
 
     @GetMapping("/dashboard")
@@ -83,6 +98,151 @@ public class ProfessionalsMvcController {
             model.addAttribute("statusCode", HttpStatus.NOT_FOUND.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
             return "error-view";
+        } catch (AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
+        }
+    }
+
+    @GetMapping("/dashboard/professional-details/{id}")
+    public String getProfessionalDetails(@PathVariable int id,
+                                     Model model,
+                                     HttpSession session) {
+
+        try {
+            checkIfAuthenticated(session);
+            Professional professional = professionalService.getProfessional(id);
+
+            if (session.getAttribute("userRole").equals("PROFESSIONAL")) {
+                checkIfLoggedUserIsOwner(session, professional);
+            }
+
+            List<JobApplication> jobApplications = jobApplicationService.getJobApplications(new JobApplicationFilterOptions(null, null, professional.getUsername(), null, null, null));
+            model.addAttribute("jobApplications", jobApplications);
+            model.addAttribute("professional", professional);
+            return "professional-details";
+
+        } catch (AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
+        }
+    }
+
+    @GetMapping("/dashboard/professional-details/{id}/change-password")
+    public String getUpdateProfessionalPassword(@PathVariable int id,
+                                                Model model,
+                                                HttpSession session) {
+
+        try {
+            rolesChecker(session);
+            Professional professional = professionalService.getProfessionalByUsername(session.getAttribute("currentUser").toString());
+
+            checkIfLoggedUserIsOwner(session, professional);
+
+            model.addAttribute("passwordChangeDto", new PasswordChangeDto());
+            return "change-password";
+        } catch (AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
+        }
+    }
+
+    @PostMapping("/dashboard/professional-details/{id}/change-password")
+    public String handleUpdateProfessionalPassword(@PathVariable int id,
+                                               @Valid @ModelAttribute("passwordChangeDto") PasswordChangeDto passwordChangeDto,
+                                               BindingResult bindingResult,
+                                               HttpSession session,
+                                               Model model) {
+
+        try {
+            rolesChecker(session);
+            UserPrincipal professional = professionalService.getProfessionalByUsername(session.getAttribute("currentUser").toString());
+
+            checkIfLoggedUserIsOwner(session, professional);
+
+            if (passwordEncoder.matches(passwordChangeDto.getPassword(), professional.getPassword())) {
+                bindingResult.rejectValue("previousPassword", "passwords.match", "Please provide your current password");
+            }
+
+            if (bindingResult.hasErrors()) {
+                return "change-password";
+            }
+
+            userService.changePassword(professional, passwordChangeDto);
+
+            return "redirect:/professionals/dashboard/professional-details/" + id;
+        } catch (AuthenticationException | AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
+    }
+
+    @GetMapping("/dashboard/professional-details/{id}/change-details")
+    public String getUpdateProfessionalDetails(@PathVariable int id,
+                                           Model model,
+                                           HttpSession session) {
+        try {
+            rolesChecker(session);
+            Professional professional = professionalService.getProfessionalByUsername(session.getAttribute("currentUser").toString());
+
+            checkIfLoggedUserIsOwner(session, professional);
+
+            ProfessionalDetailsDto professionalDetailsDto = ProfessionalMappers.INSTANCE.toProfessionalDetailsDto(professional);
+            List<JobApplication> jobApplications = jobApplicationService.getJobApplications(new JobApplicationFilterOptions(null, null, professional.getUsername(), null, null, null));
+
+            model.addAttribute("jobApplications", jobApplications);
+            model.addAttribute("professional", professional);
+            model.addAttribute("professionalDetails", professionalDetailsDto);
+            model.addAttribute("countries", locationService.getAllCountries());
+            model.addAttribute("currentCountry", locationService.getCountryByIsoCode(professional.getLocation().getIsoCode()).getName());
+            return "professional-details-update";
+        } catch (AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
+        }
+    }
+
+    @PostMapping("/dashboard/professional-details/{id}/change-details")
+    public String handleUpdateProfessionalDetails(@PathVariable int id,
+                                              @Valid @ModelAttribute("professionalDetails")
+                                              ProfessionalDetailsDto professionalDetailsDto,
+                                              BindingResult bindingResult,
+                                              Model model,
+                                              HttpSession session) {
+
+        try {
+            rolesChecker(session);
+
+            Professional professional = professionalService.getProfessionalByUsername(session.getAttribute("currentUser").toString());
+
+            checkIfLoggedUserIsOwner(session, professional);
+
+            List<JobApplication> jobApplications = jobApplicationService.getJobApplications(new JobApplicationFilterOptions(null, null, professional.getUsername(), null, null, null));
+
+            if (bindingResult.hasErrors()) {
+                model.addAttribute("jobApplications", jobApplications);
+                model.addAttribute("professional", professional);
+                return "professional-details-update";
+            }
+
+            Professional updatedProfessional = ProfessionalMappers.INSTANCE.fromProfessionalDetailsDto(professionalDetailsDto, professional, locationService);
+
+            professionalService.updateProfessional(updatedProfessional);
+
+            return "redirect:/professionals/dashboard/professional-details/" + id;
         } catch (AuthorizationException e) {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
@@ -493,6 +653,22 @@ public class ProfessionalsMvcController {
 
         if (!jobApplication.getProfessional().getUsername().equals(user)) {
             throw new AuthorizationException("access", "job ad");
+        }
+    }
+
+    private static boolean isAuthenticated(HttpSession session) {
+        return session.getAttribute("userRole") != null;
+    }
+
+    private void checkIfAuthenticated(HttpSession session) {
+        if (!isAuthenticated(session)) {
+            throw new AuthenticationException("Not authenticated");
+        }
+    }
+
+    private void checkIfLoggedUserIsOwner(HttpSession session, UserPrincipal user) {
+        if (!session.getAttribute("currentUser").equals(user.getUsername())){
+            throw new AuthorizationException("access", "dashboard");
         }
     }
 }

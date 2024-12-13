@@ -20,6 +20,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -41,6 +42,7 @@ public class EmployersMvcController {
     private final MatchService matchService;
     private final MailService mailService;
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     public EmployersMvcController(LocationService locationService,
                                   JobApplicationService jobApplicationService,
@@ -48,7 +50,7 @@ public class EmployersMvcController {
                                   JobAdService jobAdService,
                                   MatchService matchService,
                                   MailService mailService,
-                                  UserService userService) {
+                                  UserService userService, PasswordEncoder passwordEncoder) {
         this.locationService = locationService;
         this.jobApplicationService = jobApplicationService;
         this.employersService = employersService;
@@ -56,6 +58,7 @@ public class EmployersMvcController {
         this.matchService = matchService;
         this.mailService = mailService;
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @ModelAttribute("userRole")
@@ -158,6 +161,10 @@ public class EmployersMvcController {
 
             checkIfLoggedUserIsOwner(session, employer);
 
+            if (!passwordEncoder.matches(employer.getPassword(), passwordChangeDto.getPreviousPassword())) {
+                bindingResult.rejectValue("previousPassword", "Please provide your current password");
+            }
+
             if (bindingResult.hasErrors()) {
                 return "change-password";
             }
@@ -207,12 +214,12 @@ public class EmployersMvcController {
 
         try {
             rolesChecker(session);
-            Employer employer = employersService.getEmployer(session.getAttribute("currentUser").toString());
-            List<JobAd> jobAds = jobAdService.getJobAds(new JobAdFilterOptions(null, null, null, null, employer.getCompanyName(), null, null));
 
-            if (employer.getId() != id) {
-                return "error-view";
-            }
+            Employer employer = employersService.getEmployer(session.getAttribute("currentUser").toString());
+
+            checkIfLoggedUserIsOwner(session, employer);
+
+            List<JobAd> jobAds = jobAdService.getJobAds(new JobAdFilterOptions(null, null, null, null, employer.getCompanyName(), null, null));
 
             if (bindingResult.hasErrors()) {
                 model.addAttribute("jobAds", jobAds);
@@ -639,25 +646,6 @@ public class EmployersMvcController {
         }
     }
 
-    private static boolean isAuthenticated(HttpSession session) {
-        return session.getAttribute("userRole") != null;
-    }
-
-
-    private static boolean isProfessionalOrAdmin(HttpSession session) {
-        if (!isAuthenticated(session)) {
-            return false;
-        }
-
-        String role = session.getAttribute("userRole").toString();
-
-        if (!role.equals("ADMIN") && !role.equals("Professional")) {
-            throw new AuthorizationException("access", "resource");
-        }
-
-        return true;
-    }
-
     private static void checkAdCreator(HttpSession session, JobAd jobAd) {
         if (session.getAttribute("currentUser") == null) {
             throw new AuthenticationException("Not authenticated");
@@ -668,6 +656,10 @@ public class EmployersMvcController {
         if (!jobAd.getEmployer().getUsername().equals(user)) {
             throw new AuthorizationException("access", "job ad");
         }
+    }
+
+    private static boolean isAuthenticated(HttpSession session) {
+        return session.getAttribute("userRole") != null;
     }
 
     private void checkIfAuthenticated(HttpSession session) {
