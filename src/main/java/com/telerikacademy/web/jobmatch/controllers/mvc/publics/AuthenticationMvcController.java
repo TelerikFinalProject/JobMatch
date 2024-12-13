@@ -121,6 +121,7 @@ public class AuthenticationMvcController {
         Professional professional = professionalService.getProfessionalByUsername(professionalDtoIn.getUsername());
         session.setAttribute("currentUser", professional.getUsername());
         session.setAttribute("userRole", professional.getRoles());
+        session.setAttribute("userId", professional.getId());
         session.removeAttribute("professionalFromSession");
         session.removeAttribute("userDtoIn");
 
@@ -208,10 +209,11 @@ public class AuthenticationMvcController {
         Employer employer = employersService.getEmployer(employerDtoIn.getUsername());
         session.setAttribute("currentUser", employer.getUsername());
         session.setAttribute("userRole", employer.getRoles());
+        session.setAttribute("userId", employer.getId());
         session.removeAttribute("employerFromSession");
         session.removeAttribute("userDtoIn");
 
-        return "redirect:/employers/job-applications";
+        return "redirect:/employers/dashboard";
     }
 
     @GetMapping("/login")
@@ -231,11 +233,13 @@ public class AuthenticationMvcController {
             if (userPrincipal.getRoles().equals("EMPLOYER")) {
                 Employer employer = employersService.getEmployer(userPrincipal.getId());
                 session.setAttribute("currentUser", employer.getUsername());
+                session.setAttribute("userId", employer.getId());
                 session.setAttribute("userRole", employer.getRoles());
                 return "redirect:/employers/dashboard";
             } else if (userPrincipal.getRoles().equals("PROFESSIONAL")) {
                 Professional professional = professionalService.getProfessional(userPrincipal.getId());
                 session.setAttribute("currentUser", professional.getUsername());
+                session.setAttribute("userId", professional.getId());
                 session.setAttribute("userRole", professional.getRoles());
                 return "redirect:/professionals/dashboard";
             } else {
@@ -254,6 +258,7 @@ public class AuthenticationMvcController {
     public String logout(HttpSession session) {
         session.removeAttribute("currentUser");
         session.removeAttribute("userRole");
+        session.removeAttribute("userId");
         return "redirect:/";
     }
 }

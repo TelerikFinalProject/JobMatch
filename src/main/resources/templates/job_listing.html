@@ -11,7 +11,7 @@
     <!-- Hero Area Start-->
     <div class="slider-area ">
         <div class="single-slider section-overly slider-height2 d-flex align-items-center"
-             data-background="/assets/img/hero/about.jpg">
+             data-background="/img/hero/about.jpg">
             <div class="container">
                 <div class="row">
                     <div class="col-xl-12">
@@ -82,7 +82,7 @@
                             <div class="single-job-items mb-30" th:each="jobAd : ${jobAds}">
                                 <div class="job-items">
                                     <div class="company-img">
-                                        <a href="#"><img src="/img/icon/job-list1.png" alt=""></a>
+                                        <a href="#"><img class="profile-picture" th:src="${jobAd.getEmployer().getProfilePictureUrl()}" src="/img/icon/job-list1.png" alt=""></a>
                                     </div>
                                     <div class="job-tittle job-tittle2">
                                         <a href="#" th:href="@{/professionals/job-ads/{id}(id=${jobAd.id})}">

@@ -19,6 +19,6 @@ public class ProfessionalDtoIn extends UserDtoIn {
     private String lastName;
 
     @NotNull(message = "Summary" + NULL_FIELD_ERROR)
-    @Size(min = 10, max = 200)
+    @Size(min = 10, max = 500)
     private String summary;
 }

@@ -149,7 +149,7 @@
                                             <span class="current">Location</span>
                                             <ul class="list" style="max-height: 200px; overflow-y: auto">
                                                 <li class="option selected focus" data-value="">Location</li>
-                                                <li th:each="country : ${countries}" th:data-value="${country.iso2}" class="option" th:text="${country.name}" w>City</li>
+                                                <li th:each="country : ${countries}" th:data-value="${country.iso2}" class="option" th:text="${country.name}">City</li>
                                             </ul>
                                         </div>
                                         <label class="form-label" for="countriesSelect">Country</label>

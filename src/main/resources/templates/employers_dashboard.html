@@ -70,15 +70,17 @@
                     </div>
                 </div>
                 <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
+                    <a th:href="@{/employers/dashboard/company-details/{id}(id=${session.userId})}" href="job_listing.html">
                     <div class="single-services text-center mb-30">
                         <div class="services-ion" style="width: 250px;">
                             <span class="flaticon-real-estate"></span>
                         </div>
                         <div class="services-cap">
-                            <h5><a href="job_listing.html">Company Details</a></h5>
+                            <h5>Company Details</h5>
                             <span th:text="'Invisible Text'" style="visibility: hidden"></span>
                         </div>
                     </div>
+                    </a>
                 </div>
                 <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
                     <div class="single-services text-center mb-30">
