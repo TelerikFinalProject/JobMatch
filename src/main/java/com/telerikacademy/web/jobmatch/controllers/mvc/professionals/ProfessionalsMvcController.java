@@ -107,7 +107,7 @@ public class ProfessionalsMvcController {
         }
     }
 
-    @GetMapping("/dashboard/professional-details/{id}")
+    @GetMapping("/{id}")
     public String getProfessionalDetails(@PathVariable int id,
                                      Model model,
                                      HttpSession session) {
@@ -134,7 +134,7 @@ public class ProfessionalsMvcController {
         }
     }
 
-    @GetMapping("/dashboard/professional-details/{id}/change-password")
+    @GetMapping("/{id}/change-password")
     public String getUpdateProfessionalPassword(@PathVariable int id,
                                                 Model model,
                                                 HttpSession session) {
@@ -156,7 +156,7 @@ public class ProfessionalsMvcController {
         }
     }
 
-    @PostMapping("/dashboard/professional-details/{id}/change-password")
+    @PostMapping("/{id}/change-password")
     public String handleUpdateProfessionalPassword(@PathVariable int id,
                                                @Valid @ModelAttribute("passwordChangeDto") PasswordChangeDto passwordChangeDto,
                                                BindingResult bindingResult,
@@ -179,7 +179,7 @@ public class ProfessionalsMvcController {
 
             userService.changePassword(professional, passwordChangeDto);
 
-            return "redirect:/professionals/dashboard/professional-details/" + id;
+            return "redirect:/professionals/" + id;
         } catch (AuthenticationException | AuthorizationException e) {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
@@ -187,7 +187,7 @@ public class ProfessionalsMvcController {
         }
     }
 
-    @GetMapping("/dashboard/professional-details/{id}/change-details")
+    @GetMapping("/{id}/change-details")
     public String getUpdateProfessionalDetails(@PathVariable int id,
                                            Model model,
                                            HttpSession session) {
@@ -215,7 +215,7 @@ public class ProfessionalsMvcController {
         }
     }
 
-    @PostMapping("/dashboard/professional-details/{id}/change-details")
+    @PostMapping("/{id}/change-details")
     public String handleUpdateProfessionalDetails(@PathVariable int id,
                                               @Valid @ModelAttribute("professionalDetails")
                                               ProfessionalDetailsDto professionalDetailsDto,
@@ -242,7 +242,7 @@ public class ProfessionalsMvcController {
 
             professionalService.updateProfessional(updatedProfessional);
 
-            return "redirect:/professionals/dashboard/professional-details/" + id;
+            return "redirect:/professionals/" + id;
         } catch (AuthorizationException e) {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());

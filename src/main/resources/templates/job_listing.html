@@ -89,7 +89,7 @@
                                             <h4 th:text="${jobAd.positionTitle}">Job Title</h4>
                                         </a>
                                         <ul>
-                                            <li th:text="${jobAd.employer.getCompanyName()}">Company Name</li>
+                                            <а th:href="@{/employers/}"><li th:text="${jobAd.employer.getCompanyName()}">Company Name</li></а>
                                             <li>
                                                 <i class="fas fa-map-marker-alt"></i>
                                                 <!-- Case 1: Not 'Home' and not Hybrid -->

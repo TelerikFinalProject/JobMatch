@@ -103,7 +103,7 @@ public class EmployersMvcController {
         }
     }
 
-    @GetMapping("/dashboard/company-details/{id}")
+    @GetMapping("/{id}")
     public String getEmployerDetails(@PathVariable int id,
                                     Model model,
                                     HttpSession session) {
@@ -128,7 +128,7 @@ public class EmployersMvcController {
         }
     }
 
-    @GetMapping("/dashboard/company-details/{id}/change-password")
+    @GetMapping("/{id}/change-password")
     public String getUpdateEmployerPassword(@PathVariable int id,
                                             Model model,
                                             HttpSession session) {
@@ -148,7 +148,7 @@ public class EmployersMvcController {
         }
     }
 
-    @PostMapping("/dashboard/company-details/{id}/change-password")
+    @PostMapping("/{id}/change-password")
     public String handleUpdateEmployerPassword(@PathVariable int id,
                                                @Valid @ModelAttribute("passwordChangeDto") PasswordChangeDto passwordChangeDto,
                                                BindingResult bindingResult,
@@ -171,7 +171,7 @@ public class EmployersMvcController {
 
             userService.changePassword(employer, passwordChangeDto);
 
-            return "redirect:/employers/dashboard/company-details/" + id;
+            return "redirect:/employers/" + id;
         } catch (AuthenticationException | AuthorizationException e) {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
@@ -179,7 +179,7 @@ public class EmployersMvcController {
         }
     }
 
-    @GetMapping("/dashboard/company-details/{id}/change-details")
+    @GetMapping("/{id}/change-details")
     public String getUpdateEmployerDetails(@PathVariable int id,
                                           Model model,
                                           HttpSession session) {
@@ -205,7 +205,7 @@ public class EmployersMvcController {
         }
     }
 
-    @PostMapping("/dashboard/company-details/{id}/change-details")
+    @PostMapping("/{id}/change-details")
     public String handleUpdateEmployerDetails(@PathVariable int id,
                                               @Valid @ModelAttribute("employerDetails") EmployerDetailsDto employerDetailsDto,
                                               BindingResult bindingResult,
@@ -231,7 +231,7 @@ public class EmployersMvcController {
 
             employersService.updateEmployer(updatedEmployer);
 
-            return "redirect:/employers/dashboard/company-details/" + id;
+            return "redirect:/employers/" + id;
         } catch (AuthenticationException | AuthorizationException e) {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
