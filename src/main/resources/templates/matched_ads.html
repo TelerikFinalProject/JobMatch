@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zxx" class="no-js" xmlns:th="http://www.thymeleaf.org">
-<form th:replace="~{head-fragment.html :: head('Job Ads')}"></form>
+<form th:replace="~{head-fragment.html :: head('Job Applications')}"></form>
 <body style="overflow: visible">
 
 <form th:replace="~{preloader-fragment.html :: preloader}"></form>
@@ -9,14 +9,14 @@
 
 <main>
     <!-- Hero Area Start-->
-    <div class="slider-area ">
+    <div class="slider-area " th:if="${adsSize == 0}">
         <div class="single-slider section-overly slider-height2 d-flex align-items-center"
-             data-background="/img/hero/about.jpg">
+             data-background="/assets/img/hero/about.jpg">
             <div class="container">
                 <div class="row">
                     <div class="col-xl-12">
                         <div class="hero-cap text-center">
-                            <h2 th:text="${employer.companyName} + ' Job Ads'">Job Ads</h2>
+                            <h2>No Matches Found</h2>
                         </div>
                     </div>
                 </div>
@@ -25,7 +25,7 @@
     </div>
     <!-- Hero Area End -->
     <!-- Job List Area Start -->
-    <div class="job-listing-area pt-120 pb-120">
+    <div class="job-listing-area pt-120 pb-120" th:unless="${adsSize == 0}">
         <div class="container">
             <div class="row">
                 <!-- Left content -->
@@ -41,18 +41,15 @@
                                               d="M7.778,12.000 L12.222,12.000 L12.222,10.000 L7.778,10.000 L7.778,12.000 ZM-0.000,-0.000 L-0.000,2.000 L20.000,2.000 L20.000,-0.000 L-0.000,-0.000 ZM3.333,7.000 L16.667,7.000 L16.667,5.000 L3.333,5.000 L3.333,7.000 Z"/>
                                     </svg>
                                 </div>
-                                <h4>Filter Jobs</h4>
+                                <h4>Filter Ads</h4>
                             </div>
                         </div>
                     </div>
                     <!-- Job Category Listing start -->
-                    <form th:action="@{/employers/dashboard/job-ads}" method="get" th:object="${jobAdFilterOptions}">
-                        <form th:replace="~{company_view_fragments.html :: job-ads-filter-bar-private}"></form>
-                    </form>
                     <!-- Job Category Listing End -->
                 </div>
                 <!-- Right content -->
-                <div class="col-xl-9 col-lg-9 col-md-8">
+                <div class=" col-xl-9 col-lg-9 col-md-8">
                     <!-- Featured_job_start -->
                     <section class="featured-job-area">
                         <div class="container">
@@ -60,7 +57,7 @@
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="count-job mb-35">
-                                        <span th:text="${jobsSize} + ' Jobs found'">Jobs found</span>
+                                        <span th:text="${adsSize} + ' Applications found'">Applications found</span>
                                         <!-- Select job items start -->
                                         <!--  Select job items End-->
                                     </div>
@@ -68,25 +65,46 @@
                             </div>
                             <!-- Count of Job list End -->
                             <!-- single-job-content -->
-                            <div class="single-job-items mb-30" th:each="jobAd : ${jobAds}">
+                            <div class="single-job-items mb-30"
+                                 th:each="jobAd : ${jobAds}">
                                 <div class="job-items">
                                     <div class="company-img">
-                                        <a href="#"><img src="/img/icon/job-list1.png" th:src="${jobAd.getEmployer().getProfilePictureUrl()}" alt=""></a>
+                                        <a href="#"><img src="/img/icon/job-list1.png" alt=""></a>
                                     </div>
-                                    <form th:replace="~{mutual_fragments.html :: ads-listing}"></form>
+                                    <div class="job-tittle job-tittle2">
+                                        <a href="#"
+                                           th:href="@{/professionals/dashboard/job-applications/{jobApplicationId}/find-matches/job-ads/{jobAdId}(jobAdId = ${jobAd.id}, jobApplicationId=${jobApplication.id})}">
+                                            <h4 th:text="${jobAd.positionTitle}">Position Title</h4>
+                                        </a>
+                                        <ul>
+                                            <li th:unless="${jobAd.skills.isEmpty()}">
+                                                <span th:each="skill, iterStat : ${jobAd.skills}">
+                                                <span th:if="${iterStat.index < 3}"
+                                                      th:text="${skill.name}"></span>
+                                                    <span th:if="${iterStat.index < 2 && iterStat.index < (jobAd.skills.size() - 1)}">, </span>
+                                                    </span>
+
+                                            </li>
+
+                                            <li>
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                <!-- Case 1: Not 'Home' and not Hybrid -->
+                                                <a th:if="${jobAd.location.name != 'Home' and !jobAd.hybrid}"
+                                                   th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode}"></a>
+
+                                                <!-- Case 2: Not 'Home' and Hybrid -->
+                                                <a th:if="${jobAd.location.name != 'Home' and jobAd.hybrid}"
+                                                   th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode + ' (Hybrid)'}"></a>
+
+                                                <!-- Case 3: Location is 'Home' -->
+                                                <a th:if="${jobAd.location.name == 'Home'}">Remote</a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                                 <div class="f-right">
-                                    <a style="margin-left: 20px;"
-                                       th:text="${#numbers.formatDecimal(jobAd.minSalary, 0, 0)} + ' - '
-                                       + ${#numbers.formatDecimal(jobAd.maxSalary, 0, 0)}"></a>
-
-                                    <div class="items-link items-link2" th:if="${userRole.equals('ADMIN') || employer.equals(jobAd.employer)}">
-                                        <form th:action="@{/employers/dashboard/job-ads/{id}/delete(id=${jobAd.id})}" method="Post" style="
-                                        margin-top: 15px; margin-bottom: 15px;" href=""
-                                              onclick="return confirm('Are you sure you want to delete this item?');">
-                                            <button type="submit" class="btn">Delete</button>
-                                        </form>
-                                    </div>
+                                    <a th:text="${#numbers.formatDecimal(jobAd.minSalary, 0, 0)} + ' - ' + ${#numbers.formatDecimal(jobAd.maxSalary, 0, 0)}"></a>
+                                    <span></span>
                                 </div>
                             </div>
                         </div>
@@ -98,7 +116,7 @@
     </div>
     <!-- Job List Area End -->
     <!--Pagination Start  -->
-    <div class="pagination-area pb-115 text-center">
+    <div class="pagination-area pb-115 text-center" th:unless="${adsSize == 0}">
         <div class="container">
             <div class="row">
                 <div class="col-xl-12">
@@ -108,12 +126,7 @@
                                 <!-- Previous Button -->
                                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                                     <a class="page-link"
-                                       th:href="@{/employers/dashboard/job-ads(page=${currentPage - 1}, size=7,
-                                       minSalary=${filterOptions.minSalary},
-                                       maxSalary=${filterOptions.maxSalary},
-                                       location=${filterOptions.location},
-                                       status=${filterOptions.status},
-                                       hybrid=${filterOptions.hybrid})}"
+                                       th:href="@{/professional/dashboard/job-applications/{id}/find-matches(id=${jobApplication.id}, page=${currentPage - 1}, size=7)}"
                                        aria-label="Previous">
                                         <span class="ti-angle-left"></span>
                                     </a>
@@ -123,24 +136,15 @@
                                 <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                                     th:classappend="${currentPage == i} ? 'active'">
                                     <a class="page-link"
-                                       th:href="@{/employers/dashboard/job-ads(page=${i}, size=7,
-                                       minSalary=${filterOptions.minSalary},
-                                       maxSalary=${filterOptions.maxSalary},
-                                       location=${filterOptions.location},
-                                       status=${filterOptions.status},
-                                       hybrid=${filterOptions.hybrid})}"
+                                       th:href="@{/professional/dashboard/job-applications/{id}/find-matches(id=${jobApplication.id}, page=${i}, size=7)}"
                                        th:text="${i + 1}"></a>
                                 </li>
 
                                 <!-- Next Button -->
-                                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                <li class="page-item"
+                                    th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
                                     <a class="page-link"
-                                       th:href="@{/employers/dashboard/job-ads(page=${currentPage + 1}, size=7,
-                                       minSalary=${filterOptions.minSalary},
-                                       maxSalary=${filterOptions.maxSalary},
-                                       location=${filterOptions.location},
-                                       status=${filterOptions.status},
-                                       hybrid=${filterOptions.hybrid})}"
+                                       th:href="@{/professional/dashboard/job-applications/{id}/find-matches(id=${jobApplication.id}, page=${currentPage + 1}, size=7)}"
                                        aria-label="Next">
                                         <span class="ti-angle-right"></span>
                                     </a>

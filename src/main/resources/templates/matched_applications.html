@@ -15,8 +15,11 @@
             <div class="container">
                 <div class="row">
                     <div class="col-xl-12">
-                        <div class="hero-cap text-center">
+                        <div class="hero-cap text-center" th:unless="${applicationsSize == 0}">
                             <h2 th:text="${jobAd.positionTitle} + ' Matches'">Job Applications</h2>
+                        </div>
+                        <div class="hero-cap text-center" th:if="${applicationsSize == 0}">
+                            <h2>No Matches Found</h2>
                         </div>
                     </div>
                 </div>
@@ -25,7 +28,7 @@
     </div>
     <!-- Hero Area End -->
     <!-- Job List Area Start -->
-    <div class="job-listing-area pt-120 pb-120">
+    <div class="job-listing-area pt-120 pb-120" th:unless="${applicationsSize == 0}">
         <div class="container">
             <div class="row">
                 <!-- Left content -->
@@ -117,7 +120,7 @@
     </div>
     <!-- Job List Area End -->
     <!--Pagination Start  -->
-    <div class="pagination-area pb-115 text-center">
+    <div class="pagination-area pb-115 text-center" th:unless="${applicationsSize == 0}">
         <div class="container">
             <div class="row">
                 <div class="col-xl-12">

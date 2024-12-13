@@ -58,10 +58,13 @@ public class EmployersMvcController {
         this.userService = userService;
     }
 
-//    @ModelAttribute("userRole")
-//    public String populateIsAuthenticated(HttpSession session) {
-//        return session.getAttribute("userRole").toString();
-//    }
+    @ModelAttribute("userRole")
+    public String populateIsAuthenticated(HttpSession session) {
+        if (session.getAttribute("userRole") == null) {
+            return "Unauthenticated";
+        }
+        return session.getAttribute("userRole").toString();
+    }
 
     @ModelAttribute("requestURI")
     public String requestURI(final HttpServletRequest request) {
@@ -92,7 +95,7 @@ public class EmployersMvcController {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
             return "error-view";
-        } catch (AuthenticationException e){
+        } catch (AuthenticationException e) {
             return "redirect:/authentication/login";
         }
     }
@@ -242,7 +245,7 @@ public class EmployersMvcController {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
             return "error-view";
-        } catch (AuthenticationException e){
+        } catch (AuthenticationException e) {
             return "redirect:/authentication/login";
         }
 
@@ -282,6 +285,8 @@ public class EmployersMvcController {
             rolesChecker(session);
             JobApplication jobApplication = jobApplicationService.getJobApplication(id);
             model.addAttribute("jobApplication", jobApplication);
+            model.addAttribute("currentUser", session.getAttribute("currentUser").toString());
+
             return "application_details";
         } catch (EntityNotFoundException e) {
             model.addAttribute("statusCode", HttpStatus.NOT_FOUND.getReasonPhrase());
@@ -291,7 +296,7 @@ public class EmployersMvcController {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
             return "error-view";
-        } catch (AuthenticationException e){
+        } catch (AuthenticationException e) {
             return "redirect:/authentication/login";
         }
     }
@@ -340,9 +345,23 @@ public class EmployersMvcController {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
             return "error-view";
-        } catch (AuthenticationException e){
+        } catch (AuthenticationException e) {
             return "redirect:/authentication/login";
         }
+    }
+
+    @GetMapping("/dashboard/job-ads/create")
+    public String showCreateJobAdView(Model model,
+                                      @PathVariable int id,
+                                      HttpSession session) {
+        return null;
+    }
+
+    @PostMapping("/dashboard/job-ads/create")
+    public String createJobAd(Model model,
+                              @PathVariable int id,
+                              HttpSession session) {
+        return null;
     }
 
     @GetMapping("/dashboard/job-ads/{id}")
@@ -357,6 +376,8 @@ public class EmployersMvcController {
             checkAdCreator(session, jobAd);
 
             model.addAttribute("jobAd", jobAd);
+            model.addAttribute("currentUser", session.getAttribute("currentUser").toString());
+
             return "job_details";
         } catch (EntityNotFoundException e) {
             model.addAttribute("statusCode", HttpStatus.NOT_FOUND.getReasonPhrase());
@@ -366,15 +387,15 @@ public class EmployersMvcController {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
             return "error-view";
-        } catch (AuthenticationException e){
+        } catch (AuthenticationException e) {
             return "redirect:/authentication/login";
         }
     }
 
     @PostMapping("/dashboard/job-ads/{id}/delete")
     public String deleteJobAd(Model model,
-                                  @PathVariable int id,
-                                  HttpSession session) {
+                              @PathVariable int id,
+                              HttpSession session) {
         try {
             rolesChecker(session);
 
@@ -393,22 +414,22 @@ public class EmployersMvcController {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
             return "error-view";
-        } catch (AuthenticationException e){
+        } catch (AuthenticationException e) {
             return "redirect:/authentication/login";
         }
     }
 
     @GetMapping("/dashboard/job-ads/{id}/update")
     public String showUpdateJobAdView(Model model,
-                              @PathVariable int id,
-                              HttpSession session) {
+                                      @PathVariable int id,
+                                      HttpSession session) {
         return null;
     }
 
     @PostMapping("/dashboard/job-ads/{id}/update")
     public String updateJobAd(Model model,
-                                  @PathVariable int id,
-                                  HttpSession session) {
+                              @PathVariable int id,
+                              HttpSession session) {
         return null;
     }
 
@@ -447,7 +468,7 @@ public class EmployersMvcController {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
             return "error-view";
-        } catch (AuthenticationException e){
+        } catch (AuthenticationException e) {
             return "redirect:/authentication/login";
         }
     }
@@ -471,10 +492,10 @@ public class EmployersMvcController {
             model.addAttribute("jobApplication", jobApplicationService.getJobApplication(jobApplicationId));
             model.addAttribute("isApplicationSuitable",
                     matchService.getSuitableApplications(jobAdToMatchWith).contains(jobApplication));
+            model.addAttribute("isAlreadyRequestedByApplication",
+                    jobApplication.getMatchesSentToJobAds().contains(jobAdToMatchWith));
             model.addAttribute("isAlreadyRequestedByAd",
                     jobAdToMatchWith.getMatchesSentToJobApplications().contains(jobApplication));
-            model.addAttribute("isAlreadyRequestedByApplication",
-                    jobAdToMatchWith.getMatchRequestedApplications().contains(jobApplication));
 
             return "application_match-requests";
         } catch (EntityNotFoundException e) {
@@ -485,7 +506,7 @@ public class EmployersMvcController {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
             return "error-view";
-        } catch (AuthenticationException e){
+        } catch (AuthenticationException e) {
             return "redirect:/authentication/login";
         }
     }
@@ -511,7 +532,7 @@ public class EmployersMvcController {
 
             if (jobAdToMatchWith.getMatchRequestedApplications().contains(jobApplication)) {
                 throw new EntityDuplicateException(String.format("A match request for Job %s with ID:%d already exists, " +
-                        "please reach out to the Job %s creator!", "application", jobAdId, "application"));
+                        "please reach out to the Job %s creator!", "application", jobApplicationId, "application"));
             }
 
             if (!jobAdToMatchWith.getMatchesSentToJobApplications().add(jobApplication)) {
@@ -536,7 +557,7 @@ public class EmployersMvcController {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
             return "error-view";
-        } catch (AuthenticationException e){
+        } catch (AuthenticationException e) {
             return "redirect:/authentication/login";
         }
     }
@@ -568,7 +589,7 @@ public class EmployersMvcController {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
             return "error-view";
-        } catch (AuthenticationException e){
+        } catch (AuthenticationException e) {
             return "redirect:/authentication/login";
         }
     }
@@ -600,15 +621,14 @@ public class EmployersMvcController {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
             return "error-view";
-        } catch (AuthenticationException e){
+        } catch (AuthenticationException e) {
             return "redirect:/authentication/login";
         }
     }
 
 
-
     private static void rolesChecker(HttpSession session) {
-        if (session.getAttribute("userRole") == null){
+        if (session.getAttribute("userRole") == null) {
             throw new AuthenticationException("Not authenticated");
         }
 
@@ -639,7 +659,7 @@ public class EmployersMvcController {
     }
 
     private static void checkAdCreator(HttpSession session, JobAd jobAd) {
-        if (session.getAttribute("currentUser") == null){
+        if (session.getAttribute("currentUser") == null) {
             throw new AuthenticationException("Not authenticated");
         }
 

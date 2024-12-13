@@ -48,78 +48,7 @@
                     <!-- Job Category Listing start -->
                     <form th:action="@{/employers/dashboard/job-applications}" method="get"
                           th:object="${jobApplicationFilterOptions}">
-                        <div class="job-category-listing mb-50">
-                            <!-- single one -->
-                            <!-- Select job items start -->
-                            <!--  Select job items End-->
-                            <!-- select-Categories start -->
-                            <div class="single-listing pt-0 pb-0">
-                                <div class="select-Categories pt-0 pb-30">
-                                    <div class="small-section-tittle2">
-                                        <h4>Application Type</h4>
-                                    </div>
-                                    <label class="container">Hybrid
-                                        <input type="checkbox" th:field="*{hybrid}">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                </div>
-                            </div>
-                            <!-- select-Categories End -->
-                            <!-- single two -->
-                            <div class="single-listing">
-                                <div class="small-section-tittle2">
-                                    <h4>Application Location</h4>
-                                </div>
-                                <!-- Select job items start -->
-                                <div class="select-job-items2">
-                                    <select name="location" th:field="*{location}">
-                                        <option value="" selected>Choose a Location</option>
-                                        <option th:each="location : ${locations}" th:value="${location.name}"
-                                                th:text="${location.name}"></option>
-                                    </select>
-                                </div>
-                                <!--  Select job items End-->
-                                <!-- select-Categories start -->
-                                <!-- select-Categories End -->
-                            </div>
-                            <!-- single three -->
-                            <div class="single-listing">
-                                <!-- Range Slider Start -->
-                                <aside class="left_widgets p_filter_widgets price_rangs_aside sidebar_box_shadow">
-                                    <div class="select-Categories pt-80 pb-35">
-                                        <div class="small-section-tittle2">
-                                            <h4>Filter Salary</h4>
-                                        </div>
-                                        <div class="widgets_inner">
-                                            <div class="range_item">
-                                                <!-- <div id="slider-range"></div> -->
-                                                <input type="text" class="js-range-slider" value=""/>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="price_text">
-                                                        <p>Salary :</p>
-                                                    </div>
-                                                    <div class="price_value d-flex justify-content-center">
-                                                        <input type="text" class="js-input-from" readonly
-                                                               th:field="*{minSalary}"/>
-                                                        <span>to</span>
-                                                        <input type="text" class="js-input-to" id="amount" readonly
-                                                               th:field="*{maxSalary}"/>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </aside>
-                                <!-- Range Slider End -->
-                            </div>
-                            <div class="items-link">
-                                <input type="submit" value="Filter" style="margin-bottom: 0px;
-                                padding-left: 60px;
-                                padding-right: 60px;
-                                padding-top: 9px;
-                                padding-bottom: 9px;"/>
-                            </div>
-                        </div>
+                        <form th:replace="~{mutual_fragments.html :: application-listing-filter-public-view}"></form>
                     </form>
                     <!-- Job Category Listing End -->
                 </div>
@@ -167,7 +96,7 @@
                 <div class="col-xl-12">
                     <div class="single-wrap d-flex justify-content-center">
                         <nav aria-label="Page navigation example">
-                            <ul class="pagination justify-content-start">
+                            <ul class="pagination justify-content-start" th:unless="${jobApplications.isEmpty()}">
                                 <!-- Previous Button -->
                                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                                     <a class="page-link"
