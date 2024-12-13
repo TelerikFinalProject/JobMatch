@@ -24,11 +24,11 @@ public class JobAdDtoIn {
 
     @NotNull(message = "Salary" + NULL_FIELD_ERROR)
     @Positive(message = SALARY_ERROR)
-    private double minSalary;
+    private Double minSalary;
 
     @NotNull(message = "Salary" + NULL_FIELD_ERROR)
     @Positive(message = SALARY_ERROR)
-    private double maxSalary;
+    private Double maxSalary;
 
     @NotNull(message = "Description" + NULL_FIELD_ERROR)
     @Size(min = 5, max = 500)
@@ -37,12 +37,12 @@ public class JobAdDtoIn {
     @NotNull
     private boolean hybrid;
 
-    @NotNull(message = "Country Iso code" + NULL_FIELD_ERROR)
-    @Size(min = 2, max = 3)
+    //@NotNull(message = "Country Iso code" + NULL_FIELD_ERROR)
+    //@Size(min = 2, max = 3)
     private String locCountryIsoCode;
 
-    @NotNull(message = "City ID" + NULL_FIELD_ERROR)
-    private int locCityId;
+    //@NotNull(message = "City ID" + NULL_FIELD_ERROR)
+    private Integer locCityId;
 
     private String skills;
 }

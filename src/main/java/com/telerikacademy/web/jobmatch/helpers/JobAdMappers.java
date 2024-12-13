@@ -90,7 +90,7 @@ public interface JobAdMappers {
         if (skillsStr == null){
             return new HashSet<>();
         }
-        String[] skillList = skillsStr.split(", ");
+        String[] skillList = skillsStr.split(",");
 
         Set<Skill> skills = new HashSet<>();
         for (String s : skillList) {

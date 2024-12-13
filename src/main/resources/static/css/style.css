@@ -61,6 +61,14 @@
     cursor: pointer
 }
 
+.note-text {
+    display: block; /* Ensures the span is on a new line */
+    font-size: 0.85em; /* Makes the text smaller */
+    font-style: italic; /* Makes the text italicized */
+    color: #6c757d; /* Optional: Makes the text appear lighter (Bootstrap secondary color) */
+    margin-top: 4px; /* Adds space between the label and the text */
+}
+
 .boxed-btn:hover {
     background: #fb246a;
     color: #fff !important;
