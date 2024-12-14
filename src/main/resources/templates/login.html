@@ -27,7 +27,9 @@
                                 <div class="row">
                                     <div class="col-12 mb-4">
                                         <div data-mdb-input-init class="form-outline">
-                                            <label th:errors="*{username}" class="form-label text-danger" for="username">Username error</label>
+                                            <div th:errors="*{username}" class="alert alert-danger" role="alert">
+                                                Description error placeholder
+                                            </div>
                                             <input th:field="*{username}" type="text" id="username" class="form-control form-control-lg" />
                                             <label class="form-label" for="username">Username</label>
                                         </div>

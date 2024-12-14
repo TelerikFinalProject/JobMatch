@@ -1,5 +1,6 @@
 package com.telerikacademy.web.jobmatch.controllers.mvc.publics;
 
+import com.telerikacademy.web.jobmatch.exceptions.AuthenticationException;
 import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
 import com.telerikacademy.web.jobmatch.helpers.EmployerMappers;
 import com.telerikacademy.web.jobmatch.helpers.UserMappers;
@@ -17,6 +18,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,6 +36,7 @@ public class AuthenticationMvcController {
     public static final String USERNAME_IS_ALREADY_TAKEN = "Username is already taken";
     public static final String EMAIL_IS_ALREADY_TAKEN = "Email is already taken";
     public static final String COMPANY_NAME_IS_ALREADY_TAKEN = "Company name is already taken";
+    public static final String ALREADY_LOGGED_IN = "You are already logged in";
     private final LocationService locationService;
     private final UserService userService;
     private final EmployersService employersService;
@@ -48,6 +51,13 @@ public class AuthenticationMvcController {
     @GetMapping("/professional/register")
     public String showProfessionalRegister(Model model,
                                            HttpSession session) {
+        try {
+            checkIfAuthenticated(session);
+        } catch (AuthenticationException e) {
+            model.addAttribute("statusCode", HttpStatus.BAD_REQUEST.value());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
 
         UserDtoIn sessionUser = (UserDtoIn) session.getAttribute("userDtoIn");
 
@@ -65,6 +75,14 @@ public class AuthenticationMvcController {
                                                   BindingResult bindingResult,
                                                   Model model,
                                                   HttpSession session) {
+
+        try {
+            checkIfAuthenticated(session);
+        } catch (AuthenticationException e) {
+            model.addAttribute("statusCode", HttpStatus.BAD_REQUEST.value());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
 
         try {
             userService.findByUsername(userDtoIn.getUsername());
@@ -98,7 +116,16 @@ public class AuthenticationMvcController {
     @PostMapping("/professional/register/submit")
     public String handleProfessionalRegister(@ModelAttribute("professional") ProfessionalDtoIn professionalDtoIn,
                                              BindingResult bindingResult,
-                                             HttpSession session) {
+                                             HttpSession session,
+                                             Model model) {
+
+        try {
+            checkIfAuthenticated(session);
+        } catch (AuthenticationException e) {
+            model.addAttribute("statusCode", HttpStatus.BAD_REQUEST.value());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
 
         ProfessionalDtoIn professionalFromSession = (ProfessionalDtoIn) session.getAttribute("professionalFromSession");
 
@@ -131,6 +158,15 @@ public class AuthenticationMvcController {
     @GetMapping("/employer/register")
     public String showEmployerRegister(Model model,
                                        HttpSession session) {
+
+        try {
+            checkIfAuthenticated(session);
+        } catch (AuthenticationException e) {
+            model.addAttribute("statusCode", HttpStatus.BAD_REQUEST.value());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
+
         UserDtoIn sessionUser = (UserDtoIn) session.getAttribute("userDtoIn");
 
         if (sessionUser == null) {
@@ -147,6 +183,14 @@ public class AuthenticationMvcController {
                                    BindingResult bindingResult,
                                    Model model,
                                    HttpSession session) {
+
+        try {
+            checkIfAuthenticated(session);
+        } catch (AuthenticationException e) {
+            model.addAttribute("statusCode", HttpStatus.BAD_REQUEST.value());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
 
         try {
             userService.findByUsername(userDtoIn.getUsername());
@@ -180,7 +224,16 @@ public class AuthenticationMvcController {
     @PostMapping("/employer/register/submit")
     public String handleEmployerRegister(@ModelAttribute("employer") EmployerDtoIn employerDtoIn,
                                        BindingResult bindingResult,
-                                       HttpSession session) {
+                                       HttpSession session,
+                                         Model model) {
+
+        try {
+            checkIfAuthenticated(session);
+        } catch (AuthenticationException e) {
+            model.addAttribute("statusCode", HttpStatus.BAD_REQUEST.value());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
 
         EmployerDtoIn employerFromSession = (EmployerDtoIn) session.getAttribute("employerFromSession");
 
@@ -217,7 +270,16 @@ public class AuthenticationMvcController {
     }
 
     @GetMapping("/login")
-    public String showLogin(Model model) {
+    public String showLogin(Model model,
+                            HttpSession session) {
+        try {
+            checkIfAuthenticated(session);
+        } catch (AuthenticationException e) {
+            model.addAttribute("statusCode", HttpStatus.BAD_REQUEST.value());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
+
         model.addAttribute("loginDto", new LoginDto());
         return "login";
     }
@@ -225,7 +287,16 @@ public class AuthenticationMvcController {
     @PostMapping("/login")
     public String handleLogin(@Valid @ModelAttribute("loginDto") LoginDto loginDto,
                               BindingResult bindingResult,
-                              HttpSession session) {
+                              HttpSession session,
+                              Model model) {
+
+        try {
+            checkIfAuthenticated(session);
+        } catch (AuthenticationException e) {
+            model.addAttribute("statusCode", HttpStatus.BAD_REQUEST.value());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
 
         try {
             UserPrincipal userPrincipal = authenticationService.login(loginDto.getUsername(), loginDto.getPassword());
@@ -260,5 +331,12 @@ public class AuthenticationMvcController {
         session.removeAttribute("userRole");
         session.removeAttribute("userId");
         return "redirect:/";
+    }
+
+
+    private void checkIfAuthenticated(HttpSession session) {
+        if (session.getAttribute("currentUser") != null) {
+            throw new AuthenticationException(ALREADY_LOGGED_IN);
+        }
     }
 }

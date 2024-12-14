@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zxx" class="no-js" xmlns:th="http://www.thymeleaf.org">
+<form th:replace="~{head-fragment.html :: head('Employers Dashboard')}"></form>
+
+<body>
+<!-- Preloader Start -->
+<div th:replace="~{preloader-fragment.html :: preloader}">
+</div>
+<!-- Preloader Start -->
+<header th:replace="~{header-fragment.html :: header}"></header>
+<main>
+
+  <!-- slider Area Start-->
+  <!-- slider Area End-->
+  <!-- Our Services Start -->
+  <div class="our-services section-pad-t30" style="padding-top: 40px;">
+    <div class="container">
+      <!-- Section Tittle -->
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="section-tittle text-center">
+            <span>By Skills</span>
+            <h2>Job Ads</h2>
+          </div>
+        </div>
+      </div>
+      <div class="row d-flex justify-contnet-center">
+        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6" th:each="skill : ${skills}">
+          <a th:href="@{/professionals/dashboard/skills/{id}(id=${skill.id})}">
+            <div class="single-services text-center mb-30">
+              <div class="services-ion" style="width: 250px;">
+                <span class="flaticon-tour"></span>
+              </div>
+              <div class="services-cap">
+                <h5 th:text="${skill.name}">Skill name</h5>
+                <!-- Find a way to get number of ads -->
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Our Services End -->
+
+</main>
+<footer th:replace="~{footer-fragment.html :: footer}"></footer>
+
+<!-- JS here -->
+
+<div th:replace="~{scripts-fragment.html :: scripts}">
+
+</div>
+
+</body>
+</html>

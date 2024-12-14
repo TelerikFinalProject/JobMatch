@@ -44,6 +44,7 @@ public class ProfessionalsMvcController {
     private final MailService mailService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final SkillService skillService;
 
     @Autowired
     public ProfessionalsMvcController(JobAdService jobAdService,
@@ -52,7 +53,7 @@ public class ProfessionalsMvcController {
                                       ProfessionalService professionalService,
                                       JobApplicationService jobApplicationService,
                                       MatchService matchService,
-                                      MailService mailService, UserService userService, PasswordEncoder passwordEncoder) {
+                                      MailService mailService, UserService userService, PasswordEncoder passwordEncoder, SkillService skillService) {
         this.jobAdService = jobAdService;
         this.locationService = locationService;
         this.employersService = employersService;
@@ -62,6 +63,7 @@ public class ProfessionalsMvcController {
         this.mailService = mailService;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.skillService = skillService;
     }
 
     @ModelAttribute("userRole")
@@ -92,6 +94,7 @@ public class ProfessionalsMvcController {
                     (new JobApplicationFilterOptions(null, null, loggedProfessional.getUsername(),
                             null, null, null)).size());
             model.addAttribute("companyJobAdsSize", jobAdService.getNumberOfActiveJobAds());
+            model.addAttribute("featuredJobs", jobAdService.getFeaturedAds());
 
             return "professionals_dashboard";
         } catch (EntityNotFoundException e) {
@@ -249,6 +252,42 @@ public class ProfessionalsMvcController {
             return "error-view";
         } catch (AuthenticationException e) {
             return "redirect:/authentication/login";
+        }
+    }
+
+    @GetMapping("/dashboard/skills")
+    public String getDashboardSkillsView(HttpSession session,
+                                         Model model) {
+        try {
+            rolesChecker(session);
+            model.addAttribute("skills", jobAdService.getAllUniqueSkillsUsedInJobAds());
+            return "professional-skills-dashboard";
+
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
+        } catch (AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
+    }
+
+    @GetMapping("/dashboard/skills/{id}")
+    public String getJobAdsBySkill(@PathVariable int id,
+                                            HttpSession session,
+                                            Model model) {
+        try {
+            rolesChecker(session);
+            model.addAttribute("jobAds", jobAdService.getJobAdsBySkill(skillService.getSkill(id)));
+            model.addAttribute("skill", skillService.getSkill(id));
+            return "job-ads-by-skill";
+
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
+        } catch (AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
         }
     }
 

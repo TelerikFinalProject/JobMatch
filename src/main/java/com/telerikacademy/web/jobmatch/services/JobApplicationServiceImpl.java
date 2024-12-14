@@ -1,7 +1,9 @@
 package com.telerikacademy.web.jobmatch.services;
 
 import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
+import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.models.JobApplication;
+import com.telerikacademy.web.jobmatch.models.Skill;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobApplicationFilterOptions;
 import com.telerikacademy.web.jobmatch.models.specifications.JobApplicationSpecification;
 import com.telerikacademy.web.jobmatch.repositories.contracts.JobApplicationRepository;
@@ -11,6 +13,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -60,5 +64,20 @@ public class JobApplicationServiceImpl implements JobApplicationService {
         int start = page * size;
         int end = Math.min(start + size, jobApplications.size());
         return jobApplications.subList(start, end);
+    }
+
+    @Override
+    public Set<Skill> getAllUniqueSkillsUsedInJobApplications() {
+        List<JobApplication> allApplications = jobApplicationRepository.findAll();
+
+        return allApplications
+                .stream()
+                .flatMap(application -> application.getQualifications().stream())
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public List<JobApplication> getAllBySkill(Skill skill) {
+        return jobApplicationRepository.findAllBySkill(skill.getId());
     }
 }
