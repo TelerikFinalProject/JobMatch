@@ -44,7 +44,29 @@
                 </div>
                 <div class="row d-flex justify-contnet-center">
                     <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6" th:each="skill : ${skills}">
-                        <a th:href="@{/professionals/dashboard/skills/{id}(id=${skill.id})}">
+                        <a th:if="${session.userRole?.equals('PROFESSIONAL')}" th:href="@{/professionals/dashboard/skills/{id}(id=${skill.id})}">
+                            <div class="single-services text-center mb-30">
+                                <div class="services-ion" style="width: 250px;">
+                                    <span class="flaticon-tour"></span>
+                                </div>
+                                <div class="services-cap">
+                                    <h5 th:text="${skill.name}">Skill name</h5>
+                                    <!-- Find a way to get number of ads -->
+                                </div>
+                            </div>
+                        </a>
+                        <a th:if="${session.userRole?.equals('EMPLOYER')}" th:href="@{/employers/dashboard/skills/{id}(id=${skill.id})}">
+                            <div class="single-services text-center mb-30">
+                                <div class="services-ion" style="width: 250px;">
+                                    <span class="flaticon-tour"></span>
+                                </div>
+                                <div class="services-cap">
+                                    <h5 th:text="${skill.name}">Skill name</h5>
+                                    <!-- Find a way to get number of ads -->
+                                </div>
+                            </div>
+                        </a>
+                        <a th:unless="${isAuthenticated}" th:href="@{/professionals/dashboard/skills/{id}(id=${skill.id})}">
                             <div class="single-services text-center mb-30">
                                 <div class="services-ion" style="width: 250px;">
                                     <span class="flaticon-tour"></span>
