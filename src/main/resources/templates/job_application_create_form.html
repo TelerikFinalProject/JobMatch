@@ -70,76 +70,36 @@
                         <div class="card-body p-4 p-md-5">
                             <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Create Your Job Ad</h3>
                             <form id="registrationForm" method="post" action="#"
-                                  th:action="@{/employers/dashboard/job-ads/create}" th:object="${ad}">
+                                  th:action="@{/professionals/dashboard/job-applications/create}" th:object="${application}">
 
                                 <div class="row">
                                     <div class="col-12 mb-4">
                                         <div data-mdb-input-init class="form-outline">
-                                            <label th:errors="*{positionTitle}" class="form-label text-danger"
-                                                   for="positionTitle">Position Title error</label>
-                                            <input th:field="*{positionTitle}" type="text" id="positionTitle"
-                                                   class="form-control form-control-lg"/>
-                                            <label class="form-label" for="positionTitle">Position Title</label>
+                                            <label th:errors="*{description}" class="form-label text-danger"
+                                                   for="positionTitle">Job Description error</label>
+                                            <textarea th:field="*{description}" type="text" id="positionTitle"
+                                                      class="form-control form-control-lg" oninput="resizeTextarea(this)"></textarea>
+                                            <label class="form-label" for="positionTitle">Job Description</label>
+
+                                            <script th:replace="~{job_ad_create_form.html :: textarea-script}"></script>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="row" th:fragment="min-salary-row">
-                                    <div class="col-12 mb-4">
-                                        <div data-mdb-input-init class="form-outline">
-                                            <label th:errors="*{minSalary}" class="form-label text-danger"
-                                                   for="positionTitle">Min Salary error</label>
-                                            <input th:field="*{minSalary}" type="number" id="minSalary"
-                                                   class="form-control form-control-lg"/>
-                                            <label class="form-label" for="minSalary">Min Salary</label>
-                                        </div>
-                                    </div>
-                                </div>
+                                <div th:replace="~{job_ad_create_form.html :: min-salary-row}"></div>
 
-                                <div class="row" th:fragment="max-salary-row">
-                                    <div class="col-12 mb-4">
-                                        <div data-mdb-input-init class="form-outline">
-                                            <label th:errors="*{maxSalary}" class="form-label text-danger"
-                                                   for="positionTitle">Max Salary error</label>
-                                            <input th:field="*{maxSalary}" type="number" id="maxSalary"
-                                                   class="form-control form-control-lg"/>
-                                            <label class="form-label" for="maxSalary">Max Salary</label>
-                                        </div>
-                                    </div>
-                                </div>
+                                <div th:replace="~{job_ad_create_form.html :: max-salary-row}"></div>
 
                                 <div class="row" th:fragment="hybrid-row">
                                     <div class="col-12 mb-4">
                                         <div data-mdb-input-init class="form-outline">
-                                        <label class="form-label" for="positionTitle">
-                                            Hybrid
-                                        </label>
+                                            <label class="form-label" for="positionTitle">
+                                                Hybrid
+                                            </label>
                                             <!-- Hidden input to ensure "false" is submitted if the checkbox is not checked -->
                                             <!-- Checkbox to submit "true" if selected -->
                                             <input type="checkbox" th:field="*{hybrid}">
                                             <span class="checkmark"></span>
-                                    </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-12 mb-4">
-                                        <div data-mdb-input-init class="form-outline">
-                                            <label th:errors="*{jobDescription}" class="form-label text-danger"
-                                                   for="positionTitle">Job Description error</label>
-                                            <textarea th:field="*{jobDescription}" type="text" id="jobDescription"
-                                                      class="form-control form-control-lg" oninput="resizeTextarea(this)"></textarea>
-                                            <label class="form-label" for="jobDescription">Job Description</label>
-
-                                            <script th:fragment="textarea-script">
-                                                // Function to resize textarea
-                                                function resizeTextarea(textarea) {
-                                                    // Reset the height to auto to shrink the textarea
-                                                    textarea.style.height = 'auto';
-                                                    // Set the height to match the scrollHeight to resize the textarea based on content
-                                                    textarea.style.height = (textarea.scrollHeight) + 'px';
-                                                }
-                                            </script>
                                         </div>
                                     </div>
                                 </div>
@@ -150,21 +110,7 @@
                                             <select name="skills" id="skills" multiple th:field="*{skills}">
                                                 <option th:each="skill : ${AllSkills}" th:value="${skill.name}" th:text="${skill.name}"></option>
                                             </select>
-                                            <script th:fragment="skills-script">
-                                                new MultiSelectTag('skills', {
-                                                    rounded: true,    // default true
-                                                    shadow: false,      // default false
-                                                    placeholder: 'Search', // default Search...
-                                                    tagColor: {
-                                                        textColor: '#fb266b',
-                                                        borderColor: '#fb266b',
-                                                        bgColor: 'rgba(251,38,107,0.08)',
-                                                    },
-                                                    onChange: function(values) {
-                                                        console.log(values)
-                                                    }
-                                                })  // id
-                                            </script>
+                                            <script th:replace="~{job_ad_create_form.html :: skills-script}"></script>
                                             <label class="form-label">Skills</label>
                                         </div>
                                     </div>
@@ -217,6 +163,7 @@
                                     </div>
                                 </div>
 
+
                                 <div class="mt-0 pt-0">
                                     <input style="float: right; margin-left: 10px;" data-mdb-ripple-init class="btn btn-primary btn-lg"
                                            type="submit" value="Create"/>
@@ -224,13 +171,14 @@
 
                                 <div class="d-lg-block" style="float: right">
                                     <a href="#"
-                                       th:href="@{/employers/dashboard}"
+                                       th:href="@{/professionals/dashboard}"
                                        class="btn head-btn2" style="
                                                         padding-left: 25px;
                                                         padding-right: 25px;
                                                         padding-top: 26px;
                                                         padding-bottom: 26px;">Back</a>
                                 </div>
+
                             </form>
                         </div>
                     </div>

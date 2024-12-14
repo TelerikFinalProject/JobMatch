@@ -4,12 +4,12 @@ import com.telerikacademy.web.jobmatch.exceptions.AuthenticationException;
 import com.telerikacademy.web.jobmatch.exceptions.AuthorizationException;
 import com.telerikacademy.web.jobmatch.exceptions.EntityDuplicateException;
 import com.telerikacademy.web.jobmatch.exceptions.EntityNotFoundException;
-import com.telerikacademy.web.jobmatch.helpers.EmployerMappers;
+import com.telerikacademy.web.jobmatch.helpers.JobApplicationMappers;
 import com.telerikacademy.web.jobmatch.helpers.ProfessionalMappers;
 import com.telerikacademy.web.jobmatch.models.*;
+import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.filters.JobAdFilterDto;
 import com.telerikacademy.web.jobmatch.models.dtos.filters.JobApplicationFilterDto;
-import com.telerikacademy.web.jobmatch.models.dtos.users.mvc.EmployerDetailsDto;
 import com.telerikacademy.web.jobmatch.models.dtos.users.mvc.PasswordChangeDto;
 import com.telerikacademy.web.jobmatch.models.dtos.users.mvc.ProfessionalDetailsDto;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobAdFilterOptions;
@@ -44,6 +44,8 @@ public class ProfessionalsMvcController {
     private final MailService mailService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final SkillService skillService;
+    private final StatusService statusService;
 
     @Autowired
     public ProfessionalsMvcController(JobAdService jobAdService,
@@ -52,7 +54,11 @@ public class ProfessionalsMvcController {
                                       ProfessionalService professionalService,
                                       JobApplicationService jobApplicationService,
                                       MatchService matchService,
-                                      MailService mailService, UserService userService, PasswordEncoder passwordEncoder) {
+                                      MailService mailService,
+                                      UserService userService,
+                                      PasswordEncoder passwordEncoder,
+                                      SkillService skillService,
+                                      StatusService statusService) {
         this.jobAdService = jobAdService;
         this.locationService = locationService;
         this.employersService = employersService;
@@ -62,6 +68,8 @@ public class ProfessionalsMvcController {
         this.mailService = mailService;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.skillService = skillService;
+        this.statusService = statusService;
     }
 
     @ModelAttribute("userRole")
@@ -296,6 +304,7 @@ public class ProfessionalsMvcController {
         return "job_listing";
     }
 
+
     @GetMapping("/dashboard/job-ads/{id}")
     public String getJobAdById(Model model,
                                @PathVariable int id,
@@ -369,6 +378,64 @@ public class ProfessionalsMvcController {
         } catch (AuthenticationException e){
             return "redirect:/authentication/login";
         }
+    }
+
+    @GetMapping("/dashboard/job-applications/create")
+    public String showCreateJobAdView(Model model,
+                                      HttpSession session) {
+        try {
+            rolesChecker(session);
+
+            model.addAttribute("application", new JobApplicationDtoIn());
+            model.addAttribute("countries", locationService.getAllCountries());
+            model.addAttribute("AllSkills", skillService.getAllSkills());
+
+            return "job_application_create_form";
+        } catch (AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
+        }
+    }
+
+    @PostMapping("/dashboard/job-applications/create")
+    public String createJobAd(@Valid @ModelAttribute("application") JobApplicationDtoIn applicationDtoIn,
+                              BindingResult bindingResult,
+                              Model model,
+                              HttpSession session) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("AllSkills", skillService.getAllSkills());
+            model.addAttribute("countries", locationService.getAllCountries());
+            return "job_application_create_form";
+        }
+
+        Professional professional;
+        try {
+            rolesChecker(session);
+            professional = professionalService.getProfessionalByUsername(session.getAttribute("currentUser").toString());
+
+            if (applicationDtoIn.getLocCountryIsoCode() == null || applicationDtoIn.getLocCityId() == null) {
+                applicationDtoIn.setLocCountryIsoCode("Hm");
+                applicationDtoIn.setLocCityId(1);
+            }
+
+            JobApplication jobApplication = JobApplicationMappers.INSTANCE
+                    .fromDtoIn(applicationDtoIn, statusService, locationService, skillService);
+
+            jobApplication.setProfessional(professional);
+
+        } catch (AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
+        }
+
+        return "redirect:/professionals/dashboard";
     }
 
     @GetMapping("/dashboard/job-applications/{id}")

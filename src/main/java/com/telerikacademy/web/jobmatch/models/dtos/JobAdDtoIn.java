@@ -37,12 +37,7 @@ public class JobAdDtoIn {
     @NotNull
     private boolean hybrid;
 
-    //@NotNull(message = "Country Iso code" + NULL_FIELD_ERROR)
-    //@Size(min = 2, max = 3)
     private String locCountryIsoCode;
-
-    //@NotNull(message = "City ID" + NULL_FIELD_ERROR)
     private Integer locCityId;
-
     private String skills;
 }

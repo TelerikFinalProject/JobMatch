@@ -14,24 +14,20 @@ public class JobApplicationDtoIn {
     public static final String NULL_FIELD_ERROR = " should not be null!";
     public static final String SALARY_ERROR = "Salary should always be positive!";
 
-    @NotNull(message = "Country Iso code" + NULL_FIELD_ERROR)
-    @Size(min = 10, max = 200)
+    @NotNull(message = "Description" + NULL_FIELD_ERROR)
+    @Size(min = 10, max = 500)
     private String description;
 
     @NotNull(message = "Salary" + NULL_FIELD_ERROR)
     @Positive(message = SALARY_ERROR)
-    private double minSalary;
+    private Double minSalary;
 
     @NotNull(message = "Salary" + NULL_FIELD_ERROR)
     @Positive(message = SALARY_ERROR)
-    private double maxSalary;
+    private Double maxSalary;
 
-    @NotNull(message = "Country Iso code" + NULL_FIELD_ERROR)
-    @Size(min = 2, max = 2)
     private String locCountryIsoCode;
-
-    @NotNull(message = "City ID" + NULL_FIELD_ERROR)
-    private int locCityId;
+    private Integer locCityId;
 
     @NotNull(message = "Remote spec" + NULL_FIELD_ERROR)
     private boolean isHybrid;
