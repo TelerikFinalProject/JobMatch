@@ -97,6 +97,7 @@ public class EmployersMvcController {
             model.addAttribute("companyJobAdsSize", jobAdService.getJobAds(new JobAdFilterOptions(
                     null, null, null, null, loggedEmployer.getCompanyName(),
                     null, null)).size());
+            model.addAttribute("featuredJobs", jobApplicationService.getFeaturedApplications());
 
             return "employers_dashboard";
         } catch (EntityNotFoundException e) {
@@ -130,10 +131,12 @@ public class EmployersMvcController {
             model.addAttribute("employer", employer);
             return "company-details";
 
-        } catch (AuthenticationException | AuthorizationException e) {
+        } catch (AuthorizationException e) {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
             return "error-view";
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
         }
     }
 
@@ -150,10 +153,12 @@ public class EmployersMvcController {
 
             model.addAttribute("passwordChangeDto", new PasswordChangeDto());
             return "change-password";
-        } catch (AuthenticationException | AuthorizationException e) {
+        } catch (AuthorizationException e) {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
             return "error-view";
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
         }
     }
 
@@ -181,10 +186,12 @@ public class EmployersMvcController {
             userService.changePassword(employer, passwordChangeDto);
 
             return "redirect:/employers/" + id;
-        } catch (AuthenticationException | AuthorizationException e) {
+        } catch (AuthorizationException e) {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
             return "error-view";
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
         }
     }
 
@@ -207,10 +214,12 @@ public class EmployersMvcController {
             model.addAttribute("countries", locationService.getAllCountries());
             model.addAttribute("currentCountry", locationService.getCountryByIsoCode(employer.getLocation().getIsoCode()).getName());
             return "company-details-update";
-        } catch (AuthenticationException | AuthorizationException e) {
+        } catch (AuthorizationException e) {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
             return "error-view";
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
         }
     }
 
@@ -241,7 +250,45 @@ public class EmployersMvcController {
             employersService.updateEmployer(updatedEmployer);
 
             return "redirect:/employers/" + id;
-        } catch (AuthenticationException | AuthorizationException e) {
+        } catch (AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
+        }
+    }
+
+    @GetMapping("/dashboard/skills")
+    public String getDashboardSkillsView(HttpSession session,
+                                         Model model) {
+        try {
+            rolesChecker(session);
+            model.addAttribute("skills", jobApplicationService.getAllUniqueSkillsUsedInJobApplications());
+            return "employer-skills-dashboard";
+
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
+        } catch (AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
+    }
+
+    @GetMapping("/dashboard/skills/{id}")
+    public String getJobApplicationsBySkill(@PathVariable int id,
+                                            HttpSession session,
+                                            Model model) {
+        try {
+            rolesChecker(session);
+            model.addAttribute("jobApplications", jobApplicationService.getAllBySkill(skillService.getSkill(id)));
+            model.addAttribute("skill", skillService.getSkill(id));
+            return "job-applications-by-skill";
+
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
+        } catch (AuthorizationException e) {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
             return "error-view";

@@ -20,32 +20,9 @@
                         <div class="row">
                             <div class="col-xl-6 col-lg-9 col-md-10">
                                 <div class="hero__caption">
-                                    <h1>Find the most exciting startup jobs</h1>
+                                    <h1>Unlock Your Next Career Opportunity</h1>
+                                    <p class="text-muted">Explore the best job positions that match your skills and aspirations.</p>
                                 </div>
-                            </div>
-                        </div>
-                        <!-- Search Box -->
-                        <div class="row">
-                            <div class="col-xl-8">
-                                <!-- form -->
-                                <form action="#" class="search-box">
-                                    <div class="input-form">
-                                        <input type="text" placeholder="Job Tittle or keyword">
-                                    </div>
-                                    <div class="select-form">
-                                        <div class="select-itms">
-                                            <select name="select" id="select1">
-                                                <option value="">Location BD</option>
-                                                <option value="">Location PK</option>
-                                                <option value="">Location US</option>
-                                                <option value="">Location UK</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="search-form">
-                                        <a href="#">Find job</a>
-                                    </div>
-                                </form>
                             </div>
                         </div>
                     </div>
@@ -60,99 +37,46 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="section-tittle text-center">
-                            <span>FEATURED TOURS Packages</span>
+                            <span>FEATURED SKILLS</span>
                             <h2>Browse Top Categories </h2>
                         </div>
                     </div>
                 </div>
                 <div class="row d-flex justify-contnet-center">
-                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                        <div class="single-services text-center mb-30">
-                            <div class="services-ion">
-                                <span class="flaticon-tour"></span>
+                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6" th:each="skill : ${skills}">
+                        <a th:if="${session.userRole?.equals('PROFESSIONAL')}" th:href="@{/professionals/dashboard/skills/{id}(id=${skill.id})}">
+                            <div class="single-services text-center mb-30">
+                                <div class="services-ion" style="width: 250px;">
+                                    <span class="flaticon-tour"></span>
+                                </div>
+                                <div class="services-cap">
+                                    <h5 th:text="${skill.name}">Skill name</h5>
+                                    <!-- Find a way to get number of ads -->
+                                </div>
                             </div>
-                            <div class="services-cap">
-                               <h5><a href="job_listing.html">Design & Creative</a></h5>
-                                <span>(653)</span>
+                        </a>
+                        <a th:if="${session.userRole?.equals('EMPLOYER')}" th:href="@{/employers/dashboard/skills/{id}(id=${skill.id})}">
+                            <div class="single-services text-center mb-30">
+                                <div class="services-ion" style="width: 250px;">
+                                    <span class="flaticon-tour"></span>
+                                </div>
+                                <div class="services-cap">
+                                    <h5 th:text="${skill.name}">Skill name</h5>
+                                    <!-- Find a way to get number of ads -->
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                        <div class="single-services text-center mb-30">
-                            <div class="services-ion">
-                                <span class="flaticon-cms"></span>
+                        </a>
+                        <a th:unless="${isAuthenticated}" th:href="@{/professionals/dashboard/skills/{id}(id=${skill.id})}">
+                            <div class="single-services text-center mb-30">
+                                <div class="services-ion" style="width: 250px;">
+                                    <span class="flaticon-tour"></span>
+                                </div>
+                                <div class="services-cap">
+                                    <h5 th:text="${skill.name}">Skill name</h5>
+                                    <!-- Find a way to get number of ads -->
+                                </div>
                             </div>
-                            <div class="services-cap">
-                               <h5><a href="job_listing.html">Design & Development</a></h5>
-                                <span>(658)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                        <div class="single-services text-center mb-30">
-                            <div class="services-ion">
-                                <span class="flaticon-report"></span>
-                            </div>
-                            <div class="services-cap">
-                               <h5><a href="job_listing.html">Sales & Marketing</a></h5>
-                                <span>(658)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                        <div class="single-services text-center mb-30">
-                            <div class="services-ion">
-                                <span class="flaticon-app"></span>
-                            </div>
-                            <div class="services-cap">
-                               <h5><a href="job_listing.html">Mobile Application</a></h5>
-                                <span>(658)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                        <div class="single-services text-center mb-30">
-                            <div class="services-ion">
-                                <span class="flaticon-helmet"></span>
-                            </div>
-                            <div class="services-cap">
-                               <h5><a href="job_listing.html">Construction</a></h5>
-                                <span>(658)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                        <div class="single-services text-center mb-30">
-                            <div class="services-ion">
-                                <span class="flaticon-high-tech"></span>
-                            </div>
-                            <div class="services-cap">
-                               <h5><a href="job_listing.html">Information Technology</a></h5>
-                                <span>(658)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                        <div class="single-services text-center mb-30">
-                            <div class="services-ion">
-                                <span class="flaticon-real-estate"></span>
-                            </div>
-                            <div class="services-cap">
-                               <h5><a href="job_listing.html">Real Estate</a></h5>
-                                <span>(658)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                        <div class="single-services text-center mb-30">
-                            <div class="services-ion">
-                                <span class="flaticon-content"></span>
-                            </div>
-                            <div class="services-cap">
-                               <h5><a href="job_listing.html">Content Writer</a></h5>
-                                <span>(658)</span>
-                            </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
                 <!-- More Btn -->
@@ -160,7 +84,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="browse-btn2 text-center mt-50">
-                            <a href="job_listing.html" class="border-btn2">Browse All Sectors</a>
+                            <a th:href="@{/authentication/login}" href="job_listing.html" class="border-btn2">Browse All Skills</a>
                         </div>
                     </div>
                 </div>
@@ -173,9 +97,9 @@
                 <div class="row justify-content-center">
                     <div class="col-xl-10">
                         <div class="cv-caption text-center">
-                            <p class="pera1">FEATURED TOURS Packages</p>
-                            <p class="pera2"> Make a Difference with Your Online Resume!</p>
-                            <a href="#" class="border-btn2 border-btn4">Upload your cv</a>
+                            <p class="pera1">START HUNTING</p>
+                            <p class="pera2"> Make a Difference with Your Application!</p>
+                            <a th:href="@{/authentication/professional/register}" href="#" class="border-btn2 border-btn4">Sign up</a>
                         </div>
                     </div>
                 </div>
@@ -188,92 +112,93 @@
                 <!-- Section Tittle -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="section-tittle text-center">
-                            <span>Recent Job</span>
-                            <h2>Featured Jobs</h2>
+                        <div th:unless="${isAuthenticated or (session?.userRole != null and !session?.userRole.equals('PROFESSIONAL'))}" class="section-tittle text-center">
+                            <span>Recent Ads</span>
+                            <h2>Featured Ads</h2>
+                        </div>
+                        <div th:if="${session?.userRole?.equals('EMPLOYER')}" class="section-tittle text-center">
+                            <span>Recent Applications</span>
+                            <h2>Featured Applications</h2>
                         </div>
                     </div>
                 </div>
                 <div class="row justify-content-center">
                     <div class="col-xl-10">
                         <!-- single-job-content -->
-                        <div class="single-job-items mb-30">
+                        <div th:unless="${isAuthenticated or (session?.userRole != null and !session?.userRole.equals('PROFESSIONAL'))}" class="single-job-items mb-30" th:each="featuredJob : ${featuredJobs}">
                             <div class="job-items">
                                 <div class="company-img">
-                                    <a href="job_details.html"><img src="/img/icon/job-list1.png" alt=""></a>
+                                    <a href="#"><img class="profile-picture" th:src="${featuredJob.getEmployer().getProfilePictureUrl()}" src="/img/icon/job-list1.png" alt=""></a>
                                 </div>
-                                <div class="job-tittle">
-                                    <a href="job_details.html"><h4>Digital Marketer</h4></a>
+                                <div class="job-tittle job-tittle2">
+                                    <a href="#" th:href="@{/professionals/dashboard/job-ads/{id}(id=${featuredJob.id})}">
+                                        <h4 th:text="${featuredJob.positionTitle}">Job Title</h4>
+                                    </a>
                                     <ul>
-                                        <li>Creative Agency</li>
-                                        <li><i class="fas fa-map-marker-alt"></i>Athens, Greece</li>
-                                        <li>$3500 - $4000</li>
+                                        <li ><a class="text-muted" th:text="${featuredJob.employer.getCompanyName()}" th:href="@{/employers/{id}(id=${featuredJob.getEmployer().id})}">Company Name</a></li>
+                                        <li>
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <!-- Case 1: Not 'Home' and not Hybrid -->
+                                            <a th:if="${featuredJob.location.name != 'Home' and !featuredJob.hybrid}"
+                                               th:text="${featuredJob.location.name + ', ' + featuredJob.location.isoCode}"></a>
+
+                                            <!-- Case 2: Not 'Home' and Hybrid -->
+                                            <a th:if="${featuredJob.location.name != 'Home' and featuredJob.hybrid}"
+                                               th:text="${featuredJob.location.name + ', ' + featuredJob.location.isoCode + ' (Hybrid)'}"></a>
+
+                                            <!-- Case 3: Location is 'Home' -->
+                                            <a th:if="${featuredJob.location.name == 'Home'}">Remote</a>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
-                            <div class="items-link f-right">
-                                <a href="job_details.html">Full Time</a>
-                                <span>7 hours ago</span>
+                            <div class="f-right">
+                                <a th:text="${#numbers.formatDecimal(featuredJob.minSalary, 0, 0)} + ' - ' + ${#numbers.formatDecimal(featuredJob.maxSalary, 0, 0)}"></a>
+                                <span></span>
                             </div>
                         </div>
                         <!-- single-job-content -->
-                        <div class="single-job-items mb-30">
+                        <div th:if="${session.userRole?.equals('EMPLOYER')}" class="single-job-items mb-30"
+                             th:each="jobApplication : ${featuredJobs}">
                             <div class="job-items">
                                 <div class="company-img">
-                                    <a href="job_details.html"><img src="/img/icon/job-list2.png" alt=""></a>
+                                    <a href="#"><img class="profile-picture" th:src="@{${jobApplication.professional.profilePictureUrl}}" src="/img/icon/job-list1.png" alt=""></a>
                                 </div>
-                                <div class="job-tittle">
-                                    <a href="job_details.html"><h4>Digital Marketer</h4></a>
-                                    <ul>
-                                        <li>Creative Agency</li>
-                                        <li><i class="fas fa-map-marker-alt"></i>Athens, Greece</li>
-                                        <li>$3500 - $4000</li>
+                                <div class="job-tittle job-tittle2">
+                                    <a href="#"
+                                       th:href="@{/employers/dashboard/job-applications/{id}(id=${jobApplication.id})}">
+                                        <h4 th:text="${jobApplication.professional.firstName} + ' '
+                                                + ${jobApplication.professional.lastName}">Professional Name</h4>
+                                    </a>
+                                    <ul th:fragment="applications-lising-body">
+                                        <li th:unless="${jobApplication.qualifications.isEmpty()}">
+                                                <span th:each="qualification, iterStat : ${jobApplication.qualifications}">
+                                                <span th:if="${iterStat.index < 3}"
+                                                      th:text="${qualification.name}"></span>
+                                                    <span th:if="${iterStat.index < 2 && iterStat.index < (jobApplication.qualifications.size() - 1)}">, </span>
+                                                    </span>
+
+                                        </li>
+
+                                        <li>
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <!-- Case 1: Not 'Home' and not Hybrid -->
+                                            <a th:if="${jobApplication.location.name != 'Home' and !jobApplication.hybrid}"
+                                               th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode}"></a>
+
+                                            <!-- Case 2: Not 'Home' and Hybrid -->
+                                            <a th:if="${jobApplication.location.name != 'Home' and jobApplication.hybrid}"
+                                               th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode + ' (Hybrid)'}"></a>
+
+                                            <!-- Case 3: Location is 'Home' -->
+                                            <a th:if="${jobApplication.location.name == 'Home'}">Remote</a>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
-                            <div class="items-link f-right">
-                                <a href="job_details.html">Full Time</a>
-                                <span>7 hours ago</span>
-                            </div>
-                        </div>
-                         <!-- single-job-content -->
-                        <div class="single-job-items mb-30">
-                            <div class="job-items">
-                                <div class="company-img">
-                                    <a href="job_details.html"><img src="/img/icon/job-list3.png" alt=""></a>
-                                </div>
-                                <div class="job-tittle">
-                                    <a href="job_details.html"><h4>Digital Marketer</h4></a>
-                                    <ul>
-                                        <li>Creative Agency</li>
-                                        <li><i class="fas fa-map-marker-alt"></i>Athens, Greece</li>
-                                        <li>$3500 - $4000</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="items-link f-right">
-                                <a href="job_details.html">Full Time</a>
-                                <span>7 hours ago</span>
-                            </div>
-                        </div>
-                         <!-- single-job-content -->
-                        <div class="single-job-items mb-30">
-                            <div class="job-items">
-                                <div class="company-img">
-                                    <a href="job_details.html"><img src="/img/icon/job-list4.png" alt=""></a>
-                                </div>
-                                <div class="job-tittle">
-                                    <a href="job_details.html"><h4>Digital Marketer</h4></a>
-                                    <ul>
-                                        <li>Creative Agency</li>
-                                        <li><i class="fas fa-map-marker-alt"></i>Athens, Greece</li>
-                                        <li>$3500 - $4000</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="items-link f-right">
-                                <a href="job_details.html">Full Time</a>
-                                <span>7 hours ago</span>
+                            <div class="f-right" th:fragment="applications-lising-salary">
+                                <a
+                                        th:text="${#numbers.formatDecimal(jobApplication.minSalary, 0, 0)} + ' - ' + ${#numbers.formatDecimal(jobApplication.maxSalary, 0, 0)}"></a>
                             </div>
                         </div>
                     </div>
@@ -287,8 +212,8 @@
                 <!-- Section Tittle -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="section-tittle white-text text-center">
-                            <span>Apply process</span>
+                        <div class="section-tittle text-center">
+                            <span>Process</span>
                             <h2> How it works</h2>
                         </div>
                     </div>
@@ -301,8 +226,8 @@
                                 <span class="flaticon-search"></span>
                             </div>
                             <div class="process-cap">
-                               <h5>1. Search a job</h5>
-                               <p>Sorem spsum dolor sit amsectetur adipisclit, seddo eiusmod tempor incididunt ut laborea.</p>
+                                <h5>1. Apply</h5>
+                                <p>Create a job application, showcasing all your skills for the job, desired location and salary.</p>
                             </div>
                         </div>
                     </div>
@@ -312,8 +237,8 @@
                                 <span class="flaticon-curriculum-vitae"></span>
                             </div>
                             <div class="process-cap">
-                               <h5>2. Apply for job</h5>
-                               <p>Sorem spsum dolor sit amsectetur adipisclit, seddo eiusmod tempor incididunt ut laborea.</p>
+                                <h5>2. Request a match</h5>
+                                <p>Request a match with one of the many companies, that are searching for someone like you.</p>
                             </div>
                         </div>
                     </div>
@@ -323,13 +248,13 @@
                                 <span class="flaticon-tour"></span>
                             </div>
                             <div class="process-cap">
-                               <h5>3. Get your job</h5>
-                               <p>Sorem spsum dolor sit amsectetur adipisclit, seddo eiusmod tempor incididunt ut laborea.</p>
+                                <h5>3. Get your job</h5>
+                                <p>After a successful match, approved from both sides, get in contact with your desired company.</p>
                             </div>
                         </div>
                     </div>
                 </div>
-             </div>
+            </div>
         </div>
         <!-- How  Apply Process End-->
         <!-- Testimonial Start -->
@@ -352,7 +277,7 @@
                                         </div>
                                     </div>
                                     <div class="testimonial-top-cap">
-                                        <p>“I am at an age where I just want to be fit and healthy our bodies are our responsibility! So start caring for your body and it will care for you. Eat clean it will care for you and workout hard.”</p>
+                                        <p>“Finding the right job felt impossible until I discovered this platform. It’s intuitive, tailored to my skills, and connects me with companies that truly value my expertise. I’ve never felt more confident in my career prospects!”</p>
                                     </div>
                                 </div>
                             </div>
@@ -363,13 +288,13 @@
                                     <!-- founder -->
                                     <div class="testimonial-founder  ">
                                         <div class="founder-img mb-30">
-                                            <img src="/img/testmonial/testimonial-founder.png" alt="">
-                                            <span>Margaret Lawson</span>
-                                            <p>Creative Director</p>
+                                            <img src="https://res.cloudinary.com/dcfdrw08u/image/upload/v1/profile_pictures/p6swk3pfssb2m1n22oio" class="profile-picture" alt="">
+                                            <span>Mihail Boychev</span>
+                                            <p>Java Developer</p>
                                         </div>
                                     </div>
                                     <div class="testimonial-top-cap">
-                                        <p>“I am at an age where I just want to be fit and healthy our bodies are our responsibility! So start caring for your body and it will care for you. Eat clean it will care for you and workout hard.”</p>
+                                        <p>“As someone who values efficiency, this application is a game-changer. The smart matching feature saved me hours of searching, and I was able to land an interview within days. It’s made job hunting feel seamless and stress-free!”</p>
                                     </div>
                                 </div>
                             </div>
@@ -380,13 +305,13 @@
                                     <!-- founder -->
                                     <div class="testimonial-founder  ">
                                         <div class="founder-img mb-30">
-                                            <img src="/img/testmonial/testimonial-founder.png" alt="">
-                                            <span>Margaret Lawson</span>
-                                            <p>Creative Director</p>
+                                            <img class="profile-picture" src="https://res.cloudinary.com/dcfdrw08u/image/upload/v1733837537/Default-Profile-Picture-PNG-Image-Background_l5oru0.png" alt="">
+                                            <span>Simon Ankov</span>
+                                            <p>Java Developer</p>
                                         </div>
                                     </div>
                                     <div class="testimonial-top-cap">
-                                        <p>“I am at an age where I just want to be fit and healthy our bodies are our responsibility! So start caring for your body and it will care for you. Eat clean it will care for you and workout hard.”</p>
+                                        <p>“I’ve used other job platforms before, but none compare to this one. The personalized recommendations and easy-to-use interface helped me find a position that aligns perfectly with my goals. Highly recommend to anyone seeking meaningful opportunities!”</p>
                                     </div>
                                 </div>
                             </div>
@@ -397,7 +322,7 @@
         </div>
         <!-- Testimonial End -->
          <!-- Support Company Start-->
-         <div class="support-company-area support-padding fix">
+         <div class="support-company-area support-padding fix mb-5">
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-xl-6 col-lg-6">
@@ -405,12 +330,12 @@
                             <!-- Section Tittle -->
                             <div class="section-tittle section-tittle2">
                                 <span>What we are doing</span>
-                                <h2>24k Talented people are getting Jobs</h2>
+                                <h2 th:text="${numberOfApplicants + ' Talented people are getting jobs'}">24k Talented people are getting Jobs</h2>
                             </div>
                             <div class="support-caption">
-                                <p class="pera-top">Mollit anim laborum duis au dolor in voluptate velit ess cillum dolore eu lore dsu quality mollit anim laborumuis au dolor in voluptate velit cillum.</p>
-                                <p>Mollit anim laborum.Duis aute irufg dhjkolohr in re voluptate velit esscillumlore eu quife nrulla parihatur. Excghcepteur signjnt occa cupidatat non inulpadeserunt mollit aboru. temnthp incididbnt ut labore mollit anim laborum suis aute.</p>
-                                <a href="about.html" class="btn post-btn">Post a job</a>
+                                <p class="pera-top">At our job match platform, we connect talented professionals with companies that value their skills. Whether you're looking for a job or searching for the perfect candidate, our platform makes it easier to find the right fit. We focus on helping individuals land meaningful jobs while assisting employers in finding the best talent, creating a seamless experience for everyone involved.</p>
+                                <p>Our platform uses advanced matchmaking technology to save time and effort for both employers and job seekers. Professionals can quickly find roles suited to their skills, while companies can effortlessly discover top candidates. By simplifying the process, we ensure that job searching is faster and more efficient, benefiting both employers and employees in the long run.</p>
+                                <a th:href="@{/authentication/professional/register}" href="about.html" class="btn post-btn">Sign up</a>
                             </div>
                         </div>
                     </div>
@@ -419,7 +344,7 @@
                             <img src="/img/service/support-img.jpg" alt="">
                             <div class="support-img-cap text-center">
                                 <p>Since</p>
-                                <span>1994</span>
+                                <span>2024</span>
                             </div>
                         </div>
                     </div>
@@ -427,61 +352,6 @@
             </div>
         </div>
         <!-- Support Company End-->
-        <!-- Blog Area Start -->
-        <div class="home-blog-area blog-h-padding">
-            <div class="container">
-                <!-- Section Tittle -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="section-tittle text-center">
-                            <span>Our latest blog</span>
-                            <h2>Our recent news</h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-xl-6 col-lg-6 col-md-6">
-                        <div class="home-blog-single mb-30">
-                            <div class="blog-img-cap">
-                                <div class="blog-img">
-                                    <img src="/img/blog/home-blog1.jpg" alt="">
-                                    <!-- Blog date -->
-                                    <div class="blog-date text-center">
-                                        <span>24</span>
-                                        <p>Now</p>
-                                    </div>
-                                </div>
-                                <div class="blog-cap">
-                                    <p>|   Properties</p>
-                                    <h3><a href="single-blog.html">Footprints in Time is perfect House in Kurashiki</a></h3>
-                                    <a href="#" class="more-btn">Read more »</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-6 col-lg-6 col-md-6">
-                        <div class="home-blog-single mb-30">
-                            <div class="blog-img-cap">
-                                <div class="blog-img">
-                                    <img src="/img/blog/home-blog2.jpg" alt="">
-                                    <!-- Blog date -->
-                                    <div class="blog-date text-center">
-                                        <span>24</span>
-                                        <p>Now</p>
-                                    </div>
-                                </div>
-                                <div class="blog-cap">
-                                    <p>|   Properties</p>
-                                    <h3><a href="single-blog.html">Footprints in Time is perfect House in Kurashiki</a></h3>
-                                    <a href="#" class="more-btn">Read more »</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Blog Area End -->
 
     </main>
     <footer th:replace="~{footer-fragment.html :: footer}"></footer>

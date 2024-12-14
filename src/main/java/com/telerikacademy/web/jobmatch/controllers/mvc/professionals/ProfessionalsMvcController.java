@@ -10,6 +10,7 @@ import com.telerikacademy.web.jobmatch.models.*;
 import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoIn;
 import com.telerikacademy.web.jobmatch.models.dtos.filters.JobAdFilterDto;
 import com.telerikacademy.web.jobmatch.models.dtos.filters.JobApplicationFilterDto;
+import com.telerikacademy.web.jobmatch.models.dtos.users.mvc.EmployerDetailsDto;
 import com.telerikacademy.web.jobmatch.models.dtos.users.mvc.PasswordChangeDto;
 import com.telerikacademy.web.jobmatch.models.dtos.users.mvc.ProfessionalDetailsDto;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobAdFilterOptions;
@@ -100,6 +101,7 @@ public class ProfessionalsMvcController {
                     (new JobApplicationFilterOptions(null, null, loggedProfessional.getUsername(),
                             null, null, null)).size());
             model.addAttribute("companyJobAdsSize", jobAdService.getNumberOfActiveJobAds());
+            model.addAttribute("featuredJobs", jobAdService.getFeaturedAds());
 
             return "professionals_dashboard";
         } catch (EntityNotFoundException e) {

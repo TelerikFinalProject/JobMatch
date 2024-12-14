@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zxx" class="no-js" xmlns:th="http://www.thymeleaf.org">
+<form th:replace="~{head-fragment.html :: head('Job Applications')}"></form>
+<body style="overflow: visible">
+
+<form th:replace="~{preloader-fragment.html :: preloader}"></form>
+
+<form th:replace="~{header-fragment.html :: header}"></form>
+
+<main>
+    <!-- Hero Area Start-->
+    <div class="slider-area ">
+        <div class="single-slider section-overly slider-height2 d-flex align-items-center"
+             data-background="/img/hero/about.jpg">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="hero-cap text-center">
+                            <h2 th:text="${skill.name}">Job Applications with Skill</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Hero Area End -->
+    <!-- Job List Area Start -->
+    <div class="job-listing-area pt-120 pb-120">
+        <div class="container">
+            <div class="row">
+                <!-- Right content -->
+                <div class=" col-xl-9 col-lg-9 col-md-8">
+                    <!-- Featured_job_start -->
+                    <section class="featured-job-area">
+                        <div class="container">
+                            <!-- Count of Job list Start -->
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="count-job mb-35">
+                                        <span th:text="${jobApplications.size()} + ' Applications found'">Applications found</span>
+                                        <!-- Select job items start -->
+                                        <div class="select-job-items">
+                                            <span>Sort by</span>
+                                            <label>
+                                                <select name="select">
+                                                    <option value="">None</option>
+                                                    <option value="">job list</option>
+                                                    <option value="">job list</option>
+                                                    <option value="">job list</option>
+                                                </select>
+                                            </label>
+                                        </div>
+                                        <!--  Select job items End-->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Count of Job list End -->
+                            <!-- single-job-content -->
+                            <div class="single-job-items mb-30"
+                                 th:each="jobApplication : ${jobApplications}">
+                                <div class="job-items">
+                                    <div class="company-img">
+                                        <a href="#"><img class="profile-picture" th:src="@{${jobApplication.professional.profilePictureUrl}}" src="/img/icon/job-list1.png" alt=""></a>
+                                    </div>
+                                    <div class="job-tittle job-tittle2">
+                                        <a href="#"
+                                           th:href="@{/employers/dashboard/job-applications/{id}(id=${jobApplication.id})}">
+                                            <h4 th:text="${jobApplication.professional.firstName} + ' '
+                                                + ${jobApplication.professional.lastName}">Professional Name</h4>
+                                        </a>
+                                        <ul th:fragment="applications-lising-body">
+                                            <li th:unless="${jobApplication.qualifications.isEmpty()}">
+                                                <span th:each="qualification, iterStat : ${jobApplication.qualifications}">
+                                                <span th:if="${iterStat.index < 3}"
+                                                      th:text="${qualification.name}"></span>
+                                                    <span th:if="${iterStat.index < 2 && iterStat.index < (jobApplication.qualifications.size() - 1)}">, </span>
+                                                    </span>
+
+                                            </li>
+
+                                            <li>
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                <!-- Case 1: Not 'Home' and not Hybrid -->
+                                                <a th:if="${jobApplication.location.name != 'Home' and !jobApplication.hybrid}"
+                                                   th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode}"></a>
+
+                                                <!-- Case 2: Not 'Home' and Hybrid -->
+                                                <a th:if="${jobApplication.location.name != 'Home' and jobApplication.hybrid}"
+                                                   th:text="${jobApplication.location.name + ', ' + jobApplication.location.isoCode + ' (Hybrid)'}"></a>
+
+                                                <!-- Case 3: Location is 'Home' -->
+                                                <a th:if="${jobApplication.location.name == 'Home'}">Remote</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="f-right" th:fragment="applications-lising-salary">
+                                    <a
+                                            th:text="${#numbers.formatDecimal(jobApplication.minSalary, 0, 0)} + ' - ' + ${#numbers.formatDecimal(jobApplication.maxSalary, 0, 0)}"></a>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <!-- Featured_job_end -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Job List Area End -->
+
+</main>
+
+<form th:replace="~{footer-fragment.html ::footer}"></form>
+
+<!-- JS here -->
+
+<form th:replace="~{scripts-fragment.html :: scripts}"></form>
+
+</body>
+</html>
