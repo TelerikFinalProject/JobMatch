@@ -85,11 +85,11 @@
                                         <a href="#"><img class="profile-picture" th:src="${jobAd.getEmployer().getProfilePictureUrl()}" src="/img/icon/job-list1.png" alt=""></a>
                                     </div>
                                     <div class="job-tittle job-tittle2">
-                                        <a href="#" th:href="@{/professionals/job-ads/{id}(id=${jobAd.id})}">
+                                        <a href="#" th:href="@{/professionals/dashboard/job-ads/{id}(id=${jobAd.id})}">
                                             <h4 th:text="${jobAd.positionTitle}">Job Title</h4>
                                         </a>
                                         <ul>
-                                            <а th:href="@{/employers/}"><li th:text="${jobAd.employer.getCompanyName()}">Company Name</li></а>
+                                            <li ><a class="text-muted" th:text="${jobAd.employer.getCompanyName()}" th:href="@{/employers/{id}(id=${jobAd.getEmployer().id})}">Company Name</a></li>
                                             <li>
                                                 <i class="fas fa-map-marker-alt"></i>
                                                 <!-- Case 1: Not 'Home' and not Hybrid -->

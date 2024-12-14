@@ -26,15 +26,17 @@
             </div>
             <div class="row d-flex justify-contnet-center">
                 <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6" th:unless="applicationsSize == 0">
+                    <a th:href="@{/employers/dashboard/job-applications}">
                     <div class="single-services text-center mb-30">
                         <div class="services-ion" style="width: 250px;">
                             <span class="flaticon-tour"></span>
                         </div>
                         <div class="services-cap">
-                            <h5><a href="job_listing.html"  th:href="@{/employers/dashboard/job-applications}">All Applications</a></h5>
+                            <h5>All Applications</h5>
                             <span th:text="'(' + ${applicationsSize} + ')'">Applications count</span>
                         </div>
                     </div>
+                    </a>
                 </div>
                 <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6" th:if="applicationsSize == 0">
                     <div class="single-services text-center mb-30">
@@ -48,15 +50,17 @@
                     </div>
                 </div>
                 <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6" th:unless="companyJobAdsSize == 0">
+                    <a th:href="@{/employers/dashboard/job-ads}">
                     <div class="single-services text-center mb-30">
                         <div class="services-ion" style="width: 250px;">
                             <span class="flaticon-content"></span>
                         </div>
                         <div class="services-cap">
-                            <h5><a href="company_job_ads_listing.html" th:unless="companyJobAdsSize == 0" th:href="@{/employers/dashboard/job-ads}">Your Job Ads</a></h5>
+                            <h5>Your Job Ads</h5>
                             <span th:text="'(' + ${companyJobAdsSize} + ')'">(658)</span>
                         </div>
                     </div>
+                    </a>
                 </div>
                 <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6" th:if="companyJobAdsSize == 0">
                     <div class="single-services text-center mb-30">
@@ -83,15 +87,17 @@
                     </a>
                 </div>
                 <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
+                    <a th:href="@{/employers/dashboard/job-ads/create}">
                     <div class="single-services text-center mb-30">
                         <div class="services-ion" style="width: 250px;">
                             <span class="flaticon-content"></span>
                         </div>
                         <div class="services-cap" >
-                            <h5><a href="job_listing.html" th:href="@{/employers/dashboard/job-ads/create}">Create an Ad</a></h5>
+                            <h5>Create an Ad=</h5>
                             <span th:text="'Invisible Text'" style="visibility: hidden"></span>
                         </div>
                     </div>
+                    </a>
                 </div>
             </div>
             <!-- More Btn -->
