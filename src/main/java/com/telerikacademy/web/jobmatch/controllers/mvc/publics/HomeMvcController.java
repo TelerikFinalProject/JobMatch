@@ -1,5 +1,7 @@
 package com.telerikacademy.web.jobmatch.controllers.mvc.publics;
 
+import com.telerikacademy.web.jobmatch.models.JobAd;
+import com.telerikacademy.web.jobmatch.models.JobApplication;
 import com.telerikacademy.web.jobmatch.models.Skill;
 import com.telerikacademy.web.jobmatch.services.contracts.JobAdService;
 import com.telerikacademy.web.jobmatch.services.contracts.JobApplicationService;
@@ -44,22 +46,33 @@ public class HomeMvcController {
 
                 Set<Skill> uniqueSkills = jobAdService.getAllUniqueSkillsUsedInJobAds();
                 List<Skill> limitedSkills = new ArrayList<>(uniqueSkills).subList(0, 8);
+
+                List<JobAd> featuredAds = jobAdService.getFeaturedAds();
+
+                model.addAttribute("featuredJobs", featuredAds);
                 model.addAttribute("skills", limitedSkills);
             } else if (session.getAttribute("userRole").equals("EMPLOYER")) {
 
                 Set<Skill> uniqueSkills = jobApplicationService.getAllUniqueSkillsUsedInJobApplications();
                 List<Skill> limitedSkills = new ArrayList<>(uniqueSkills).subList(0, 8);
+
+                List<JobApplication> featuredApplications = jobApplicationService.getFeaturedApplications();
+
+                model.addAttribute("featuredJobs", featuredApplications);
                 model.addAttribute("skills", limitedSkills);
             }
         } else {
 
             Set<Skill> uniqueSkills = jobAdService.getAllUniqueSkillsUsedInJobAds();
             List<Skill> limitedSkills = new ArrayList<>(uniqueSkills).subList(0, 8);
+
+            List<JobAd> featuredAds = jobAdService.getFeaturedAds();
+
+            model.addAttribute("featuredJobs", featuredAds);
             model.addAttribute("skills", limitedSkills);
         }
 
         model.addAttribute("numberOfApplicants", professionalService.getProfessionals().size());
-        model.addAttribute("featuredJobs", jobAdService.getFeaturedAds());
         return "index";
     }
 }

@@ -57,7 +57,7 @@
                             <!-- Count of Job list End -->
                             <!-- single-job-content -->
                             <div class="single-job-items mb-30"
-                                 th:each="jobApplication : ${jobApplications}" th:fragment="applications-lising">
+                                 th:each="jobApplication : ${jobApplications}">
                                 <div class="job-items">
                                     <div class="company-img">
                                         <a href="#"><img class="profile-picture" th:src="@{${jobApplication.professional.profilePictureUrl}}" src="/img/icon/job-list1.png" alt=""></a>

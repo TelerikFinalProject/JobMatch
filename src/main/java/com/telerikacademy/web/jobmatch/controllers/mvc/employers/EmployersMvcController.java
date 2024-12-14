@@ -97,6 +97,7 @@ public class EmployersMvcController {
             model.addAttribute("companyJobAdsSize", jobAdService.getJobAds(new JobAdFilterOptions(
                     null, null, null, null, loggedEmployer.getCompanyName(),
                     null, null)).size());
+            model.addAttribute("featuredJobs", jobApplicationService.getFeaturedApplications());
 
             return "employers_dashboard";
         } catch (EntityNotFoundException e) {

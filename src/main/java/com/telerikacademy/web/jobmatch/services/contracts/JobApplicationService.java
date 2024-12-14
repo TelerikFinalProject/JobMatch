@@ -25,4 +25,6 @@ public interface JobApplicationService {
     Set<Skill> getAllUniqueSkillsUsedInJobApplications();
 
     List<JobApplication> getAllBySkill(Skill skill);
+
+    List<JobApplication> getFeaturedApplications();
 }

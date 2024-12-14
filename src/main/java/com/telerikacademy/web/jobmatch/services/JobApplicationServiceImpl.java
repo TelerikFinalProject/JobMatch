@@ -80,4 +80,9 @@ public class JobApplicationServiceImpl implements JobApplicationService {
     public List<JobApplication> getAllBySkill(Skill skill) {
         return jobApplicationRepository.findAllBySkill(skill.getId());
     }
+
+    @Override
+    public List<JobApplication> getFeaturedApplications() {
+        return jobApplicationRepository.findFeaturedJobApplications();
+    }
 }

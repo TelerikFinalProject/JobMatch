@@ -1,7 +1,6 @@
 package com.telerikacademy.web.jobmatch.repositories.contracts;
 
 import com.telerikacademy.web.jobmatch.models.JobApplication;
-import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +16,7 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
             "JOIN qualifications s ON j.id = s.job_application_id " +
             "WHERE s.skill_id = :skill_id", nativeQuery = true)
     List<JobApplication> findAllBySkill(@Param("skill_id") int skillId);
+
+    @Query(value = "SELECT * FROM job_applications ORDER BY id DESC LIMIT 4", nativeQuery = true)
+    List<JobApplication> findFeaturedJobApplications();
 }
