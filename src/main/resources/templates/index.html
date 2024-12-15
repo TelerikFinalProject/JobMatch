@@ -112,7 +112,7 @@
                 <!-- Section Tittle -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <div th:unless="${isAuthenticated or (session?.userRole != null and !session?.userRole.equals('PROFESSIONAL'))}" class="section-tittle text-center">
+                        <div th:if="${!isAuthenticated or (session?.userRole != null and session?.userRole.equals('PROFESSIONAL'))}" class="section-tittle text-center">
                             <span>Recent Ads</span>
                             <h2>Featured Ads</h2>
                         </div>
@@ -125,7 +125,7 @@
                 <div class="row justify-content-center">
                     <div class="col-xl-10">
                         <!-- single-job-content -->
-                        <div th:unless="${isAuthenticated or (session?.userRole != null and !session?.userRole.equals('PROFESSIONAL'))}" class="single-job-items mb-30" th:each="featuredJob : ${featuredJobs}">
+                        <div th:if="${!isAuthenticated or (session?.userRole != null and session?.userRole.equals('PROFESSIONAL'))}" class="single-job-items mb-30" th:each="featuredJob : ${featuredJobs}">
                             <div class="job-items">
                                 <div class="company-img">
                                     <a href="#"><img class="profile-picture" th:src="${featuredJob.getEmployer().getProfilePictureUrl()}" src="/img/icon/job-list1.png" alt=""></a>
@@ -358,9 +358,7 @@
 
   <!-- JS here -->
 
-		<div th:replace="~{scripts-fragment.html :: scripts}">
-
-        </div>
+		<div th:replace="~{scripts-fragment.html :: scripts}"></div>
 
     </body>
 </html>

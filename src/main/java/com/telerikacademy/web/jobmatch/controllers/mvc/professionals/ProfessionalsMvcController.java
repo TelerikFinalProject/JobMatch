@@ -262,6 +262,23 @@ public class ProfessionalsMvcController {
         }
     }
 
+    @GetMapping("/dashboard/skills")
+    public String getDashboardSkillsView(HttpSession session,
+                                         Model model) {
+        try {
+            rolesChecker(session);
+            model.addAttribute("skills", jobAdService.getAllUniqueSkillsUsedInJobAds());
+            return "professional-skills-dashboard";
+
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
+        } catch (AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
+    }
+
     @GetMapping("/dashboard/job-ads")
     public String getAllJobAds(@RequestParam(defaultValue = "0") int page,
                                @RequestParam(defaultValue = "7") int size,

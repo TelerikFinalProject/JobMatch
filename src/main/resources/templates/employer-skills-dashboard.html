@@ -1,13 +1,44 @@
 <!doctype html>
 <html lang="zxx" class="no-js" xmlns:th="http://www.thymeleaf.org">
 <form th:replace="~{head-fragment.html :: head('Employers Dashboard')}"></form>
+<head>
+    <style>
+        .form-control-borderless {
+            border: none;
+        }
+
+        .form-control-borderless:hover, .form-control-borderless:active, .form-control-borderless:focus {
+            border: none;
+            outline: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
 
 <body>
 <!-- Preloader Start -->
-<div th:replace="~{preloader-fragment.html :: preloader}">
-</div>
+<div th:replace="~{preloader-fragment.html :: preloader}"></div>
 <!-- Preloader Start -->
 <header th:replace="~{header-fragment.html :: header}"></header>
+
+<script>
+    function filterBySkill(event) {
+        const searchTerm = event.target.value.trim().toLowerCase();
+
+        const skillNames = document.querySelectorAll("div.skill-card h5.skill-name");
+
+        skillNames.forEach(function(item) {
+            item.parentElement.parentElement.parentElement.parentElement.style.display = "revert";
+        })
+
+        skillNames.forEach(function(item) {
+            console.log(item.innerText)
+            if (!item.innerText.toLowerCase().startsWith(searchTerm)) {
+                item.parentElement.parentElement.parentElement.parentElement.style.display = "none";
+            }
+        })
+    }
+</script>
 <main>
 
     <!-- slider Area Start-->
@@ -21,18 +52,37 @@
                     <div class="section-tittle text-center">
                         <span>By Skills</span>
                         <h2>Job Applications</h2>
+                        <div class="container mb-5">
+                            <br/>
+                            <div class="row justify-content-center">
+                                <div class="col-12 col-md-10 col-lg-8">
+                                    <form class="card card-sm">
+                                        <div class="card-body row no-gutters align-items-center">
+                                            <div class="col-auto">
+                                                <i class="fas fa-search h4 text-body"></i>
+                                            </div>
+                                            <!--end of col-->
+                                            <div class="col">
+                                                <input oninput="filterBySkill(event)" id="search" class="form-control form-control-lg form-control-borderless" type="search" placeholder="Search for a skill">
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!--end of col-->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="row d-flex justify-contnet-center">
-                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6" th:each="skill : ${skills}">
+                <div class="skill-card col-xl-3 col-lg-3 col-md-4 col-sm-6" th:each="skill : ${skills}">
                     <a th:href="@{/employers/dashboard/skills/{id}(id=${skill.id})}">
                         <div class="single-services text-center mb-30">
                             <div class="services-ion" style="width: 250px;">
                                 <span class="flaticon-tour"></span>
                             </div>
                             <div class="services-cap">
-                                <h5 th:text="${skill.name}">Skill name</h5>
+                                <h5 class="skill-name" th:text="${skill.name}">Skill name</h5>
                                 <!-- Find a way to get number of ads -->
                             </div>
                         </div>

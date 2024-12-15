@@ -75,4 +75,14 @@ public class HomeMvcController {
         model.addAttribute("numberOfApplicants", professionalService.getProfessionals().size());
         return "index";
     }
+
+    @GetMapping("/about")
+    public String getAboutView(Model model) {
+        return "about";
+    }
+
+    @GetMapping("/contact")
+    public String getContactView(Model model) {
+        return "contact";
+    }
 }
