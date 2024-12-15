@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 
 import static com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoIn.SALARY_ERROR;
 
@@ -40,4 +39,5 @@ public class JobAdDtoIn {
     private String locCountryIsoCode;
     private Integer locCityId;
     private String skills;
+    private Boolean remote;
 }
