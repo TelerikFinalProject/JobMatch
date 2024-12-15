@@ -41,7 +41,7 @@
                                 <h4 th:text="${jobAd.positionTitle}">Job Title</h4>
 
                                 <ul>
-                                    <li th:text="${jobAd.employer.companyName}">Company Name</li>
+                                    <li><a th:text="${jobAd.employer.companyName}" style="color: black" th:href="@{/employers/{id}(id=(${jobAd.getEmployer().id}))}"></a></li>
                                     <li>
                                         <i class="fas fa-map-marker-alt"></i>
                                         <!-- Case 1: Not 'Home' and not Hybrid -->
@@ -130,7 +130,7 @@
                         <div class="small-section-tittle">
                             <h4>Company Information</h4>
                         </div>
-                        <span th:text="${jobAd.employer.companyName}">Company Name</span>
+                        <a th:href="@{/employers/{id}(id=(${jobAd.getEmployer().id}))}"><span th:text="${jobAd.employer.companyName}">Company Name</span></a>
                         <p th:text="${jobAd.employer.description}">Company Description</p>
                         <ul>
                             <li>Name: <span th:text="${jobAd.employer.companyName}">Company Name </span></li>
