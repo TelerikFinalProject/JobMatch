@@ -87,8 +87,8 @@
         </div>
         <div class="job-tittle">
 
-            <h4 th:text="${jobApplication.professional.firstName} + ' ' +
-                            ${jobApplication.professional.lastName}">Professional Names</h4>
+            <a th:href="@{'/professionals/' + ${jobApplication.professional.id}}"><h4 th:text="${jobApplication.professional.firstName} + ' ' +
+                            ${jobApplication.professional.lastName}">Professional Names</h4></a>
 
             <ul>
                 <li>
@@ -118,8 +118,8 @@
     <div class="small-section-tittle">
         <h4>Applicant Information</h4>
     </div>
-    <span th:text="${jobApplication.professional.firstName} + ' ' +
-                            ${jobApplication.professional.lastName}">Professional Names</span>
+    <a th:href="@{'/professionals/' + ${jobApplication.professional.id}}"><span th:text="${jobApplication.professional.firstName} + ' ' +
+                            ${jobApplication.professional.lastName}">Professional Names</span></a>
     <p th:text="${jobApplication.professional.summary}">Professional Description</p>
     <ul>
         <li>Name: <span th:text="${jobApplication.professional.firstName} + ' ' +

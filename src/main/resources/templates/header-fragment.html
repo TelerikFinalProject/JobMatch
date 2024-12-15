@@ -19,16 +19,16 @@
                     <li><a th:href="@{/}" href="index.html">Home</a></li>
                     <li><a th:if="${session.userRole?.equals('PROFESSIONAL')}" href="job_listing.html" th:href="@{/professionals/dashboard}">Dashboard</a></li>
                     <li><a th:if="${session.userRole?.equals('EMPLOYER')}" href="job_listing.html" th:href="@{/employers/dashboard}">Dashboard</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="#">Page</a>
-                      <ul class="submenu">
-                        <li><a href="blog.html">Blog</a></li>
-                        <li><a href="single-blog.html">Blog Details</a></li>
-                        <li><a href="elements.html">Elements</a></li>
-                        <li><a href="job_details.html">job Details</a></li>
-                      </ul>
-                    </li>
-                    <li><a href="contact.html">Contact</a></li>
+                    <li><a th:href="@{/about}" href="about.html">About</a></li>
+<!--                    <li><a href="#">Page</a>-->
+<!--                      <ul class="submenu">-->
+<!--                        <li><a href="blog.html">Blog</a></li>-->
+<!--                        <li><a href="single-blog.html">Blog Details</a></li>-->
+<!--                        <li><a href="elements.html">Elements</a></li>-->
+<!--                        <li><a href="job_details.html">job Details</a></li>-->
+<!--                      </ul>-->
+<!--                    </li>-->
+                    <li><a th:href="@{/contact}" href="contact.html">Contact</a></li>
                   </ul>
                 </nav>
               </div>
