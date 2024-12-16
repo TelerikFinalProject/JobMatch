@@ -112,8 +112,10 @@
                             <li th:if="${jobAd.status.status.equals('Archived')}">Status:
                             <span>ARCHIVED</span></li>
                         </ul>
-                        <div class="d-lg-block" th:if="${userRole.equals('ADMIN') || currentUser.equals(jobAd.employer.username)}">
-                            <a href="#" class="btn head-btn1" style="
+                        <div class="d-lg-block"
+                             th:if="${userRole.equals('ADMIN') || currentUser.equals(jobAd.employer.username)}">
+                            <a th:href="@{/employers/dashboard/job-ads/{id}/update(id=${jobAd.id})}"
+                               class="btn head-btn1" style="
                                                         padding-left: 46px;
                                                         padding-right: 46px;">Update</a>
                             <a href="#" th:if="${jobAd.status.status.equals('Active')}"

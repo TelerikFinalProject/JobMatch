@@ -11,6 +11,7 @@ import com.telerikacademy.web.jobmatch.models.JobAd;
 import com.telerikacademy.web.jobmatch.models.JobApplication;
 import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoIn;
 import com.telerikacademy.web.jobmatch.models.UserPrincipal;
+import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoUpdate;
 import com.telerikacademy.web.jobmatch.models.dtos.filters.JobAdFilterDto;
 import com.telerikacademy.web.jobmatch.models.dtos.filters.JobApplicationFilterDto;
 import com.telerikacademy.web.jobmatch.models.dtos.users.mvc.EmployerDetailsDto;
@@ -529,14 +530,71 @@ public class EmployersMvcController {
     public String showUpdateJobAdView(Model model,
                                       @PathVariable int id,
                                       HttpSession session) {
-        return null;
+        try {
+            rolesChecker(session);
+
+            JobAd jobAd = jobAdService.getJobAd(id);
+
+            checkAdCreator(session, jobAd);
+
+            JobAdDtoUpdate jobAdDtoUpdate = JobAdMappers.INSTANCE.toDtoUpdate(jobAd);
+
+            model.addAttribute("ad", jobAdDtoUpdate);
+            model.addAttribute("adId", id);
+            model.addAttribute("countries", locationService.getAllCountries());
+            model.addAttribute("AllSkills", skillService.getAllSkills());
+            model.addAttribute("currentCountry", locationService.getCountryByIsoCode(jobAd.getLocation().getIsoCode()).getName());
+            model.addAttribute("currentCity", locationService.getLocationById(jobAdDtoUpdate.getLocCityId()).getName());
+
+            return "job_ad_update_view";
+
+        } catch (AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
+        }
     }
 
     @PostMapping("/dashboard/job-ads/{id}/update")
-    public String updateJobAd(Model model,
-                              @PathVariable int id,
+    public String updateJobAd(@PathVariable int id,
+                              @Valid @ModelAttribute("ad") JobAdDtoUpdate jobAdDtoUpdate,
+                              BindingResult bindingResult,
+                              Model model,
                               HttpSession session) {
-        return null;
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("AllSkills", skillService.getAllSkills());
+            model.addAttribute("countries", locationService.getAllCountries());
+            return "job_ad_update_view";
+        }
+
+        try {
+            rolesChecker(session);
+
+            JobAd jobAd = jobAdService.getJobAd(id);
+
+            checkAdCreator(session, jobAd);
+
+            if (jobAdDtoUpdate.getRemote()) {
+                jobAdDtoUpdate.setHybrid(false);
+                jobAdDtoUpdate.setLocCountryIsoCode("Hm");
+                jobAdDtoUpdate.setLocCityId(1);
+            }
+
+            JobAd jobAdUpdated = JobAdMappers.INSTANCE.fromDtoIn(jobAd,
+                    jobAdDtoUpdate, locationService, statusService, skillService);
+
+            jobAdService.updateJobAd(jobAdUpdated);
+
+            return String.format("redirect:/employers/dashboard/job-ads/%d", id);
+        } catch (AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
+        }
     }
 
     @GetMapping("/dashboard/job-ads/{id}/find-matches")

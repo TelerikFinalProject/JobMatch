@@ -252,13 +252,15 @@
                   </div>
                   <div id="citiesDiv" style="display: none">
                     <div id="citiesCol" class="col-sm-9">
-                      <select th:field="*{locCityId}" id="citiesSelect" name="select" style="display: none;">
-                        <option th:text="${employer.location.name}" th:value="${employer.location.id}">City</option>
+                      <select th:field="*{locCityId}" id="citiesSelect" name="select"
+                              style="display: none;">
+                        <option value="">City</option>
                       </select>
                       <div id="nice-select-cities" class="nice-select" tabindex="0">
-                        <span th:text="${employer.location.name}" id="currentText" class="current">City</span>
-                        <ul id="citiesList" class="list" style="max-height: 200px; overflow-y: auto">
-                          <li th:text="${employer.location.name}" th:value="${employer.location.id}" class="option selected focus" data-value="">City</li>
+                        <span id="currentText" class="current">City</span>
+                        <ul id="citiesList" class="list"
+                            style="max-height: 200px; overflow-y: auto">
+                          <li class="option selected focus" data-value="">City</li>
                         </ul>
                       </div>
                     </div>

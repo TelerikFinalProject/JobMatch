@@ -64,6 +64,17 @@ public interface JobAdMappers {
     @Mapping(source = "jobAd.status.status", target = "status")
     JobAdDtoOut toDtoOut(JobAd jobAd);
 
+    @Mapping(source = "positionTitle", target = "positionTitle")
+    @Mapping(source = "minSalary", target = "minSalary")
+    @Mapping(source = "maxSalary", target = "maxSalary")
+    @Mapping(source = "jobDescription", target = "jobDescription")
+    @Mapping(target = "locCityId", source = "jobAd.location.id") // Nested mapping for role
+    @Mapping(target = "locCountryIsoCode", source = "jobAd.location.isoCode") // Nested mapping for role// Nested mapping for location
+    @Mapping(target = "hybrid", source = "hybrid")
+    @Mapping(source = "skills", target = "skills", qualifiedByName = "setToString")
+    @Mapping(source = "jobAd.status.status", target = "status")
+    JobAdDtoUpdate toDtoUpdate(JobAd jobAd);
+
     List<JobAdDtoOut> toDtoOutList(List<JobAd> jobAds);
 
     Set<JobAdDtoOut> toDtoOutSet(Set<JobAd> jobAds);
@@ -106,7 +117,7 @@ public interface JobAdMappers {
         }
         return qualifications.stream()
                 .map(Skill::getName) // Convert Skill to its name
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(","));
     }
 
 }

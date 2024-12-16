@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:insert="~{head-fragment.html :: head('Create Job Ad')}">
+</head>
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.1.0/dist/css/multi-select-tag.css">
+<script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.1.0/dist/js/multi-select-tag.js"></script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<head>
+  <style>
+    textarea {
+      overflow-y: hidden;  /* Hide the vertical scrollbar */
+      resize: none;        /* Disable manual resizing by the user */
+    }
+    /* Set font for the <select> element */
+    #skills {
+      font-family: inherit; /* Specify desired font */
+      font-size: 1.25rem; /* Adjust size */
+      color: #333; /* Text color */
+      padding: 8px; /* Optional: Adjust padding for better visibility */
+    }
+
+    /* Set font for the options */
+    #skills option {
+      font-family: inherit; /* Match the <select> font */
+      font-size: 1.25rem; /* Adjust size */
+      color: #555; /* Text color for options */
+    }
+
+    .card-registration .select-input.form-control[readonly]:not([disabled]) {
+      font-size: 1rem;
+      line-height: 2.15;
+      padding-left: .75em;
+      padding-right: .75em;
+    }
+
+    .card-registration .select-arrow {
+      top: 13px;
+    }
+
+    .nice-select {
+      width: 100%;
+      height: 45px;
+      background: #fff;
+      border-radius: 5px; /* Match the default border-radius of .form-control */
+      font-family: "Muli", sans-serif;
+      font-size: 1.25rem; /* Adjust font size to match form-control */
+      padding: .5rem 1rem; /* Match form-control padding */
+      color: #495057; /* Match Bootstrap's text color */
+      line-height: 1.5; /* Match Bootstrap's line-height */
+      border: 1px solid #ced4da; /* Match form-control border color */
+      transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
+
+    .nice-select:focus {
+      border-color: #80bdff; /* Light blue border */
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Blue glow */
+      outline: none; /* Remove default browser outline */
+    }
+  </style>
+</head>
+<body>
+<header th:replace="~{header-fragment.html :: header}"></header>
+<main>
+  <section class="vh-100 gradient-custom">
+    <div class="container py-5 h-100">
+      <div class="row justify-content-center align-items-center h-100">
+        <div class="col-12 col-lg-9 col-xl-10">
+          <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+            <div class="card-body p-4 p-md-5">
+              <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Create Your Job Ad</h3>
+              <form id="registrationForm" method="post" action="#"
+                    th:action="@{/employers/dashboard/job-ads/{id}/update(id=${adId})}" th:object="${ad}">
+
+                <div class="row">
+                  <div class="col-12 mb-4">
+                    <div data-mdb-input-init class="form-outline">
+                      <label th:errors="*{positionTitle}" class="form-label text-danger"
+                             for="positionTitle">Position Title error</label>
+                      <input th:field="*{positionTitle}" type="text" id="positionTitle"
+                             class="form-control form-control-lg"/>
+                      <label class="form-label" for="positionTitle">Position Title</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row" th:fragment="min-salary-row">
+                  <div class="col-12 mb-4">
+                    <div data-mdb-input-init class="form-outline">
+                      <label th:errors="*{minSalary}" class="form-label text-danger"
+                             for="positionTitle">Min Salary error</label>
+                      <input th:field="*{minSalary}" type="number" id="minSalary"
+                             class="form-control form-control-lg"/>
+                      <label class="form-label" for="minSalary">Min Salary</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row" th:fragment="max-salary-row">
+                  <div class="col-12 mb-4">
+                    <div data-mdb-input-init class="form-outline">
+                      <label th:errors="*{maxSalary}" class="form-label text-danger"
+                             for="positionTitle">Max Salary error</label>
+                      <input th:field="*{maxSalary}" type="number" id="maxSalary"
+                             class="form-control form-control-lg"/>
+                      <label class="form-label" for="maxSalary">Max Salary</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row" th:fragment="hybrid-row">
+                  <div class="col-12 mb-4">
+                    <div data-mdb-input-init class="form-outline">
+                      <label class="form-label" for="positionTitle">
+                        Hybrid
+                      </label>
+                      <!-- Hidden input to ensure "false" is submitted if the checkbox is not checked -->
+                      <!-- Checkbox to submit "true" if selected -->
+                      <input type="checkbox" th:field="*{hybrid}">
+                      <span class="checkmark"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row" th:fragment="status-row">
+                  <div class="col-12 mb-4">
+                    <div data-mdb-input-init class="form-outline">
+                      <label th:errors="*{status}" class="form-label text-danger" for="positionTitle">Status error</label>
+                      <select name="status" id="status" multiple th:field="*{status}">
+                        <option th:text="${ad.status}" th:value="${ad.status}">Status</option>
+                        <option th:unless="${ad.status == 'Active'}" th:value="'Active'">Active</option>
+                        <option th:unless="${ad.status == 'Archived'}" th:value="'Archived'">Archived</option>
+                      </select>
+                      <label class="form-label" for="maxSalary">Status</label>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="row">
+                  <div class="col-12 mb-4">
+                    <div data-mdb-input-init class="form-outline">
+                      <label th:errors="*{jobDescription}" class="form-label text-danger"
+                             for="positionTitle">Job Description error</label>
+                      <textarea th:field="*{jobDescription}" type="text" id="jobDescription"
+                                class="form-control form-control-lg" oninput="resizeTextarea(this)"></textarea>
+                      <label class="form-label" for="jobDescription">Job Description</label>
+
+                      <script th:fragment="textarea-script">
+                        // Function to resize textarea
+                        function resizeTextarea(textarea) {
+                          // Reset the height to auto to shrink the textarea
+                          textarea.style.height = 'auto';
+                          // Set the height to match the scrollHeight to resize the textarea based on content
+                          textarea.style.height = (textarea.scrollHeight) + 'px';
+                        }
+                      </script>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-12 mb-4">
+                    <div data-mdb-input-init class="form-outline">
+                      <select name="skills" id="skills" multiple th:field="*{skills}" class="nice-select">
+                        <option th:each="skill : ${AllSkills}"
+                                th:value="${skill.name}"
+                                th:text="${skill.name}"
+                        >
+
+                      </select>
+                      <script th:fragment="skills-script">
+                        new MultiSelectTag('skills', {
+                          rounded: true,    // default true
+                          shadow: false,      // default false
+                          placeholder: 'Search', // default Search...
+                          tagColor: {
+                            textColor: '#fb266b',
+                            borderColor: '#fb266b',
+                            bgColor: 'rgba(251,38,107,0.08)',
+                          },
+                          onChange: function(values) {
+                            console.log(values)
+                          }
+                        })  // id
+                      </script>
+                      <label class="form-label">Skills</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row" th:fragment="hybrid-row">
+                  <div class="col-12 mb-4">
+                    <div data-mdb-input-init class="form-outline">
+                      <label class="form-label" for="remote">
+                        Remote
+                      </label>
+
+                      <!-- Hidden input to ensure "false" is submitted if checkbox is not checked -->
+                      <input type="hidden" name="remote" value="false">
+
+                      <!-- Checkbox to submit "true" if selected and bind to the "remote" field -->
+                      <input type="checkbox" id="remote" th:field="*{remote}" value="true" onclick="updateLocationVisibility()">
+                      <span class="checkmark"></span> <!-- Custom checkmark span -->
+                    </div>
+                  </div>
+                </div>
+
+
+                <script>
+                  function updateLocationVisibility() {
+                    var checkbox = document.getElementById('remote');
+
+                    // Get references to the country and city divs
+                    var countryDiv = document.getElementById('countryDiv');
+                    var citiesDiv = document.getElementById('citiesDiv');
+
+                    if (checkbox.checked) {
+                      // Hide country and city divs if "Remote" is selected (checkbox checked)
+                      countryDiv.style.display = 'none';
+                      citiesDiv.style.display = 'none';
+                    } else {
+                      // Show country and city divs if "Remote" is not selected (checkbox unchecked)
+                      countryDiv.style.display = 'block';
+                      citiesDiv.style.display = 'block';
+                    }
+                  }
+                  // Function to handle hiding the country selection div and city selection div when "Remote" is selected
+                  function hideCountrySelection() {
+                    const countrySelect = document.getElementById('countriesSelect');
+                    const countryDiv = document.getElementById('countryDiv');
+                    const citiesDiv = document.getElementById('citiesDiv');
+
+                    // If a valid country is selected, hide both country and city divs
+                    if (countrySelect.value !== 'Hm' && countrySelect.value !== "") {
+                      countryDiv.style.display = 'none'; // Hide the country selection div
+                      citiesDiv.style.display = 'none'; // Hide the cities selection div
+                    } else {
+                      countryDiv.style.display = 'block'; // Show the country selection div if "Remote" is selected or nothing is selected
+                      citiesDiv.style.display = 'block'; // Show the cities selection div if "Remote" is selected or nothing is selected
+                    }
+                  }
+
+                  // Function to fetch and populate cities based on selected country
+                  function getCities(country) {
+                    const remote = document.getElementById('remote');
+
+                    // If Remote is checked, clear city dropdown and hide it
+                    if (remote.checked) {
+                      document.getElementById('citiesDiv').style.display = 'none';
+                      return; // No need to fetch cities when remote is selected
+                    }
+
+                    // Only fetch cities if a valid country is selected
+                    if (!country) {
+                      return;
+                    }
+
+                    const citySelect = document.getElementById('citiesSelect');
+                    const niceSelectList = document.getElementById('citiesList');
+                    const currentText = document.getElementById('currentCity');
+                    const niceSelect = document.getElementById('citiesDiv');
+
+                    fetch('http://localhost:8080/api/locations/' + country + '/cities')
+                            .then(response => response.json())
+                            .then(cities => {
+                              console.log(cities);
+                              citySelect.innerHTML = "<option value=''>Select a city</option>";
+                              niceSelectList.innerHTML = ""; // Clear the list
+
+                              cities.forEach(city => {
+                                console.log(city);
+                                const option = document.createElement("option");
+                                option.value = city.id;
+                                option.textContent = city.name;
+                                citySelect.appendChild(option);
+
+                                const li = document.createElement('li');
+                                li.className = "option";
+                                li.setAttribute("data-value", city.id);
+                                li.textContent = city.name;
+                                niceSelectList.appendChild(li);
+                              });
+
+                              // If there are cities, display the cities selector
+                              if (cities.length > 0) {
+                                niceSelect.style.display = 'block';
+                                niceSelect.classList.add('mb-2');
+                              } else {
+                                niceSelect.style.display = 'none';
+                                currentText.textContent = 'Location'; // Reset city label
+                              }
+                            })
+                            .catch(error => console.error("Error fetching cities:", error));
+                  }
+
+                </script>
+                <script>
+                  document.addEventListener("DOMContentLoaded", function () {
+                    const countrySelect = document.getElementById("countriesSelect");
+                    if (countrySelect) {
+                      const selectedCountry = countrySelect.value;
+                      if (selectedCountry) {
+                        getCities(selectedCountry); // Call your function with the current value
+                      }
+                    }
+                  });
+                </script>
+
+                <label th:errors="*{locCountryIsoCode}" class="form-label text-danger"
+                       for="positionTitle">Country error</label>
+                <div class="row" id="countryDiv">
+                  <div class="col-12 mb-4">
+                    <select th:field="*{locCountryIsoCode}" onchange="getCities(this.value)"
+                            id="countriesSelect" name="select" style="display: block;">
+                      <option th:text="Remote" th:value="Hm"></option>
+                      <option th:text="${currentCountry}" th:value="${ad.locCountryIsoCode}"></option>
+                      <option th:each="country : ${countries}" th:value="${country.iso2}" th:text="${country.name}">City</option>
+                    </select>
+                    <div class="nice-select" tabindex="0">
+                      <span class="current" th:text="${currentCountry}">Location</span>
+                      <ul class="list" style="max-height: 200px; overflow-y: auto">
+                        <li th:text="${currentCountry}" class="option selected focus" th:data-value="${ad.locCountryIsoCode}"></li>
+                        <li th:each="country : ${countries}" th:data-value="${country.iso2}" class="option" th:text="${country.name}">City</li>
+                      </ul>
+                    </div>
+                    <label class="form-label" for="countriesSelect">Country</label>
+                    <br>
+                    <span class="note-text">Leave Location Empty if Ad will be remote</span>
+                  </div>
+                </div>
+
+                <label th:errors="*{locCityId}" class="form-label text-danger" for="positionTitle" th:unless="${ad.locCityId == 'Hm'}">City
+                  error</label>
+                <div id="citiesDiv" class="row" style="display: none">
+                  <div id="citiesCol" class="col-12 mb-4">
+                    <select th:field="*{locCityId}" id="citiesSelect" name="select" style="display: none;">
+                      <option th:text="${currentCity}" th:value="${ad.locCityId}">City</option>
+                    </select>
+                    <div id="nice-select-cities" class="nice-select" tabindex="0">
+                      <span th:text="${currentCity}" id="currentText" class="current">City</span>
+                      <ul id="citiesList" class="list" style="max-height: 200px; overflow-y: auto">
+                        <li th:text="${currentCity}" th:value="${ad.locCityId}" class="option selected focus" data-value="">City</li>
+                      </ul>
+                    </div>
+                    <label class="form-label" for="citiesSelect">City</label>
+                  </div>
+                </div>
+
+                <div class="mt-0 pt-0">
+                  <input style="float: right; margin-left: 10px;" data-mdb-ripple-init class="btn btn-primary btn-lg"
+                         type="submit" value="Save"/>
+                </div>
+
+                <div class="d-lg-block" style="float: right">
+                  <a href="#"
+                     th:href="@{/employers/dashboard/job-application/{id}(id=${adId})}"
+                     class="btn head-btn2" style="
+                                                        padding-left: 25px;
+                                                        padding-right: 25px;
+                                                        padding-top: 26px;
+                                                        padding-bottom: 26px;">Back</a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer th:replace="~{footer-fragment.html :: footer}"></footer>
+<div th:replace="~{scripts-fragment.html :: scripts}"></div>
+</body>
+</html>
