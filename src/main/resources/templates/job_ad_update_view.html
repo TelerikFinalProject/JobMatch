@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head th:insert="~{head-fragment.html :: head('Create Job Ad')}">
+<head th:insert="~{head-fragment.html :: head('Update Job Ad')}">
 </head>
 <link rel="stylesheet"
       href="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.1.0/dist/css/multi-select-tag.css">
@@ -202,14 +202,15 @@
                       <input type="hidden" name="remote" value="false">
 
                       <!-- Checkbox to submit "true" if selected and bind to the "remote" field -->
-                      <input type="checkbox" id="remote" th:field="*{remote}" value="true" onclick="updateLocationVisibility()">
+                      <input type="checkbox" id="remote" th:field="*{remote}" value="true"
+                             onclick="updateLocationVisibility()">
                       <span class="checkmark"></span> <!-- Custom checkmark span -->
                     </div>
                   </div>
                 </div>
 
 
-                <script>
+                <script th:fragment="show-location-script">
                   function updateLocationVisibility() {
                     var checkbox = document.getElementById('remote');
 
@@ -227,87 +228,16 @@
                       citiesDiv.style.display = 'block';
                     }
                   }
-                  // Function to handle hiding the country selection div and city selection div when "Remote" is selected
-                  function hideCountrySelection() {
-                    const countrySelect = document.getElementById('countriesSelect');
-                    const countryDiv = document.getElementById('countryDiv');
-                    const citiesDiv = document.getElementById('citiesDiv');
 
-                    // If a valid country is selected, hide both country and city divs
-                    if (countrySelect.value !== 'Hm' && countrySelect.value !== "") {
-                      countryDiv.style.display = 'none'; // Hide the country selection div
-                      citiesDiv.style.display = 'none'; // Hide the cities selection div
-                    } else {
-                      countryDiv.style.display = 'block'; // Show the country selection div if "Remote" is selected or nothing is selected
-                      citiesDiv.style.display = 'block'; // Show the cities selection div if "Remote" is selected or nothing is selected
-                    }
-                  }
-
-                  // Function to fetch and populate cities based on selected country
-                  function getCities(country) {
-                    const remote = document.getElementById('remote');
-
-                    // If Remote is checked, clear city dropdown and hide it
-                    if (remote.checked) {
-                      document.getElementById('citiesDiv').style.display = 'none';
-                      return; // No need to fetch cities when remote is selected
-                    }
-
-                    // Only fetch cities if a valid country is selected
-                    if (!country) {
-                      return;
-                    }
-
-                    const citySelect = document.getElementById('citiesSelect');
-                    const niceSelectList = document.getElementById('citiesList');
-                    const currentText = document.getElementById('currentCity');
-                    const niceSelect = document.getElementById('citiesDiv');
-
-                    fetch('http://localhost:8080/api/locations/' + country + '/cities')
-                            .then(response => response.json())
-                            .then(cities => {
-                              console.log(cities);
-                              citySelect.innerHTML = "<option value=''>Select a city</option>";
-                              niceSelectList.innerHTML = ""; // Clear the list
-
-                              cities.forEach(city => {
-                                console.log(city);
-                                const option = document.createElement("option");
-                                option.value = city.id;
-                                option.textContent = city.name;
-                                citySelect.appendChild(option);
-
-                                const li = document.createElement('li');
-                                li.className = "option";
-                                li.setAttribute("data-value", city.id);
-                                li.textContent = city.name;
-                                niceSelectList.appendChild(li);
-                              });
-
-                              // If there are cities, display the cities selector
-                              if (cities.length > 0) {
-                                niceSelect.style.display = 'block';
-                                niceSelect.classList.add('mb-2');
-                              } else {
-                                niceSelect.style.display = 'none';
-                                currentText.textContent = 'Location'; // Reset city label
-                              }
-                            })
-                            .catch(error => console.error("Error fetching cities:", error));
-                  }
-
-                </script>
-                <script>
-                  document.addEventListener("DOMContentLoaded", function () {
-                    const countrySelect = document.getElementById("countriesSelect");
-                    if (countrySelect) {
-                      const selectedCountry = countrySelect.value;
-                      if (selectedCountry) {
-                        getCities(selectedCountry); // Call your function with the current value
-                      }
-                    }
+                  // Ensure the function is executed when the page is fully loaded
+                  document.addEventListener('DOMContentLoaded', () => {
+                    updateLocationVisibility();
                   });
-                </script>
+
+                  </script>
+
+                <script th:replace="~{professional-details-update.html :: update-location-script}"></script>
+                <script th:replace="~{professional-details-update.html :: update-location-script-addon}"></script>
 
                 <label th:errors="*{locCountryIsoCode}" class="form-label text-danger"
                        for="positionTitle">Country error</label>
@@ -315,7 +245,6 @@
                   <div class="col-12 mb-4">
                     <select th:field="*{locCountryIsoCode}" onchange="getCities(this.value)"
                             id="countriesSelect" name="select" style="display: block;">
-                      <option th:text="Remote" th:value="Hm"></option>
                       <option th:text="${currentCountry}" th:value="${ad.locCountryIsoCode}"></option>
                       <option th:each="country : ${countries}" th:value="${country.iso2}" th:text="${country.name}">City</option>
                     </select>
@@ -328,7 +257,6 @@
                     </div>
                     <label class="form-label" for="countriesSelect">Country</label>
                     <br>
-                    <span class="note-text">Leave Location Empty if Ad will be remote</span>
                   </div>
                 </div>
 

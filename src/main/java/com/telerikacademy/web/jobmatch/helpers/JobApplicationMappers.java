@@ -2,10 +2,7 @@ package com.telerikacademy.web.jobmatch.helpers;
 
 import com.telerikacademy.web.jobmatch.exceptions.EntityStatusException;
 import com.telerikacademy.web.jobmatch.models.*;
-import com.telerikacademy.web.jobmatch.models.dtos.JobAdDtoOut;
-import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoIn;
-import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoOut;
-import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoUpdate;
+import com.telerikacademy.web.jobmatch.models.dtos.*;
 import com.telerikacademy.web.jobmatch.services.contracts.LocationService;
 import com.telerikacademy.web.jobmatch.services.contracts.SkillService;
 import com.telerikacademy.web.jobmatch.services.contracts.StatusService;
@@ -61,6 +58,16 @@ public interface JobApplicationMappers {
     @Mapping(target = "sentMatches", expression = "java(mapMatchedJobAds(jobApplication.getMatchesSentToJobAds()))")
     @Mapping(target = "requestedMatches", expression = "java(mapMatchedJobAds(jobApplication.getMatchRequestedAds()))")
     JobApplicationDtoOut toDtoOut(JobApplication jobApplication);
+
+    @Mapping(source = "description", target = "description")
+    @Mapping(source = "minSalary", target = "minSalary")
+    @Mapping(source = "maxSalary", target = "maxSalary")
+    @Mapping(target = "locCityId", source = "jobApplication.location.id") // Nested mapping for role
+    @Mapping(target = "locCountryIsoCode", source = "jobApplication.location.isoCode") // Nested mapping for role// Nested mapping for location
+    @Mapping(target = "hybrid", source = "hybrid")
+    @Mapping(source = "qualifications", target = "skills", qualifiedByName = "setToString")
+    @Mapping(source = "jobApplication.status.status", target = "status")
+    JobApplicationDtoUpdate toDtoUpdate(JobApplication jobApplication);
 
     List<JobApplicationDtoOut> toDtoOutList(List<JobApplication> jobApplication);
 

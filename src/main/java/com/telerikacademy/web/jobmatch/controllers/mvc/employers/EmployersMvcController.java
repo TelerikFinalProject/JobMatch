@@ -451,7 +451,8 @@ public class EmployersMvcController {
             rolesChecker(session);
             employer = employersService.getEmployer(session.getAttribute("currentUser").toString());
 
-            if (adDtoIn.getLocCountryIsoCode() == null || adDtoIn.getLocCityId() == null) {
+            if (adDtoIn.getRemote()) {
+                adDtoIn.setHybrid(false);
                 adDtoIn.setLocCountryIsoCode("Hm");
                 adDtoIn.setLocCityId(1);
             }
@@ -538,6 +539,10 @@ public class EmployersMvcController {
             checkAdCreator(session, jobAd);
 
             JobAdDtoUpdate jobAdDtoUpdate = JobAdMappers.INSTANCE.toDtoUpdate(jobAd);
+
+            if (jobAd.getLocation().getName().equals("Home")){
+                jobAdDtoUpdate.setRemote(true);
+            }
 
             model.addAttribute("ad", jobAdDtoUpdate);
             model.addAttribute("adId", id);

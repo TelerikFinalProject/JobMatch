@@ -36,10 +36,14 @@
 <form th:replace="~{preloader-fragment.html :: preloader}"></form>
 
 <form th:replace="~{header-fragment.html :: header}"></form>
-<script>
+<script th:fragment="update-location-script">
   function getCities(country) {
 
     if (country === "") {
+      return;
+    }
+
+    if (country === "Hm"){
       return;
     }
 
@@ -86,7 +90,7 @@
 
   }
 </script>
-<script>
+<script th:fragment="update-location-script-addon">
   document.addEventListener("DOMContentLoaded", function () {
     const countrySelect = document.getElementById("countriesSelect");
     if (countrySelect) {

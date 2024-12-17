@@ -179,11 +179,29 @@
                                     </div>
                                 </div>
 
+                                <div class="row" th:fragment="hybrid-row">
+                                    <div class="col-12 mb-4">
+                                        <div data-mdb-input-init class="form-outline">
+                                            <label class="form-label" for="remote">
+                                                Remote
+                                            </label>
+
+                                            <!-- Hidden input to ensure "false" is submitted if checkbox is not checked -->
+                                            <input type="hidden" name="remote" value="false">
+
+                                            <!-- Checkbox to submit "true" if selected and bind to the "remote" field -->
+                                            <input type="checkbox" id="remote" th:field="*{remote}" value="true" onclick="updateLocationVisibility()">
+                                            <span class="checkmark"></span> <!-- Custom checkmark span -->
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <script th:replace="~{user-register.html :: location-script}"></script>
+                                <script th:replace="~{job_ad_update_view.html :: show-location-script}"></script>
 
                                 <label th:errors="*{locCountryIsoCode}" class="form-label text-danger"
                                        for="positionTitle">Country error</label>
-                                <div class="row">
+                                <div class="row" id="countryDiv">
                                     <div class="col-12 mb-4">
                                         <select th:field="*{locCountryIsoCode}" onchange="getCities(this.value)"
                                                 id="countriesSelect" name="select" style="display: none;">

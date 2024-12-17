@@ -8,9 +8,9 @@ import com.telerikacademy.web.jobmatch.helpers.JobApplicationMappers;
 import com.telerikacademy.web.jobmatch.helpers.ProfessionalMappers;
 import com.telerikacademy.web.jobmatch.models.*;
 import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoIn;
+import com.telerikacademy.web.jobmatch.models.dtos.JobApplicationDtoUpdate;
 import com.telerikacademy.web.jobmatch.models.dtos.filters.JobAdFilterDto;
 import com.telerikacademy.web.jobmatch.models.dtos.filters.JobApplicationFilterDto;
-import com.telerikacademy.web.jobmatch.models.dtos.users.mvc.EmployerDetailsDto;
 import com.telerikacademy.web.jobmatch.models.dtos.users.mvc.PasswordChangeDto;
 import com.telerikacademy.web.jobmatch.models.dtos.users.mvc.ProfessionalDetailsDto;
 import com.telerikacademy.web.jobmatch.models.filter_options.JobAdFilterOptions;
@@ -436,7 +436,8 @@ public class ProfessionalsMvcController {
             rolesChecker(session);
             professional = professionalService.getProfessionalByUsername(session.getAttribute("currentUser").toString());
 
-            if (applicationDtoIn.getLocCountryIsoCode() == null || applicationDtoIn.getLocCityId() == null) {
+            if (applicationDtoIn.getRemote()) {
+                applicationDtoIn.setHybrid(false);
                 applicationDtoIn.setLocCountryIsoCode("Hm");
                 applicationDtoIn.setLocCityId(1);
             }
@@ -512,17 +513,81 @@ public class ProfessionalsMvcController {
     }
 
     @GetMapping("/dashboard/job-applications/{id}/update")
-    public String showUpdateJobApplicationView(Model model,
+    public String showUpdateJobAdView(Model model,
                                       @PathVariable int id,
                                       HttpSession session) {
-        return null;
+        try {
+            rolesChecker(session);
+
+            JobApplication jobApplication = jobApplicationService.getJobApplication(id);
+
+            checkApplicationCreator(session, jobApplication);
+
+            JobApplicationDtoUpdate jobApplicationDtoUpdate = JobApplicationMappers.INSTANCE
+                    .toDtoUpdate(jobApplication);
+
+            if (jobApplication.getLocation().getName().equals("Home")){
+                jobApplicationDtoUpdate.setRemote(true);
+            }
+
+            model.addAttribute("application", jobApplicationDtoUpdate);
+            model.addAttribute("applicationId", id);
+            model.addAttribute("countries", locationService.getAllCountries());
+            model.addAttribute("AllSkills", skillService.getAllSkills());
+            model.addAttribute("currentCountry", locationService.getCountryByIsoCode(jobApplication
+                    .getLocation().getIsoCode()).getName());
+            model.addAttribute("currentCity", locationService.getLocationById(jobApplicationDtoUpdate
+                    .getLocCityId()).getName());
+
+            return "job_application_update_view";
+
+        } catch (AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
+        }
     }
 
     @PostMapping("/dashboard/job-applications/{id}/update")
-    public String updateJobApplication(Model model,
-                              @PathVariable int id,
+    public String updateJobAd(@PathVariable int id,
+                              @Valid @ModelAttribute("application") JobApplicationDtoUpdate jobApplicationDtoUpdate,
+                              BindingResult bindingResult,
+                              Model model,
                               HttpSession session) {
-        return null;
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("AllSkills", skillService.getAllSkills());
+            model.addAttribute("countries", locationService.getAllCountries());
+            return "job_application_update_view";
+        }
+
+        try {
+            rolesChecker(session);
+
+            JobApplication jobApplication = jobApplicationService.getJobApplication(id);
+
+            checkApplicationCreator(session, jobApplication);
+
+            if (jobApplicationDtoUpdate.getRemote()) {
+                jobApplicationDtoUpdate.setHybrid(false);
+                jobApplicationDtoUpdate.setLocCountryIsoCode("Hm");
+                jobApplicationDtoUpdate.setLocCityId(1);
+            }
+
+            JobApplication jobAdUpdated = JobApplicationMappers.INSTANCE.fromDtoIn(jobApplication,
+                    jobApplicationDtoUpdate, statusService, locationService, skillService);
+
+            jobApplicationService.updateJobApplication(jobAdUpdated);
+
+            return String.format("redirect:/professionals/dashboard/job-applications/%d", id);
+        } catch (AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
+        }
     }
 
 

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head th:insert="~{head-fragment.html :: head('Create Job Application')}">
+<head th:insert="~{head-fragment.html :: head('Update Job Ad')}">
 </head>
 <link rel="stylesheet"
       href="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.1.0/dist/css/multi-select-tag.css">
@@ -27,13 +27,6 @@
             font-family: inherit; /* Match the <select> font */
             font-size: 1.25rem; /* Adjust size */
             color: #555; /* Text color for options */
-        }
-
-        .gradient-custom {
-            /* fallback for old browsers */
-
-            background: rgb(1, 11, 29);
-            background: linear-gradient(0deg, rgba(1, 11, 29, 1) 14%, rgba(9, 9, 121, 0.68) 48%, rgba(255, 255, 255, 1) 100%);
         }
 
         .card-registration .select-input.form-control[readonly]:not([disabled]) {
@@ -79,30 +72,58 @@
                         <div class="card-body p-4 p-md-5">
                             <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Create Your Job Ad</h3>
                             <form id="registrationForm" method="post" action="#"
-                                  th:action="@{/professionals/dashboard/job-applications/create}" th:object="${application}">
+                                  th:action="@{/professionals/dashboard/job-applications/{id}/update(id=${applicationId})}" th:object="${application}">
 
                                 <div class="row">
                                     <div class="col-12 mb-4">
                                         <div data-mdb-input-init class="form-outline">
                                             <label th:errors="*{description}" class="form-label text-danger"
-                                                   for="positionTitle">Job Description error</label>
-                                            <textarea th:field="*{description}" type="text" id="positionTitle"
+                                                   for="jobDescription">Job Description error</label>
+                                            <textarea th:field="*{description}" type="text" id="jobDescription"
                                                       class="form-control form-control-lg" oninput="resizeTextarea(this)"></textarea>
-                                            <label class="form-label" for="positionTitle">Job Description</label>
+                                            <label class="form-label" for="jobDescription">Job Description</label>
 
-                                            <script th:replace="~{job_ad_create_form.html :: textarea-script}"></script>
+                                            <script th:fragment="textarea-script">
+                                                // Function to resize textarea
+                                                function resizeTextarea(textarea) {
+                                                    // Reset the height to auto to shrink the textarea
+                                                    textarea.style.height = 'auto';
+                                                    // Set the height to match the scrollHeight to resize the textarea based on content
+                                                    textarea.style.height = (textarea.scrollHeight) + 'px';
+                                                }
+                                            </script>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div th:replace="~{job_ad_create_form.html :: min-salary-row}"></div>
+                                <div class="row" th:fragment="min-salary-row">
+                                    <div class="col-12 mb-4">
+                                        <div data-mdb-input-init class="form-outline">
+                                            <label th:errors="*{minSalary}" class="form-label text-danger"
+                                                   for="minSalary">Min Salary error</label>
+                                            <input th:field="*{minSalary}" type="number" id="minSalary"
+                                                   class="form-control form-control-lg"/>
+                                            <label class="form-label" for="minSalary">Min Salary</label>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                <div th:replace="~{job_ad_create_form.html :: max-salary-row}"></div>
+                                <div class="row" th:fragment="max-salary-row">
+                                    <div class="col-12 mb-4">
+                                        <div data-mdb-input-init class="form-outline">
+                                            <label th:errors="*{maxSalary}" class="form-label text-danger"
+                                                   for="maxSalary">Max Salary error</label>
+                                            <input th:field="*{maxSalary}" type="number" id="maxSalary"
+                                                   class="form-control form-control-lg"/>
+                                            <label class="form-label" for="maxSalary">Max Salary</label>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <div class="row" th:fragment="hybrid-row">
                                     <div class="col-12 mb-4">
                                         <div data-mdb-input-init class="form-outline">
-                                            <label class="form-label" for="positionTitle">
+                                            <label class="form-label" for="maxSalary">
                                                 Hybrid
                                             </label>
                                             <!-- Hidden input to ensure "false" is submitted if the checkbox is not checked -->
@@ -113,13 +134,47 @@
                                     </div>
                                 </div>
 
+                                <div class="row" th:fragment="status-row">
+                                    <div class="col-12 mb-4">
+                                        <div data-mdb-input-init class="form-outline">
+                                            <label th:errors="*{status}" class="form-label text-danger" for="maxSalary">Status error</label>
+                                            <select name="status" id="status" multiple th:field="*{status}">
+                                                <option th:text="${application.status}" th:value="${application.status}">Status</option>
+                                                <option th:unless="${application.status == 'Active'}" th:value="'Active'">Active</option>
+                                                <option th:unless="${application.status == 'Matched'}" th:value="'Matched'">Archived</option>
+                                                <option th:unless="${application.status == 'Hidden'}" th:value="'Hidden'">Archived</option>
+                                                <option th:unless="${application.status == 'Private'}" th:value="'Private'">Archived</option>
+                                            </select>
+                                            <label class="form-label" for="maxSalary">Status</label>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="row">
                                     <div class="col-12 mb-4">
                                         <div data-mdb-input-init class="form-outline">
-                                            <select name="skills" id="skills" multiple th:field="*{skills}">
-                                                <option th:each="skill : ${AllSkills}" th:value="${skill.name}" th:text="${skill.name}"></option>
+                                            <select name="skills" id="skills" multiple th:field="*{skills}" class="nice-select">
+                                                <option th:each="skill : ${AllSkills}"
+                                                        th:value="${skill.name}"
+                                                        th:text="${skill.name}"
+                                                >
+
                                             </select>
-                                            <script th:replace="~{job_ad_create_form.html :: skills-script}"></script>
+                                            <script th:fragment="skills-script">
+                                                new MultiSelectTag('skills', {
+                                                    rounded: true,    // default true
+                                                    shadow: false,      // default false
+                                                    placeholder: 'Search', // default Search...
+                                                    tagColor: {
+                                                        textColor: '#fb266b',
+                                                        borderColor: '#fb266b',
+                                                        bgColor: 'rgba(251,38,107,0.08)',
+                                                    },
+                                                    onChange: function(values) {
+                                                        console.log(values)
+                                                    }
+                                                })  // id
+                                            </script>
                                             <label class="form-label">Skills</label>
                                         </div>
                                     </div>
@@ -142,27 +197,27 @@
                                     </div>
                                 </div>
 
-                                <script th:replace="~{user-register.html :: location-script}"></script>
+
                                 <script th:replace="~{job_ad_update_view.html :: show-location-script}"></script>
 
+                                <script th:replace="~{professional-details-update.html :: update-location-script}"></script>
+                                <script th:replace="~{professional-details-update.html :: update-location-script-addon}"></script>
+
                                 <label th:errors="*{locCountryIsoCode}" class="form-label text-danger"
-                                       for="positionTitle">Country error</label>
+                                       for="countryDiv">Country error</label>
                                 <div class="row" id="countryDiv">
                                     <div class="col-12 mb-4">
                                         <select th:field="*{locCountryIsoCode}" onchange="getCities(this.value)"
-                                                id="countriesSelect" name="select" style="display: none;">
-                                            <option value="">Location</option>
-                                            <option th:each="country : ${countries}" th:value="${country.iso2}"
-                                                    th:text="${country.name}">City
-                                            </option>
+                                                id="countriesSelect" name="select" style="display: block;">
+                                            <option th:text="Remote" th:value="Hm"></option>
+                                            <option th:unless="${currentCountry == 'Hm'}" th:text="${currentCountry}" th:value="${application.locCountryIsoCode}"></option>
+                                            <option th:each="country : ${countries}" th:value="${country.iso2}" th:text="${country.name}">City</option>
                                         </select>
                                         <div class="nice-select" tabindex="0">
-                                            <span class="current">Location</span>
+                                            <span class="current" th:text="${currentCountry}">Location</span>
                                             <ul class="list" style="max-height: 200px; overflow-y: auto">
-                                                <li class="option selected focus" data-value="">Location</li>
-                                                <li th:each="country : ${countries}" th:data-value="${country.iso2}"
-                                                    class="option" th:text="${country.name}" w>City
-                                                </li>
+                                                <li th:unless="${currentCountry == 'Hm'}" th:text="${currentCountry}" class="option selected focus" th:data-value="${application.locCountryIsoCode}"></li>
+                                                <li th:each="country : ${countries}" th:data-value="${country.iso2}" class="option" th:text="${country.name}">City</li>
                                             </ul>
                                         </div>
                                         <label class="form-label" for="countriesSelect">Country</label>
@@ -171,41 +226,37 @@
                                     </div>
                                 </div>
 
-                                <label th:errors="*{locCityId}" class="form-label text-danger" for="positionTitle">City
+                                <label th:errors="*{locCityId}" class="form-label text-danger" for="citiesDiv" th:unless="${application.locCityId == 'Hm'}">City
                                     error</label>
                                 <div id="citiesDiv" class="row" style="display: none">
                                     <div id="citiesCol" class="col-12 mb-4">
-                                        <select th:field="*{locCityId}" id="citiesSelect" name="select"
-                                                style="display: none;">
-                                            <option value="">City</option>
+                                        <select th:field="*{locCityId}" id="citiesSelect" name="select" style="display: none;">
+                                            <option th:text="${currentCity}" th:value="${application.locCityId}">City</option>
                                         </select>
                                         <div id="nice-select-cities" class="nice-select" tabindex="0">
-                                            <span id="currentText" class="current">City</span>
-                                            <ul id="citiesList" class="list"
-                                                style="max-height: 200px; overflow-y: auto">
-                                                <li class="option selected focus" data-value="">City</li>
+                                            <span th:text="${currentCity}" id="currentText" class="current">City</span>
+                                            <ul id="citiesList" class="list" style="max-height: 200px; overflow-y: auto">
+                                                <li th:text="${currentCity}" th:value="${application.locCityId}" class="option selected focus" data-value="">City</li>
                                             </ul>
                                         </div>
                                         <label class="form-label" for="citiesSelect">City</label>
                                     </div>
                                 </div>
 
-
                                 <div class="mt-0 pt-0">
                                     <input style="float: right; margin-left: 10px;" data-mdb-ripple-init class="btn btn-primary btn-lg"
-                                           type="submit" value="Create"/>
+                                           type="submit" value="Save"/>
                                 </div>
 
                                 <div class="d-lg-block" style="float: right">
                                     <a href="#"
-                                       th:href="@{/professionals/dashboard}"
+                                       th:href="@{/professionals/dashboard/job-applications/{id}(id=${applicationId})}"
                                        class="btn head-btn2" style="
                                                         padding-left: 25px;
                                                         padding-right: 25px;
                                                         padding-top: 26px;
                                                         padding-bottom: 26px;">Back</a>
                                 </div>
-
                             </form>
                         </div>
                     </div>

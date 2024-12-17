@@ -33,4 +33,5 @@ public class JobApplicationDtoIn {
     private boolean isHybrid;
 
     private String skills;
+    private Boolean remote;
 }
