@@ -279,6 +279,25 @@ public class ProfessionalsMvcController {
         }
     }
 
+    @GetMapping("/dashboard/skills/{id}")
+    public String getJobApplicationsBySkill(@PathVariable int id,
+                                            HttpSession session,
+                                            Model model) {
+        try {
+            rolesChecker(session);
+            model.addAttribute("jobApplications", jobApplicationService.getAllBySkill(skillService.getSkill(id)));
+            model.addAttribute("skill", skillService.getSkill(id));
+            return "job-applications-by-skill";
+
+        } catch (AuthenticationException e) {
+            return "redirect:/authentication/login";
+        } catch (AuthorizationException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
+        }
+    }
+
     @GetMapping("/dashboard/job-ads")
     public String getAllJobAds(@RequestParam(defaultValue = "0") int page,
                                @RequestParam(defaultValue = "7") int size,
@@ -446,6 +465,8 @@ public class ProfessionalsMvcController {
                     .fromDtoIn(applicationDtoIn, statusService, locationService, skillService);
 
             jobApplication.setProfessional(professional);
+
+            jobApplicationService.addJobApplication(jobApplication);
 
         } catch (AuthorizationException e) {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
