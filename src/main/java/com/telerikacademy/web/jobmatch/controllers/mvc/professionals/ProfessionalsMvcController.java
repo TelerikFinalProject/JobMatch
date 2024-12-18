@@ -131,7 +131,14 @@ public class ProfessionalsMvcController {
             }
 
             List<JobApplication> jobApplications = jobApplicationService.getJobApplications(new JobApplicationFilterOptions(null, null, professional.getUsername(), null, null, null));
-            model.addAttribute("jobApplications", jobApplications);
+
+            if (!jobApplications.isEmpty()) {
+                List<JobApplication> limitedJobAds = jobApplications.subList(0, Math.min(2, jobApplications.size()));
+                model.addAttribute("jobApplications", limitedJobAds);
+            } else {
+                model.addAttribute("jobApplications", jobApplications);
+            }
+
             model.addAttribute("professional", professional);
             return "professional-details";
 
@@ -210,7 +217,13 @@ public class ProfessionalsMvcController {
             ProfessionalDetailsDto professionalDetailsDto = ProfessionalMappers.INSTANCE.toProfessionalDetailsDto(professional);
             List<JobApplication> jobApplications = jobApplicationService.getJobApplications(new JobApplicationFilterOptions(null, null, professional.getUsername(), null, null, null));
 
-            model.addAttribute("jobApplications", jobApplications);
+            if (!jobApplications.isEmpty()) {
+                List<JobApplication> limitedJobAds = jobApplications.subList(0, Math.min(2, jobApplications.size()));
+                model.addAttribute("jobApplications", limitedJobAds);
+            } else {
+                model.addAttribute("jobApplications", jobApplications);
+            }
+
             model.addAttribute("professional", professional);
             model.addAttribute("professionalDetails", professionalDetailsDto);
             model.addAttribute("countries", locationService.getAllCountries());
@@ -241,6 +254,13 @@ public class ProfessionalsMvcController {
             checkIfLoggedUserIsOwner(session, professional);
 
             List<JobApplication> jobApplications = jobApplicationService.getJobApplications(new JobApplicationFilterOptions(null, null, professional.getUsername(), null, null, null));
+
+            if (!jobApplications.isEmpty()) {
+                List<JobApplication> limitedJobAds = jobApplications.subList(0, Math.min(2, jobApplications.size()));
+                model.addAttribute("jobApplications", limitedJobAds);
+            } else {
+                model.addAttribute("jobApplications", jobApplications);
+            }
 
             if (bindingResult.hasErrors()) {
                 model.addAttribute("jobApplications", jobApplications);

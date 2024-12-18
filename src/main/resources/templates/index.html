@@ -128,7 +128,7 @@
                         <div th:if="${!isAuthenticated or (session?.userRole != null and session?.userRole.equals('PROFESSIONAL'))}" class="single-job-items mb-30" th:each="featuredJob : ${featuredJobs}">
                             <div class="job-items">
                                 <div class="company-img">
-                                    <a href="#"><img class="profile-picture" th:src="${featuredJob.getEmployer().getProfilePictureUrl()}" src="/img/icon/job-list1.png" alt=""></a>
+                                    <a href="#"><img class="company-profile-picture" th:src="${featuredJob.getEmployer().getProfilePictureUrl()}" src="/img/icon/job-list1.png" alt=""></a>
                                 </div>
                                 <div class="job-tittle job-tittle2">
                                     <a href="#" th:href="@{/professionals/dashboard/job-ads/{id}(id=${featuredJob.id})}">
@@ -162,7 +162,7 @@
                              th:each="jobApplication : ${featuredJobs}">
                             <div class="job-items">
                                 <div class="company-img">
-                                    <a href="#"><img class="profile-picture" th:src="@{${jobApplication.professional.profilePictureUrl}}" src="/img/icon/job-list1.png" alt=""></a>
+                                    <a href="#"><img class="professional-profile-picture" th:src="@{${jobApplication.professional.profilePictureUrl}}" src="/img/icon/job-list1.png" alt=""></a>
                                 </div>
                                 <div class="job-tittle job-tittle2">
                                     <a href="#"
@@ -305,7 +305,7 @@
                                     <!-- founder -->
                                     <div class="testimonial-founder  ">
                                         <div class="founder-img mb-30">
-                                            <img class="profile-picture" src="https://res.cloudinary.com/dcfdrw08u/image/upload/v1733837537/Default-Profile-Picture-PNG-Image-Background_l5oru0.png" alt="">
+                                            <img class="professional-profile-picture" src="https://res.cloudinary.com/dcfdrw08u/image/upload/v1733837537/Default-Profile-Picture-PNG-Image-Background_l5oru0.png" alt="">
                                             <span>Simon Ankov</span>
                                             <p>Java Developer</p>
                                         </div>

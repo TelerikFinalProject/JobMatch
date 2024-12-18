@@ -41,8 +41,17 @@ svg {
 .company-img {
     text-align: center;
 }
-.profile-picture {
+.company-profile-picture {
     width: 85px;
     display: inline-block;
     border: 1px solid #a8ade5
+}
+
+.professional-profile-picture {
+    height: 120px;
+    width: 80px;
+    display: inline-block;
+    border: 1px solid #a8ade5;
+    object-fit: cover; /* Maintain aspect ratio and fill the container */
+    object-position: top; /* Show the top part of the image */
 }

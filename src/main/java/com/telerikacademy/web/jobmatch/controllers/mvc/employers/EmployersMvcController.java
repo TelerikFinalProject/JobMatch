@@ -130,7 +130,7 @@ public class EmployersMvcController {
             List<JobAd> jobAds = jobAdService.getJobAds(new JobAdFilterOptions(null, null, null, null, employer.getCompanyName(), "Active", null));
 
             if (!jobAds.isEmpty()) {
-                List<JobAd> limitedJobAds = jobAds.subList(0, Math.min(3, jobAds.size()));
+                List<JobAd> limitedJobAds = jobAds.subList(0, Math.min(2, jobAds.size()));
                 model.addAttribute("jobAds", limitedJobAds);
             } else {
                 model.addAttribute("jobAds", jobAds);
@@ -220,7 +220,13 @@ public class EmployersMvcController {
             EmployerDetailsDto employerDetailsDto = EmployerMappers.INSTANCE.toEmployerDetailsDto(employer);
             List<JobAd> jobAds = jobAdService.getJobAds(new JobAdFilterOptions(null, null, null, null, employer.getCompanyName(), null, null));
 
-            model.addAttribute("jobAds", jobAds);
+            if (!jobAds.isEmpty()) {
+                List<JobAd> limitedJobAds = jobAds.subList(0, Math.min(2, jobAds.size()));
+                model.addAttribute("jobAds", limitedJobAds);
+            } else {
+                model.addAttribute("jobAds", jobAds);
+            }
+
             model.addAttribute("employer", employer);
             model.addAttribute("employerDetails", employerDetailsDto);
             model.addAttribute("countries", locationService.getAllCountries());
@@ -250,6 +256,13 @@ public class EmployersMvcController {
             checkIfLoggedUserIsOwner(session, employer);
 
             List<JobAd> jobAds = jobAdService.getJobAds(new JobAdFilterOptions(null, null, null, null, employer.getCompanyName(), null, null));
+
+            if (!jobAds.isEmpty()) {
+                List<JobAd> limitedJobAds = jobAds.subList(0, Math.min(3, jobAds.size()));
+                model.addAttribute("jobAds", limitedJobAds);
+            } else {
+                model.addAttribute("jobAds", jobAds);
+            }
 
             if (bindingResult.hasErrors()) {
                 model.addAttribute("jobAds", jobAds);
