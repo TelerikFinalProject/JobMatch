@@ -146,7 +146,7 @@
                     <div class="single-job-items mb-30" th:each="featuredJob : ${featuredJobs}">
                         <div class="job-items">
                             <div class="company-img">
-                                <a href="#"><img class="profile-picture" th:src="${featuredJob.getEmployer().getProfilePictureUrl()}" src="/img/icon/job-list1.png" alt=""></a>
+                                <a th:href="@{'/employers/' + ${featuredJob.employer.id}}"><img class="profile-picture" th:src="${featuredJob.getEmployer().getProfilePictureUrl()}" src="/img/icon/job-list1.png" alt=""></a>
                             </div>
                             <div class="job-tittle job-tittle2">
                                 <a href="#" th:href="@{/professionals/dashboard/job-ads/{id}(id=${featuredJob.id})}">
