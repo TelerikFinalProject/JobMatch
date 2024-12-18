@@ -71,7 +71,7 @@
                             <div class="single-job-items mb-30" th:each="jobAd : ${jobAds}">
                                 <div class="job-items">
                                     <div class="company-img">
-                                        <a href="#"><img class="profile-picture" src="/img/icon/job-list1.png" th:src="${jobAd.getEmployer().getProfilePictureUrl()}" alt=""></a>
+                                        <a href="#"><img class="company-profile-picture" src="/img/icon/job-list1.png" th:src="${jobAd.getEmployer().getProfilePictureUrl()}" alt=""></a>
                                     </div>
                                     <form th:replace="~{mutual_fragments.html :: ads-listing}"></form>
                                 </div>

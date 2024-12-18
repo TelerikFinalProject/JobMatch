@@ -15,14 +15,14 @@
             <div class="card-body d-flex flex-column justify-content-center align-items-center" style="height: 100%;">
 
               <img th:unless="${session.userId == professional.id}" th:src="${professional.profilePictureUrl}" alt="avatar"
-                   class="profile-picture img-fluid" style="width: 150px;">
+                   class="professional-profile-picture img-fluid" style="width: 150px;">
 
               <div th:if="${session.userId == professional.id}">
                 <form th:action="@{'/upload/profile-picture/' + ${session.userId}}" method="post" enctype="multipart/form-data">
                   <input type="file" id="fileInput" name="profilePicture" style="display: none;" onchange="this.form.submit()">
                   <button style="all: unset; cursor: pointer;" type="button" onclick="document.getElementById('fileInput').click()">
                     <img th:src="${professional.profilePictureUrl}" alt="avatar"
-                         class="profile-picture img-fluid" style="width: 150px;">
+                         class="professional-profile-picture img-fluid" style="height: 160px; width: 150px;">
                   </button>
                 </form>
               </div>
@@ -42,7 +42,7 @@
               <div class="col-xl-15">
                 <p style="padding-left:30px; padding-top: 20px; margin-bottom: 0" class="white-bg text-heading">Featured Applications</p>
                 <!-- single-job-content -->
-                <div class="white-bg single-job-items mb-30" th:each="jobApplication : ${jobApplications}">
+                <div class="white-bg single-job-items" th:each="jobApplication : ${jobApplications}">
                   <div class="job-items">
                     <div class="job-tittle">
 
@@ -90,7 +90,7 @@
           <div class="row">
             <div class="col-md-6 mb-3">
               <div class="card mb-4 mb-md-0">
-                <div class="card-body" style="max-height: 400px;">
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
                   <p class="mb-4 text-heading">Summary</p>
                   <p th:text="${professional.summary}" class="mb-1" style="font-size: 1rem;">Summary</p>
                 </div>
