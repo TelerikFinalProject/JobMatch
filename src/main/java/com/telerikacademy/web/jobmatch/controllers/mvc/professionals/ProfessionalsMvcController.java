@@ -446,6 +446,7 @@ public class ProfessionalsMvcController {
                     .fromDtoIn(applicationDtoIn, statusService, locationService, skillService);
 
             jobApplication.setProfessional(professional);
+            jobApplicationService.addJobApplication(jobApplication);
 
         } catch (AuthorizationException e) {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());

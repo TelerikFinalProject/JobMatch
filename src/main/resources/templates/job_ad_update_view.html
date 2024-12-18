@@ -197,12 +197,7 @@
                       <label class="form-label" for="remote">
                         Remote
                       </label>
-
-                      <!-- Hidden input to ensure "false" is submitted if checkbox is not checked -->
-                      <input type="hidden" name="remote" value="false">
-
-                      <!-- Checkbox to submit "true" if selected and bind to the "remote" field -->
-                      <input type="checkbox" id="remote" th:field="*{remote}" value="true"
+                      <input type="checkbox" id="remote" th:field="*{remote}"
                              onclick="updateLocationVisibility()">
                       <span class="checkmark"></span> <!-- Custom checkmark span -->
                     </div>
@@ -260,7 +255,7 @@
                   </div>
                 </div>
 
-                <label th:errors="*{locCityId}" class="form-label text-danger" for="positionTitle" th:unless="${ad.locCityId == 'Hm'}">City
+                <label th:errors="*{locCityId}" class="form-label text-danger" for="positionTitle">City
                   error</label>
                 <div id="citiesDiv" class="row" style="display: none">
                   <div id="citiesCol" class="col-12 mb-4">
@@ -268,7 +263,7 @@
                       <option th:text="${currentCity}" th:value="${ad.locCityId}">City</option>
                     </select>
                     <div id="nice-select-cities" class="nice-select" tabindex="0">
-                      <span th:text="${currentCity}" id="currentText" class="current">City</span>
+                      <span th:text="${currentCity}" th:value="${ad.locCityId}" id="currentText" class="current">City</span>
                       <ul id="citiesList" class="list" style="max-height: 200px; overflow-y: auto">
                         <li th:text="${currentCity}" th:value="${ad.locCityId}" class="option selected focus" data-value="">City</li>
                       </ul>

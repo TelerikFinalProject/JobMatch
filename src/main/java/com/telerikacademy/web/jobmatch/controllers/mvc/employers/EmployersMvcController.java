@@ -461,6 +461,8 @@ public class EmployersMvcController {
 
             jobAd.setEmployer(employer);
 
+            jobAdService.createJobAd(jobAd);
+
         } catch (AuthorizationException e) {
             model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
             model.addAttribute("error", e.getMessage());
@@ -549,7 +551,7 @@ public class EmployersMvcController {
             model.addAttribute("countries", locationService.getAllCountries());
             model.addAttribute("AllSkills", skillService.getAllSkills());
             model.addAttribute("currentCountry", locationService.getCountryByIsoCode(jobAd.getLocation().getIsoCode()).getName());
-            model.addAttribute("currentCity", locationService.getLocationById(jobAdDtoUpdate.getLocCityId()).getName());
+            model.addAttribute("currentCity", locationService.getLocationById(jobAd.getLocation().getId()).getName());
 
             return "job_ad_update_view";
 
@@ -571,6 +573,8 @@ public class EmployersMvcController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("AllSkills", skillService.getAllSkills());
             model.addAttribute("countries", locationService.getAllCountries());
+            model.addAttribute("currentCountry", locationService.getCountryByIsoCode(jobAdDtoUpdate.getLocCountryIsoCode()).getName());
+            model.addAttribute("currentCity", locationService.getLocationById(jobAdDtoUpdate.getLocCityId()).getName());
             return "job_ad_update_view";
         }
 

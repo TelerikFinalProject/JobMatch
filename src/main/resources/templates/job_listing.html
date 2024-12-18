@@ -46,7 +46,7 @@
                         </div>
                     </div>
                     <!-- Job Category Listing start -->
-                    <form th:action="@{/professionals/job-ads}" method="get" th:object="${jobAdFilterOptions}">
+                    <form th:action="@{/professionals/dashboard/job-ads}" method="get" th:object="${jobAdFilterOptions}">
                         <form th:replace="~{professionals_view_fragments.html :: job-ads-filter-bar-public}"></form>
                     </form>
                     <!-- Job Category Listing End -->
@@ -130,7 +130,7 @@
                                 <!-- Previous Button -->
                                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                                     <a class="page-link"
-                                       th:href="@{/professionals/job-ads(page=${currentPage - 1}, size=7,
+                                       th:href="@{/professionals/dashboard/job-ads(page=${currentPage - 1}, size=7,
                                        minSalary=${filterOptions.minSalary},
                                        maxSalary=${filterOptions.maxSalary},
                                        location=${filterOptions.location},
@@ -145,7 +145,7 @@
                                 <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                                     th:classappend="${currentPage == i} ? 'active'">
                                     <a class="page-link"
-                                       th:href="@{/professionals/job-ads(page=${i}, size=7,
+                                       th:href="@{/professionals/dashboard/job-ads(page=${i}, size=7,
                                        minSalary=${filterOptions.minSalary},
                                        maxSalary=${filterOptions.maxSalary},
                                        location=${filterOptions.location},
@@ -157,7 +157,7 @@
                                 <!-- Next Button -->
                                 <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
                                     <a class="page-link"
-                                       th:href="@{/professionals/job-ads(page=${currentPage + 1}, size=7,
+                                       th:href="@{/professionals/dashboard/job-ads(page=${currentPage + 1}, size=7,
                                        minSalary=${filterOptions.minSalary},
                                        maxSalary=${filterOptions.maxSalary},
                                        location=${filterOptions.location},

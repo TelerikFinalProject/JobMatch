@@ -157,7 +157,7 @@
                                                 <option th:each="skill : ${AllSkills}"
                                                         th:value="${skill.name}"
                                                         th:text="${skill.name}"
-                                                >
+                                                        th:selected="${application.skills != null and #lists.contains(application.skills.split(','), skill.name)}">
 
                                             </select>
                                             <script th:fragment="skills-script">
@@ -186,12 +186,8 @@
                                             <label class="form-label" for="remote">
                                                 Remote
                                             </label>
-
-                                            <!-- Hidden input to ensure "false" is submitted if checkbox is not checked -->
-                                            <input type="hidden" name="remote" value="false">
-
-                                            <!-- Checkbox to submit "true" if selected and bind to the "remote" field -->
-                                            <input type="checkbox" id="remote" th:field="*{remote}" value="true" onclick="updateLocationVisibility()">
+                                            <input type="checkbox" id="remote" th:field="*{remote}"
+                                                   onclick="updateLocationVisibility()">
                                             <span class="checkmark"></span> <!-- Custom checkmark span -->
                                         </div>
                                     </div>
@@ -210,28 +206,27 @@
                                         <select th:field="*{locCountryIsoCode}" onchange="getCities(this.value)"
                                                 id="countriesSelect" name="select" style="display: block;">
                                             <option th:text="Remote" th:value="Hm"></option>
-                                            <option th:unless="${currentCountry == 'Hm'}" th:text="${currentCountry}" th:value="${application.locCountryIsoCode}"></option>
+                                            <option th:text="${currentCountry}" th:value="${application.locCountryIsoCode}"></option>
                                             <option th:each="country : ${countries}" th:value="${country.iso2}" th:text="${country.name}">City</option>
                                         </select>
                                         <div class="nice-select" tabindex="0">
                                             <span class="current" th:text="${currentCountry}">Location</span>
                                             <ul class="list" style="max-height: 200px; overflow-y: auto">
-                                                <li th:unless="${currentCountry == 'Hm'}" th:text="${currentCountry}" class="option selected focus" th:data-value="${application.locCountryIsoCode}"></li>
+                                                <li th:text="${currentCountry}" class="option selected focus" th:data-value="${application.locCountryIsoCode}"></li>
                                                 <li th:each="country : ${countries}" th:data-value="${country.iso2}" class="option" th:text="${country.name}">City</li>
                                             </ul>
                                         </div>
                                         <label class="form-label" for="countriesSelect">Country</label>
                                         <br>
-                                        <span class="note-text">Leave Location Empty if Ad will be remote</span>
                                     </div>
                                 </div>
 
-                                <label th:errors="*{locCityId}" class="form-label text-danger" for="citiesDiv" th:unless="${application.locCityId == 'Hm'}">City
+                                <label th:errors="*{locCityId}" class="form-label text-danger" for="citiesDiv">City
                                     error</label>
                                 <div id="citiesDiv" class="row" style="display: none">
                                     <div id="citiesCol" class="col-12 mb-4">
                                         <select th:field="*{locCityId}" id="citiesSelect" name="select" style="display: none;">
-                                            <option th:text="${currentCity}" th:value="${application.locCityId}">City</option>
+                                            <option th:value="${application.locCityId}" th:text="${currentCity}" selected>City</option>
                                         </select>
                                         <div id="nice-select-cities" class="nice-select" tabindex="0">
                                             <span th:text="${currentCity}" id="currentText" class="current">City</span>
