@@ -145,6 +145,10 @@ public class EmployersMvcController {
             return "error-view";
         } catch (AuthenticationException e) {
             return "redirect:/authentication/login";
+        } catch (EntityNotFoundException e) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            model.addAttribute("error", e.getMessage());
+            return "error-view";
         }
     }
 

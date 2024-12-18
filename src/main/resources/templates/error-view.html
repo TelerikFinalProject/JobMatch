@@ -1,10 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
+<head th:replace="~{head-fragment.html :: head('Error')}"></head>
 <head>
-    <meta charset="UTF-8">
-    <title>Error</title>
+    <style>
+        body {
+            background: rgb(1,11,29);
+            background: linear-gradient(0deg, rgba(1,11,29,1) 14%, rgba(9,9,121,0.68) 48%, rgba(255,255,255,1) 100%);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .error-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 3rem;
+            max-width: 600px;
+            margin: auto;
+        }
+        .error-title {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .error-message {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .btn-primary {
+            background-color: black;
+            border-color: rgba(1,11,29,1);
+        }
+        .btn-primary:hover {
+            background-color: rgba(9,9,121,0.68);
+            border-color: rgba(1,11,29,1);
+        }
+    </style>
 </head>
 <body>
-<h1>Error</h1>
+<div class="error-container">
+    <div th:text="${statusCode}" class="error-title">404</div>
+    <div th:text="${error}" class="error-message">Oops! The page you're looking for doesn't exist.</div>
+    <a th:href="@{/}" href="/" class="btn btn-primary btn-lg">Go Back to Home</a>
+</div>
 </body>
 </html>
