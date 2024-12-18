@@ -27,7 +27,6 @@ public class JobApplicationDtoIn {
     private Double maxSalary;
 
     private String locCountryIsoCode;
-
     private Integer locCityId;
 
     @NotNull(message = "Remote spec" + NULL_FIELD_ERROR)

@@ -135,12 +135,8 @@
                                             <label class="form-label" for="remote">
                                                 Remote
                                             </label>
-
-                                            <!-- Hidden input to ensure "false" is submitted if checkbox is not checked -->
-                                            <input type="hidden" name="remote" value="false">
-
-                                            <!-- Checkbox to submit "true" if selected and bind to the "remote" field -->
-                                            <input type="checkbox" id="remote" th:field="*{remote}" value="true" onclick="updateLocationVisibility()">
+                                            <input type="checkbox" id="remote" th:field="*{remote}"
+                                                   onclick="updateLocationVisibility()">
                                             <span class="checkmark"></span> <!-- Custom checkmark span -->
                                         </div>
                                     </div>

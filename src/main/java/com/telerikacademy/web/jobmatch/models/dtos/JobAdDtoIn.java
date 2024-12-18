@@ -37,9 +37,7 @@ public class JobAdDtoIn {
     private boolean hybrid;
 
     private String locCountryIsoCode;
-
     private Integer locCityId;
-
     private String skills;
     private Boolean remote;
 }
