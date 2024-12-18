@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,19 +33,26 @@ public class UploadMvcController {
     public String handleProfilePictureUpload(@PathVariable int id,
                                              HttpSession session,
                                              MultipartFile profilePicture,
-                                             HttpServletRequest request) {
+                                             HttpServletRequest request,
+                                             Model model) {
 
         if (session.getAttribute("currentUser") == null) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.value());
+            model.addAttribute("error", "You are not logged in");
             return "error-view";
         }
 
         if (profilePicture.isEmpty()) {
+            model.addAttribute("statusCode", HttpStatus.BAD_REQUEST.value());
+            model.addAttribute("error", "Provide a valid profile picture");
             return "error-view";
         }
 
         UserPrincipal user = userService.findByUsername(session.getAttribute("currentUser").toString());
 
         if (user.getId() != id) {
+            model.addAttribute("statusCode", HttpStatus.UNAUTHORIZED.value());
+            model.addAttribute("error", "Unauthorized user");
             return "error-view";
         }
 
@@ -52,6 +60,8 @@ public class UploadMvcController {
             uploadService.uploadImage(user.getId(), profilePicture);
 
         } catch (Exception e) {
+            model.addAttribute("statusCode", HttpStatus.INTERNAL_SERVER_ERROR.value());
+            model.addAttribute("error", e.getMessage());
             return "error-view";
         }
 

@@ -130,6 +130,8 @@ public class AuthenticationMvcController {
         ProfessionalDtoIn professionalFromSession = (ProfessionalDtoIn) session.getAttribute("professionalFromSession");
 
         if (professionalFromSession == null) {
+            model.addAttribute("statusCode", HttpStatus.BAD_REQUEST.value());
+            model.addAttribute("error", "Try again");
             return "error-view";
         } else {
             professionalDtoIn.setUsername(professionalFromSession.getUsername());
@@ -238,6 +240,8 @@ public class AuthenticationMvcController {
         EmployerDtoIn employerFromSession = (EmployerDtoIn) session.getAttribute("employerFromSession");
 
         if (employerFromSession == null) {
+            model.addAttribute("statusCode", HttpStatus.BAD_REQUEST.value());
+            model.addAttribute("error", "There was an error");
             return "error-view";
         } else {
             employerDtoIn.setUsername(employerFromSession.getUsername());
