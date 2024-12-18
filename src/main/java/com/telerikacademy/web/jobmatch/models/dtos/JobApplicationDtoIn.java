@@ -26,11 +26,7 @@ public class JobApplicationDtoIn {
     @Positive(message = SALARY_ERROR)
     private Double maxSalary;
 
-    @NotNull(message = "Country Iso code" + NULL_FIELD_ERROR)
-    @Size(min = 2, max = 3, message = "Please provide a country")
     private String locCountryIsoCode;
-
-    @NotNull(message = "City" + NULL_FIELD_ERROR)
     private Integer locCityId;
 
     @NotNull(message = "Remote spec" + NULL_FIELD_ERROR)
