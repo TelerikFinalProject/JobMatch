@@ -13,9 +13,9 @@
             <ul th:fragment="applications-lising-body">
                 <li th:unless="${jobApplication.qualifications.isEmpty()}">
                                                 <span th:each="qualification, iterStat : ${jobApplication.qualifications}">
-                                                <span th:if="${iterStat.index < 3}"
+                                                <span th:if="${iterStat.index < 2}"
                                                       th:text="${qualification.name}"></span>
-                                                    <span th:if="${iterStat.index < 2 && iterStat.index < (jobApplication.qualifications.size() - 1)}">, </span>
+                                                    <span th:if="${iterStat.index < 1 && iterStat.index < (jobApplication.qualifications.size() - 1)}">, </span>
                                                     </span>
 
                 </li>
