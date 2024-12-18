@@ -127,8 +127,15 @@ public class EmployersMvcController {
                 checkIfLoggedUserIsOwner(session, employer);
             }
 
-            List<JobAd> jobAds = jobAdService.getJobAds(new JobAdFilterOptions(null, null, null, null, employer.getCompanyName(), null, null));
-            model.addAttribute("jobAds", jobAds);
+            List<JobAd> jobAds = jobAdService.getJobAds(new JobAdFilterOptions(null, null, null, null, employer.getCompanyName(), "Active", null));
+
+            if (!jobAds.isEmpty()) {
+                List<JobAd> limitedJobAds = jobAds.subList(0, Math.min(3, jobAds.size()));
+                model.addAttribute("jobAds", limitedJobAds);
+            } else {
+                model.addAttribute("jobAds", jobAds);
+            }
+
             model.addAttribute("employer", employer);
             return "company-details";
 
@@ -176,8 +183,8 @@ public class EmployersMvcController {
 
             checkIfLoggedUserIsOwner(session, employer);
 
-            if (!passwordEncoder.matches(employer.getPassword(), passwordChangeDto.getPreviousPassword())) {
-                bindingResult.rejectValue("previousPassword", "Please provide your current password");
+            if (!passwordEncoder.matches(passwordChangeDto.getPreviousPassword(), employer.getPassword())) {
+                bindingResult.rejectValue("previousPassword", "password.error", "Please provide a valid previous password");
             }
 
             if (bindingResult.hasErrors()) {
@@ -460,6 +467,7 @@ public class EmployersMvcController {
             JobAd jobAd = JobAdMappers.INSTANCE.fromDtoIn(adDtoIn, locationService, statusService, skillService);
 
             jobAd.setEmployer(employer);
+            jobAdService.createJobAd(jobAd);
 
             jobAdService.createJobAd(jobAd);
 

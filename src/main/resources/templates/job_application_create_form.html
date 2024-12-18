@@ -81,11 +81,15 @@
                             <form id="registrationForm" method="post" action="#"
                                   th:action="@{/professionals/dashboard/job-applications/create}" th:object="${application}">
 
+                                <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors()}">
+                                    <ul>
+                                        <li th:each="error : ${#fields.errors('*')}" th:text="${error}"></li>
+                                    </ul>
+                                </div>
+
                                 <div class="row">
                                     <div class="col-12 mb-4">
                                         <div data-mdb-input-init class="form-outline">
-                                            <label th:errors="*{description}" class="form-label text-danger"
-                                                   for="positionTitle">Job Description error</label>
                                             <textarea th:field="*{description}" type="text" id="positionTitle"
                                                       class="form-control form-control-lg" oninput="resizeTextarea(this)"></textarea>
                                             <label class="form-label" for="positionTitle">Job Description</label>
@@ -145,8 +149,6 @@
                                 <script th:replace="~{user-register.html :: location-script}"></script>
                                 <script th:replace="~{job_ad_update_view.html :: show-location-script}"></script>
 
-                                <label th:errors="*{locCountryIsoCode}" class="form-label text-danger"
-                                       for="positionTitle">Country error</label>
                                 <div class="row" id="countryDiv">
                                     <div class="col-12 mb-4">
                                         <select th:field="*{locCountryIsoCode}" onchange="getCities(this.value)"
@@ -171,8 +173,6 @@
                                     </div>
                                 </div>
 
-                                <label th:errors="*{locCityId}" class="form-label text-danger" for="positionTitle">City
-                                    error</label>
                                 <div id="citiesDiv" class="row" style="display: none">
                                     <div id="citiesCol" class="col-12 mb-4">
                                         <select th:field="*{locCityId}" id="citiesSelect" name="select"

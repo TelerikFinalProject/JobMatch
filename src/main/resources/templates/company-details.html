@@ -33,30 +33,60 @@
               </div>
             </div>
           </div>
-          <div class="card mb-4 mb-lg-0">
-            <div class="card-body p-0">
-              <ul class="list-group list-group-flush rounded-3">
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                  <i class="fas fa-globe fa-lg text-warning"></i>
-                  <p class="mb-0">https://mdbootstrap.com</p>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                  <i class="fab fa-github fa-lg text-body"></i>
-                  <p class="mb-0">mdbootstrap</p>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                  <i class="fab fa-twitter fa-lg" style="color: #55acee;"></i>
-                  <p class="mb-0">@mdbootstrap</p>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                  <i class="fab fa-instagram fa-lg" style="color: #ac2bac;"></i>
-                  <p class="mb-0">mdbootstrap</p>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                  <i class="fab fa-facebook-f fa-lg" style="color: #3b5998;"></i>
-                  <p class="mb-0">mdbootstrap</p>
-                </li>
-              </ul>
+          <div class="container mt-5 text-center" th:if="${jobAds == null or jobAds.size() == 0}">
+            <h3 style="padding: 20px" class="text-muted white-bg text-center">No Active Ads</h3>
+          </div>
+          <div class="container mt-5" th:if="${jobAds != null and jobAds.size() != 0}">
+            <!-- Section Tittle -->
+            <div class="row justify-content-center">
+              <div class="col-xl-15">
+                <p style="padding-left:30px; padding-top: 20px; margin-bottom: 0" class="white-bg text-heading">Featured Ads</p>
+                <!-- single-job-content -->
+                <div class="white-bg single-job-items mb-30" th:each="jobAd : ${jobAds}">
+                  <div class="job-items">
+                    <div class="job-tittle">
+
+                      <a th:if="${session.userId == employer.id}" href="#"
+                         th:href="@{/employers/dashboard/job-ads/{id}(id=${jobAd.id})}">
+                        <h4 th:text="${jobAd.positionTitle}">Position Title</h4>
+                      </a>
+                      <a th:unless="${session.userId == employer.id}" href="#"
+                         th:href="@{/professionals/dashboard/job-ads/{id}(id=${jobAd.id})}">
+                        <h4 th:text="${jobAd.positionTitle}">Position Title</h4>
+                      </a>
+                      <ul>
+                        <li th:unless="${jobAd.skills.isEmpty()}">
+                                                <span th:each="skill, iterStat : ${jobAd.skills}">
+                                                <span th:if="${iterStat.index < 3}"
+                                                      th:text="${skill.name}"></span>
+                                                    <span th:if="${iterStat.index < 2 && iterStat.index < (jobAd.skills.size() - 1)}">, </span>
+                                                    </span>
+
+                        </li>
+
+                        <li>
+                          <i class="fas fa-map-marker-alt"></i>
+                          <!-- Case 1: Not 'Home' and not Hybrid -->
+                          <a th:if="${jobAd.location.name != 'Home' and !jobAd.hybrid}"
+                             th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode}"></a>
+
+                          <!-- Case 2: Not 'Home' and Hybrid -->
+                          <a th:if="${jobAd.location.name != 'Home' and jobAd.hybrid}"
+                             th:text="${jobAd.location.name + ', ' + jobAd.location.isoCode + ' (Hybrid)'}"></a>
+
+                          <!-- Case 3: Location is 'Home' -->
+                          <a th:if="${jobAd.location.name == 'Home'}">Remote</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="f-right">
+                    <a th:text="${#numbers.formatDecimal(jobAd.minSalary, 0, 0)} + ' - ' + ${#numbers.formatDecimal(jobAd.maxSalary, 0, 0)}"></a>
+                    <span></span>
+                  </div>
+                </div>
+                <!-- single-job-content -->
+              </div>
             </div>
           </div>
         </div>
